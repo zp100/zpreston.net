@@ -3,7 +3,7 @@ import flask
 import re
 
 # Import modules.
-from utils import db_control
+from api._utils import db_control
 
 # App setup.
 app = flask.Flask(__name__)
