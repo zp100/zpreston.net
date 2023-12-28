@@ -4,5 +4,9 @@
       "includeFiles": "_utils/**"
     }
   },
-  "routes": [{ "src": "/", "dest": "api/index.py" }]
+  "rewrites": [
+
+    { "source": "/(.*)", "destination": "/api/index" }
+
+  ]
 }
