@@ -29,5 +29,5 @@ Once the local Flask server is running, access it by going to http://127.0.0.1:5
 -   Style: [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS), [Bootstrap 5.3](https://getbootstrap.com/docs/5.3/).
 -   Client-side code (frontend): [JavaScript ES6](https://developer.mozilla.org/en-US/docs/Web/JavaScript) (vanilla), [YouTube player API](https://developers.google.com/youtube/iframe_api_reference).
 -   Server-side code (backend): [Python 3.10](https://www.python.org/downloads/release/python-3100/) with [Flask 3.0](https://flask.palletsprojects.com/en/3.0.x/).
--   Website hosting: [Vercel](https://vercel.com/) directly hosting [this repository](https://github.com/zp100/zpreston.net).
+-   Website hosting: [Vercel](https://vercel.com/) directly hosting this repository.
 -   Domain control: [Namecheap](https://www.namecheap.com/).
