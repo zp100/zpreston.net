@@ -1,0 +1,89 @@
+<!-- YouTune main page. -->
+{% extends 'base.html' %}
+{% block icon %}
+  <link rel="icon" href="{{ url_for('static', filename='images/YouTune_icon.png') }}">
+{% endblock %}
+{% block title %}
+  <title>{{ username }}'s tracks | YouTune</title>
+{% endblock %}
+{% block stylesheets %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/setup.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/effects.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/custom.css') }}"/>
+{% endblock %}
+{% block scripts %}
+  <script src="https://www.youtube.com/player_api"></script>
+  <script src="{{ url_for('static', filename='src/init.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/generate_options.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/generate_lists.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/callbacks.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/actions.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/loading.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/youtube_iframe.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/token_compiler.js') }}"></script>
+{% endblock %}
+
+<!-- Content. -->
+{% block content %}
+  <!-- Whole page contents as one movable block. -->
+  <div class="page-box">
+    <!-- Video and options (left box). -->
+    <div id="sidebar-box" class="sidebar-box">
+      <!-- Video and placeholder. -->
+      <div id="video" class="video-box" hidden=1></div>
+      <div id="video-placeholder" class="video-box">
+        <img class="placeholder-box" src="{{ url_for('static', filename='images/YouTune_placeholder.png') }}" alt="YouTune logo placeholder">
+      </div>
+
+      <!-- View list selection. -->
+      <div id="view-box" class="view-box">
+        <label for="view">View&nbsp;list:&nbsp;&nbsp; </label>
+        <select name="view">
+          <option value="song-list-tab">Mix</option>
+          <option value="queue-tab">Queue</option>
+          <option value="sorted-tab">All tracks</option>
+          <option value="recent-tab">Recent</option>
+        </select>
+      </div>
+
+      <!-- Options tab selection. -->
+      <div id="options-tab-box" class="options-tab-box">
+        <button name="mix-tab" class="mini" title="Mix tracks">🎶</button>
+        <button name="new-tab" class="mini" title="Add track">➕</button>
+        <button name="edit-tab" class="mini" title="Edit track" disabled>✏️</button>
+        <!-- <button name="results-tab" class="mini" title="Edit results">📜</button> -->
+        <button name="account-tab" class="mini" title="Account">👤</button>
+        <button name="info-tab" class="mini" title="Option info">❓</button>
+      </div>
+
+      <!-- Options tabs. -->
+      <div id="options-box" class="options-box"></div>
+    </div>
+
+    <!-- Song list (right box). -->
+    <div id="list-box" class="list-box"></div>
+
+    <!-- Jump buttons. -->
+    <div id="jump-box" class="jump-box">
+      <button name="jump-top" class="mini" title="Jump to top">⇑</button>
+      <br>
+      <button name="jump-selected" class="mini" title="Jump to playing track">🎶</button>
+      <br>
+      <button name="jump-bottom" class="mini" title="Jump to bottom">⇓</button>
+    </div>
+  </div>
+
+  <!-- Scripts run after page loads. -->
+  <script>
+    init(
+      {{ username|tojson }},
+      {{ user_data|tojson }},
+      {{ url_for('logout')|tojson }},
+      {{ url_for('database')|tojson }},
+      {{ url_for('extra_lists')|tojson }},
+      {{ url_for('password')|tojson }},
+      {{ url_for('login')|tojson }},
+      {{ url_for('static', filename='src/video_fade.js')|tojson }}
+    )
+  </script>
+{% endblock %}

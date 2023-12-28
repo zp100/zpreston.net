@@ -1,0 +1,85 @@
+/* Fix heights for inputs. */
+button, input {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+select {
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+/* Effects for inputs. */
+button, input, select {
+    width: 100%;
+    margin-right: 0.1rem;
+    background-color: var(--darker-gray);
+    color: var(--light-gray);
+    border-color: var(--dark-gray);
+    border-style: solid;
+    border-radius: 0.2rem;
+}
+button.mini {
+    width: 1.6rem;
+    font-size: small;
+    color: transparent;
+    text-shadow: 0 0 0 var(--light-gray)
+}
+button.song-button {
+    background-color: transparent;
+    color: white;
+    border-color: transparent;
+    border-radius: 0.5rem;
+    padding: 0;
+}
+
+/* Effects for selected inputs. */
+button.selected, button:hover, input:focus, select:focus {
+    background-color: var(--mid-gray);
+    color: var(--light-gray);
+    border-color: var(--mid-gray);
+}
+button.mini.selected, button.mini:hover {
+    color: transparent;
+    text-shadow: 0 0 0 var(--light-gray)
+}
+button.song-button.selected, button.song-button:hover {
+    background-color: var(--darker-gray);
+    color: white;
+    border-color: transparent;
+}
+
+/* Effects for clicked buttons. */
+button:active {
+    background-color: var(--light-gray);
+    color: var(--mid-gray);
+    border-color: var(--light-gray);
+}
+button.mini:active {
+    color: transparent;
+    text-shadow: 0 0 0 var(--dark-gray)
+}
+button.song-button:active {
+    background-color: var(--dark-gray);
+}
+
+/* Effects for disabled buttons. */
+button:disabled {
+    background-color: var(--darker-gray);
+    color: var(--dark-gray);
+    border-color: var(--dark-gray);
+}
+button.mini:disabled {
+    color: transparent;
+    text-shadow: 0 0 0 var(--dark-gray);
+    border-color: var(--dark-gray);
+}
+
+/* Highlight text colors. */
+label, p {
+    color: var(--light-gray);
+}
+span.emph, input, select, input:focus, select:focus {
+    color: white;
+}

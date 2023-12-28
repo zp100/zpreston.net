@@ -1,0 +1,117 @@
+/* Size and arrangement for view selection. */
+div.view-box {
+    display: flex;
+    align-items: center;
+    margin-top: 3px;
+}
+
+/* Size and arrangement for options tab selection. */
+div.options-tab-box {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 3px;
+
+    button {
+        width: auto;
+        flex-grow: 1;
+    }
+}
+
+/* Size and arrangement for groups in options tabs. */
+section.group {
+    margin-top: 2.5rem;
+
+    div.item {
+        margin-top: 3px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+    }
+
+    div.field {
+        label {
+            flex-grow: 1;
+        }
+
+        input, select {
+            width: 100%;
+        }
+    }
+
+    div.main-info {
+        flex-wrap: nowrap;
+
+        span {
+            margin-right: 0.1rem;
+            white-space: nowrap;
+        }
+
+        span.main-name {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+/* Size and arrangement for song list items. */
+section.list-item {
+    display: flex;
+    line-height: 1.8;
+    margin-top: 3px;
+
+    button.song-button {
+        display: flex;
+        align-items: center;
+
+        div.song-text {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-start;
+            text-align: left;
+            font-size: large;
+        }
+
+    }
+
+    div.side-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+section.list-item.message {
+    display: block;
+    color: var(--light-gray);
+}
+
+/* Style for song indices. */
+span.song-index {
+    text-align: right;
+    display: inline-block;
+    min-width: 3rem;
+}
+
+/* Style for tags. */
+span.tag {
+    background-color: var(--dark-gray);
+    color: var(--light-gray);
+    border-radius: 0.2em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+}
+
+/* Positioning and style for "Jump" buttons. */
+.jump-box {
+    top: 0;
+    right: 0;
+    position: fixed;
+    background-color: var(--mid-gray);
+    border-radius: 0.2rem;
+
+    button {
+        margin: 0.1rem;
+    }
+}

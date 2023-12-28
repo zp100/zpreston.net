@@ -1,0 +1,32 @@
+<!-- Boilerplate. -->
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Header info. -->
+  <head>
+    <!-- Meta. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Page icon. -->
+    {% block icon %}{% endblock %}
+
+    <!-- Page title. -->
+    {% block title %}{% endblock %}
+
+    <!-- Style sheets. -->
+    <link rel="stylesheet" href="https://bootswatch.com/5/darkly/bootstrap.min.css">
+    {% block stylesheets %}{% endblock %}
+
+    <!-- Scripts. -->
+    {% block scripts %}{% endblock %}
+  </head>
+
+  <!-- Page. -->
+  <body>
+    <!-- Main content. -->
+    {% block content %}{% endblock %}
+
+    <!-- Bootstrap JS. -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
