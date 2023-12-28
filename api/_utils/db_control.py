@@ -7,7 +7,7 @@ import json
 def init(app, edit_list):
     # Set the path to the database.
     global DATABASE_PATH
-    DATABASE_PATH = f"{app.static_folder}/database.json"
+    DATABASE_PATH = f"/tmp/database.json"
 
     # Set the users' editable properties in the database.
     global EDIT_LIST
