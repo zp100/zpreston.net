@@ -3,7 +3,8 @@ import bcrypt
 import psycopg2
 
 # Import modules.
-import pg_utils
+from api._utils import pg_errors
+from api._utils import pg_utils
 
 
 
@@ -29,7 +30,7 @@ def create_user(cur, username, password):
         ])
     except psycopg2.errors.UniqueViolation as exc:
         # Error.
-        raise pg_utils.DupUsersError(f"a user with the username \"{username}\" already exists")
+        raise pg_errors.DupUserError(f"a user with the username \"{username}\" already exists")
 
 
 
@@ -58,7 +59,7 @@ def update_user(cur, username, record):
     cur.execute("""
         update users
         set default_volume = %s, save_extra = %s
-        where username = %s;
+        where lower(username) = lower(%s);
     """, [
         record['default_volume'],
         record['save_extra'],
@@ -77,10 +78,51 @@ def delete_user(cur, username):
     cur.execute("""
         delete
         from users
-        where username = %s;
+        where lower(username) = lower(%s);
     """, [
         username,
     ])
+
+
+
+# Updates the password for the given user.
+@pg_utils.transaction
+def change_password(cur, username, password):
+    # Validate the user's data.
+    pg_utils.fetch_user(cur, username)
+
+    # Salt and hash the password, converting it to binary.
+    hash_password = bcrypt.hashpw(
+        bytes(password, 'utf-8'),
+        bcrypt.gensalt(),
+    )
+
+    # Update the user's password.
+    cur.execute("""
+        update users
+        set hash_password = %s
+        where lower(username) = lower(%s);
+    """, [
+        hash_password,
+        username,
+    ])
+
+
+
+# Checks if the password is correct for the given username.
+@pg_utils.transaction
+def is_valid_login(cur, username, password):
+    # Fetch and validate the user's data.
+    record = pg_utils.fetch_user(cur, username)
+
+    # Get the hashed password for this user.
+    hash_password = record['hash_password']
+
+    # Return whether or not the password matches.
+    return bcrypt.checkpw(
+        bytes(password, 'utf-8'),
+        hash_password,
+    )
 
 
 
@@ -123,7 +165,7 @@ def read_track(cur, track_id, owner):
     # Fetch and validate the tracks's data.
     record = pg_utils.fetch_track(cur, track_id, owner)
 
-    # Extract and return the relevant fields.
+    # Extract and return all fields.
     return {
         'track_id': record[0],
         'owner': record[1],
@@ -150,7 +192,7 @@ def update_track(cur, track_id, owner, record):
     cur.execute("""
         select index
         from tracks
-        where track_id = %s, owner = %s;
+        where track_id = %s, lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
@@ -170,7 +212,7 @@ def update_track(cur, track_id, owner, record):
     cur.execute("""
         update tracks
         set index = %s, title = %s, tags = %s, url = %s, volume = %s, start_time = %s, fade_in_sec = %s, fade_out_sec = %s, end_time = %s
-        where track_id = %s, owner = %s;
+        where track_id = %s, lower(owner) = lower(%s);
     """, [
         record['index'],
         record['title'],
@@ -197,7 +239,7 @@ def delete_track(cur, track_id, owner):
     cur.execute("""
         select index
         from tracks
-        where track_id = %s, owner = %s;
+        where track_id = %s, lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
@@ -211,8 +253,46 @@ def delete_track(cur, track_id, owner):
     cur.execute("""
         delete
         from tracks
-        where track_id = %s, owner = %s;
+        where track_id = %s, lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
     ])
+
+
+
+# Read all of a user's tracks from the "tracks" table.
+@pg_utils.transaction
+def get_all_tracks(cur, username):
+    # Validate the user's data.
+    pg_utils.fetch_user(cur, username)
+
+    # Query the user's tracks.
+    cur.execute("""
+        select *
+        from tracks
+        where lower(owner) = lower(%s);
+    """, [
+        username,
+    ])
+
+    # Loop through the records.
+    record_list = []
+    for record in cur:
+        # Extract all fields.
+        record_list.append({
+            'track_id': record[0],
+            'owner': record[1],
+            'index': record[2],
+            'title': record[3],
+            'tags': record[4],
+            'url': record[5],
+            'volume': record[6],
+            'start_time': record[7],
+            'fade_in_sec': record[8],
+            'fade_out_sec': record[9],
+            'end_time': record[10],
+        })
+
+    # Return the list of tracks.
+    return record_list

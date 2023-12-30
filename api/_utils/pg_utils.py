@@ -4,17 +4,8 @@ import psycopg2
 import psycopg2.extras
 import uuid
 
-
-
-# Custom exceptions.
-class DupUsersError(Exception):
-    pass
-
-class UsersError(Exception):
-    pass
-
-class TracksError(Exception):
-    pass
+# Import modules.
+from api._utils import pg_errors
 
 
 
@@ -42,7 +33,7 @@ def transaction(func):
                 # Use cursor context.
                 with conn.cursor() as cur:
                     # Execute queries.
-                    return func(cur, *args, **kwargs)
+                    ret = func(cur, *args, **kwargs)
         except Exception as exc:
             # If any exceptions occured, undo the changes.
             conn.rollback()
@@ -55,6 +46,9 @@ def transaction(func):
         finally:
             # Regardless of exceptions, close the connection.
             conn.close()
+        
+        # Return the wrapped function's return value.
+        return ret
 
     # Return the function.
     return inner
@@ -67,7 +61,7 @@ def fetch_user(cur, username):
     cur.execute("""
         select *
         from users
-        where username = %s;
+        where lower(username) = lower(%s);
     """, [
         username,
     ])
@@ -79,7 +73,7 @@ def fetch_user(cur, username):
         return record
     else:
         # Error.
-        raise UsersError(f"the user with the username \"{username}\" doesn't exist")
+        raise pg_errors.UsersError(f"the user with the username \"{username}\" doesn't exist")
 
 
 
@@ -99,7 +93,7 @@ def get_end_index(cur, owner):
     cur.execute("""
         select max(index)
         from tracks
-        where owner = %s;
+        where lower(owner) = lower(%s);
     """, [
         owner,
     ])
@@ -147,7 +141,7 @@ def add_index(cur, owner, index):
     cur.execute("""
         update tracks
         set index += 1
-        where owner = %s, index >= %s;
+        where lower(owner) = lower(%s), index >= %s;
     """, [
         owner,
         index,
@@ -161,7 +155,7 @@ def remove_index(cur, owner, index):
     cur.execute("""
         update tracks
         set index -= 1
-        where owner = %s, index >= %s;
+        where lower(owner) = lower(%s), index >= %s;
     """, [
         owner,
         index,
@@ -175,7 +169,7 @@ def fetch_track(cur, track_id, owner):
     cur.execute("""
         select *
         from tracks
-        where track_id = %s, owner = %s;
+        where track_id = %s, lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
@@ -188,4 +182,4 @@ def fetch_track(cur, track_id, owner):
         return record
     else:
         # Error.
-        raise TracksError(f"this track owned by \"{owner}\" doesn't exist")
+        raise pg_errors.TracksError(f"this track owned by \"{owner}\" doesn't exist")
