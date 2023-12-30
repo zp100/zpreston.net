@@ -19,6 +19,7 @@
   <script src="{{ url_for('static', filename='src/callbacks.js') }}"></script>
   <script src="{{ url_for('static', filename='src/actions.js') }}"></script>
   <script src="{{ url_for('static', filename='src/loading.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/to_server.js') }}"></script>
   <script src="{{ url_for('static', filename='src/youtube_iframe.js') }}"></script>
   <script src="{{ url_for('static', filename='src/token_compiler.js') }}"></script>
 {% endblock %}
@@ -76,13 +77,13 @@
   <!-- Scripts run after page loads. -->
   <script>
     init(
-      {{ username|tojson }},
-      {{ user_data|tojson }},
-      {{ url_for('logout')|tojson }},
-      {{ url_for('database')|tojson }},
-      {{ url_for('extra_lists')|tojson }},
-      {{ url_for('password')|tojson }},
-      {{ url_for('login')|tojson }},
+      {{ user_record|tojson }},
+      {{ track_list|tojson }},
+      {{ extra_lists|tojson }},
+      {{ url_for('session')|tojson }},
+      {{ url_for('user_record')|tojson }},
+      {{ url_for('tracks')|tojson }},
+      {{ url_for('reload_track_list')|tojson }},
       {{ url_for('static', filename='src/video_fade.js')|tojson }}
     )
   </script>

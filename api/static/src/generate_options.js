@@ -20,7 +20,7 @@ function generate_options_tabs() {
     add_options_tab_html('results-tab', group_list)
 
     // Add "Account" tab.
-    if (username === '<guest>') group_list = get_guest_items()
+    if (user_record.username === '<guest>') group_list = get_guest_items()
     else group_list = get_account_items()
     add_options_tab_html('account-tab', group_list)
 
@@ -252,7 +252,7 @@ function reload_options_tab(tab_id=null) {
         // "Account" tab.
         case 'account-tab': {
             // Check if the user is not a guest.
-            if (username !== '<guest>') {
+            if (user_record.username !== '<guest>') {
                 // Add values to options.
                 document.querySelector(`#account-tab input[name="default-volume"]`).value = default_volume
                 if (save_extra) {
@@ -719,7 +719,7 @@ function get_account_items() {
             {
                 'item_type': 'user',
                 'value': 'username',
-                'display': `Username: ${username}`,
+                'display': `Username: ${user_record.username}`,
             },
 
             // Log out button.

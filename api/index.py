@@ -60,23 +60,27 @@ def root():
 
 
 
-# Route function for session control. Might also update users.
+# Route function for session control. Can also update users.
 # Valid actions: 'login', 'signup', 'extra_lists', 'logout'
 @app.route('/session/', methods=['POST'])
 def session():
     # Cancel if the "action" argument wasn't provided.
     if 'action' not in flask.request.args:
         # Return error message.
-        return f"Error: No action provided. Posted URL was: {flask.request.url}"
+        return {
+            'error': f"No action provided. Posted URL was: {flask.request.url}",
+        }
 
     # Check which action was selected.
-    action = flask.request.args.get('action')
+    action = flask.request.args['action']
     if action == 'login':
         # Check if not all necessary fields were provided.
         if 'username' not in flask.request.json or \
         'password' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the username and password.
         username = flask.request.json['username']
@@ -85,7 +89,9 @@ def session():
         # Check if the login is invalid.
         if not postgresql.is_valid_login(username, password):
             # Return error message.
-            return 'Error: Incorrect username or password.'
+            return {
+                'error': f"Incorrect username or password.",
+            }
 
         # Log in.
         flask.session['username'] = username
@@ -94,7 +100,9 @@ def session():
         if 'username' not in flask.request.json or \
         'password' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the username and password.
         username = flask.request.json['username']
@@ -103,12 +111,16 @@ def session():
         # Check if the username is invalid.
         if not re.fullmatch(r"[\-0-9A-Z_a-z]{3,20}", username):
             # Return error message.
-            return 'Error: Invalid format for username.'
+            return {
+                'error': f"Invalid format for username.",
+            }
 
         # Check if the password is invalid.
         if not re.fullmatch(r".{6,64}", password):
             # Return error message.
-            return 'Error: Invalid format for password.'
+            return {
+                'error': f"Invalid format for password.",
+            }
 
         # Check if a user with that username already exists.
         try:
@@ -116,7 +128,9 @@ def session():
             postgresql.create_user(username, password)
         except pg_errors.DupUserError as exc:
             # Return error message.
-            return 'Error: Username already taken.'
+            return {
+                'error': f"Username already taken.",
+            }
 
         # Log in.
         flask.session['username'] = username
@@ -125,7 +139,9 @@ def session():
         if 'queue_key_list' not in flask.request.json or \
         'recent_key_list' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
         
         # Get the lists.
         queue_key_list = flask.request.json['queue_key_list']
@@ -142,10 +158,12 @@ def session():
     else:
         # Invalid action.
         # Return error message.
-        return f"Error: Invalid action \"{action}\"."
+        return {
+            'error': f"Invalid action \"{action}\".",
+        }
 
     # Return successful.
-    return ''
+    return {}
 
 
 
@@ -156,24 +174,30 @@ def user_record():
     # Cancel if the "action" argument wasn't provided.
     if 'action' not in flask.request.args:
         # Return error message.
-        return f"Error: No action provided. Posted URL was: {flask.request.url}"
+        return {
+            'error': f"No action provided. Posted URL was: {flask.request.url}",
+        }
 
     # Cancel if user is NOT logged in.
     if 'username' not in flask.session:
         # Return error message.
-        return "Error: Not logged in."
+        return {
+            'error': f"Not logged in.",
+        }
     
     # Get the user.
     username = flask.session['username']
 
     # Check which action was selected.
-    action = flask.request.args.get('action')
+    action = flask.request.args['action']
     if action == 'update_user':
         # Check if not all necessary fields were provided.
         if 'default_volume' not in flask.request.json or \
         'save_extra' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the settings.
         default_volume = flask.request.json['default_volume']
@@ -191,13 +215,17 @@ def user_record():
             postgresql.update_user(username, record)
         except pg_errors.UsersError as exc:
             # Return error message.
-            return f"Error: User \"{username}\" doesn't exist."
+            return {
+                'error': f"User \"{username}\" doesn't exist.",
+            }
     elif action == 'change_password':
         # Check if not all necessary fields were provided.
         if 'password' not in flask.request.json or \
         'new_password' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the old and new password.
         password = flask.request.json['password']
@@ -206,17 +234,23 @@ def user_record():
         # Check if the new password is blank.
         if new_password == '':
             # Return error message.
-            return 'Error: New password is blank.'
+            return {
+                'error': f"New password is blank.",
+            }
 
         # Check if the passwords are the same.
         if new_password == password:
             # Return error message.
-            return 'Error: New password is the same as current password.'
+            return {
+                'error': f"New password is the same as current password.",
+            }
 
         # Check if the old password is invalid.
         if not postgresql.is_valid_login(username, password):
             # Return error message.
-            return 'Error: Incorrect current password.'
+            return {
+                'error': f"Incorrect current password.",
+            }
 
         # Check if the user exists.
         try:
@@ -224,14 +258,18 @@ def user_record():
             postgresql.change_password(username, new_password)
         except pg_errors.UsersError as exc:
             # Return error message.
-            return f"Error: User \"{username}\" doesn't exist."
+            return {
+                'error': f"User \"{username}\" doesn't exist.",
+            }
     else:
         # Invalid action.
         # Return error message.
-        return f"Error: Invalid action \"{action}\"."
+        return {
+            'error': f"Invalid action \"{action}\".",
+        }
 
     # Return successful.
-    return ''
+    return {}
 
 
 
@@ -242,18 +280,22 @@ def tracks():
     # Cancel if the "action" argument wasn't provided.
     if 'action' not in flask.request.args:
         # Return error message.
-        return f"Error: No action provided. Posted URL was: {flask.request.url}"
+        return {
+            'error': f"No action provided. Posted URL was: {flask.request.url}",
+        }
 
     # Cancel if user is NOT logged in.
     if 'username' not in flask.session:
         # Return error message.
-        return "Error: Not logged in."
+        return {
+            'error': f"Not logged in.",
+        }
     
     # Get the user.
     username = flask.session['username']
 
     # Check which action was selected.
-    action = flask.request.args.get('action')
+    action = flask.request.args['action']
     if action == 'add':
         # Check if not all necessary fields were provided.
         if 'index' not in flask.request.json or \
@@ -266,7 +308,9 @@ def tracks():
         'fade_out_sec' not in flask.request.json or \
         'end_time' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the track options.
         index = flask.request.json['index']
@@ -307,7 +351,9 @@ def tracks():
         'fade_out_sec' not in flask.request.json or \
         'end_time' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the track options.
         track_id = flask.request.json['track_id']
@@ -340,12 +386,16 @@ def tracks():
             postgresql.update_track(track_id, username, record)
         except pg_errors.TracksError as exc:
             # Return error message.
-            return f"Error: Track doesn't exist."
+            return {
+                'error': f"Track doesn't exist.",
+            }
     elif action == 'delete':
         # Check if not all necessary fields were provided.
         if 'track_id' not in flask.request.json:
             # Return error message.
-            return f"Error: Not all fields provided."
+            return {
+                'error': f"Not all fields provided.",
+            }
 
         # Get the track's ID.
         track_id = flask.request.json['track_id']
@@ -356,11 +406,45 @@ def tracks():
             postgresql.delete_track(track_id, username)
         except pg_errors.TracksError as exc:
             # Return error message.
-            return f"Error: Track doesn't exist."
+            return {
+                'error': f"Track doesn't exist.",
+            }
     else:
         # Invalid action.
         # Return error message.
-        return f"Error: Invalid action \"{action}\"."
+        return {
+            'error': f"Invalid action \"{action}\".",
+        }
 
     # Return successful.
-    return ''
+    return {}
+
+
+
+# Route function for reloading the track list.
+@app.route('/reload_track_list/', methods=['GET'])
+def reload_track_list():
+    # Cancel if user is NOT logged in.
+    if 'username' not in flask.session:
+        # Return error message.
+        return {
+            'error': f"Not logged in.",
+        }
+
+    # Get the user.
+    username = flask.session['username']
+
+    # Check if the user exists.
+    try:
+        # Load the user's tracks.
+        track_list = postgresql.get_all_tracks(username)
+    except pg_errors.UsersError as exc:
+        # Return error message.
+        return {
+            'error': f"User \"{username}\" doesn't exist.",
+        }
+    
+    # Return the tracks.
+    return {
+        'track_list': track_list,
+    }
