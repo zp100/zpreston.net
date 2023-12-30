@@ -30,7 +30,7 @@ def root():
             # Print the error and redirect to logout page.
             print(exc)
             return flask.redirect(
-                flask.url_for('logout')
+                flask.url_for('session', action='logout')
             )
 
         # Add extra lists if they're stored.

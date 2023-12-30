@@ -4,7 +4,7 @@
   <link rel="icon" href="{{ url_for('static', filename='images/YouTune_icon.png') }}">
 {% endblock %}
 {% block title %}
-  <title>{{ username }}'s tracks | YouTune</title>
+  <title>{{ user_record.username }}'s tracks | YouTune</title>
 {% endblock %}
 {% block stylesheets %}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/setup.css') }}"/>
