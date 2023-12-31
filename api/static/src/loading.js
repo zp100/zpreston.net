@@ -1,3 +1,25 @@
+// Gets the ID of the track at the given index.
+function id_from_index(index) {
+    // Get the track with the given index.
+    const track = track_list.find(item => item.index === index)
+
+    // Return its ID.
+    return track.track_id
+}
+
+
+
+// Gets the index of the track with the given track ID.
+function index_from_id(track_id) {
+    // Get the track with the given ID.
+    const track = track_list.find(item => item.track_id === track_id)
+
+    // Return its index.
+    return track.index
+}
+
+
+
 // Loads the next song based on the play mode.
 function load_next_song(mode) {
     // Get the filtered list of songs.
@@ -39,7 +61,7 @@ function load_next_song(mode) {
             if (queue_key_list.length > 0) {
                 // Play the next song in the queue.
                 key = queue_key_list.shift()
-                send_to_extra_lists()
+                to_server('extra_lists')
                 reload_all()
             }
         } break
@@ -55,7 +77,7 @@ function load_next_song(mode) {
                     let index = queue_key_list.indexOf(new_key)
                     queue_key_list.splice(index, 1)
                     key = new_key
-                    send_to_extra_lists()
+                    to_server('extra_lists')
                     reload_all()
                 }
             }
@@ -67,7 +89,7 @@ function load_next_song(mode) {
             if (queue_key_list.length > 0) {
                 // Play the next song in the queue.
                 key = queue_key_list.shift()
-                send_to_extra_lists()
+                to_server('extra_lists')
                 reload_all()
             } else {
                 // Choose a random song.
@@ -91,7 +113,7 @@ function load_next_song(mode) {
                     let index = queue_key_list.indexOf(new_key)
                     queue_key_list.splice(index, 1)
                     key = new_key
-                    send_to_extra_lists()
+                    to_server('extra_lists')
                     reload_all()
                 }
             } else {

@@ -336,8 +336,13 @@ def tracks():
             'end_time': end_time,
         }
 
-        # Add the track
-        postgresql.create_track(username, record)
+        # Add the track.
+        track_id = postgresql.create_track(username, record)
+
+        # Return the track ID.
+        return {
+            'track_id': track_id,
+        }
     elif action == 'save':
         # Check if not all necessary fields were provided.
         if 'track_id' not in flask.request.json or \

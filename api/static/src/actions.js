@@ -51,42 +51,21 @@ function do_mix_empty_queue() {
     reload_list_tab()
 
     // Store extra lists.
-    send_to_extra_lists()
+    to_server('extra_lists')
 }
 
 
 
 // Save the changes to the song.
 function do_new_save() {
-    // Get the entered values.
-    const song = {}
-    for (const field of ['url', 'title', 'tags', 'volume', 'start-time', 'fade-in-sec', 'fade-out-sec', 'end-time']) {
-        // Get the "Add track" tab input for each save field.
-        song[field] = document.querySelector(`#new-tab input[name="${field}"]`).value
-    }
-
-    // Add the new song.
-    all_songs.push(song)
-
-    // Add the new song's key.
-    edit_key = all_songs.length - 1
-    const new_index = Number(document.querySelector('#new-tab input[name="index"]').value) - 1
-    if (!Number.isNaN(new_index) && new_index > 0) {
-        // Add at the provided index.
-        song_key_list.splice(new_index, 0, edit_key)
-    } else {
-        // Add to the end of the list.
-        song_key_list.push(edit_key)
-    }
+    // Add the song.
+    to_server('add')
 
     // Open the new song to edit.
     switch_options_tab('edit-tab')
 
     // Reload the list.
     reload_list_tab()
-
-    // Update the database.
-    send_to_database()
 }
 
 
@@ -102,38 +81,21 @@ function do_edit_play() {
 
 
 
-// Queues a song
+// Queues a song.
 function do_edit_queue() {
     // Queue.
     add_to_queue(edit_key)
 
     // Store extra lists.
-    send_to_extra_lists()
+    to_server('extra_lists')
 }
 
 
 
-// Save the changes to the song.
+// Saves the changes to the song.
 function do_edit_save() {
-    // Get the entered values.
-    const song = {}
-    for (const field of ['url', 'title', 'tags', 'volume', 'start-time', 'end-time', 'fade-in-sec', 'fade-out-sec']) {
-        // Get the "Edit track" tab input for each save field.
-        song[field] = document.querySelector(`#edit-tab input[name="${field}"]`).value
-    }
-
     // Update the song.
-    const new_index = Number(document.querySelector('#edit-tab input[name="index"]').value) - 1
-    const new_key = update_song(edit_key, song, new_index)
-
-    // Check if the song being edited is the currently-playing song.
-    if (edit_key === key) {
-        // Update the key as well.
-        key = new_key
-    }
-
-    // Update the edit key.
-    edit_key = new_key
+    to_server('save')
 
     // Reload the list.
     reload_list_tab()
@@ -153,8 +115,32 @@ function do_edit_export() {
 
 // Deletes a song.
 function do_edit_delete() {
+    // Check if the song being deleted is the one currently playing.
+    if (key === edit_key) {
+        // Skip to the next song.
+        do_mix_skip()
+    }
+
+    // Delete the song from the queue key list.
+    old_ix = queue_key_list.indexOf(edit_key)
+    if (old_ix >= 0) {
+        queue_key_list.splice(old_ix, 1)
+    }
+
+    // Delete the song from the recent key list.
+    old_ix = recent_key_list.indexOf(edit_key)
+    while (old_ix >= 0) {
+        recent_key_list.splice(old_ix, 1)
+        old_ix = recent_key_list.indexOf(edit_key)
+    }
+
+    // Update the edit key to the next track.
+    edit_key = id_from_index(
+        index_from_id(edit_key) % track_list.length + 1
+    )
+
     // Delete the song.
-    do_delete(edit_key)
+    to_server('delete')
 
     // Switch back to the "Mix" tab.
     switch_options_tab('mix-tab')
@@ -162,46 +148,32 @@ function do_edit_delete() {
     // Reload the list.
     reload_list_tab()
 
-    // Update the database, and store extra lists.
-    send_to_extra_lists()
-    send_to_database()
+    // Store extra lists.
+    to_server('extra_lists')
 }
 
 
 
 // Logs out of the current account.
 function do_account_logout() {
-    // Redirect to logout page.
-    window.location.href = logout_url
+    // Log out.
+    to_server('logout')
 }
 
 
 
 // Updates the account settings.
 function do_account_update() {
-    // Update values using option fields.
-    default_volume = document.querySelector(`#account-tab input[name="default-volume"]`).value
-    if (Number.isNaN(default_volume) || default_volume === '') default_volume = 100
-    if (document.querySelector(`#account-tab button.true[name="save-extra"]`).classList.contains('selected')) {
-        save_extra = true
-    } else if (document.querySelector(`#account-tab button.false[name="save-extra"]`).classList.contains('selected')) {
-        save_extra = false
-    }
-
-    // Update the database.
-    send_to_database()
+    // Update the user.
+    to_server('update_user')
 }
 
 
 
 // Changes the password.
 function do_account_change() {
-    // Get the old and new passwords.
-    const password = document.querySelector('input[name="password"]').value
-    const new_password = document.querySelector('input[name="new-password"]').value
-
-    // Change the password.
-    send_to_password(password, new_password)
+    // Attempt to change the password.
+    to_server('change_password')
 }
 
 
@@ -246,24 +218,16 @@ function do_account_import() {
 
 // Logs into an existing account.
 function do_account_login() {
-    // Get the username and password.
-    const try_username = document.querySelector('input[name="username"]').value
-    const try_password = document.querySelector('input[name="password"]').value
-
     // Attempt to log in.
-    send_to_login('login', try_username, try_password)
+    to_server('login')
 }
 
 
 
 // Signs up with a new account.
 function do_account_signup() {
-    // Get the username and password.
-    const try_username = document.querySelector('input[name="username"]').value
-    const try_password = document.querySelector('input[name="password"]').value
-
     // Attempt to sign up.
-    send_to_login('signup', try_username, try_password)
+    to_server('signup')
 }
 
 
@@ -287,47 +251,7 @@ function reload_all(is_scroll=true) {
     load_video()
 
     // Store extra lists.
-    send_to_extra_lists()
-}
-
-
-
-// Updates a song in the song list.
-function update_song(value_key, song, new_index) {
-    // Add the new entry to the list of songs.
-    all_songs.push(song)
-
-    // Get the song's new key.
-    const new_key = all_songs.length - 1
-
-    // Delete the song from the list.
-    let old_index = song_key_list.indexOf(value_key)
-    if (old_index >= 0) {
-        song_key_list.splice(old_index, 1)
-    }
-
-    // Re-insert the song in the list at the given index.
-    song_key_list.splice(new_index, 0, new_key)
-
-    // Update the song in the queue key list.
-    old_index = queue_key_list.indexOf(value_key)
-    if (old_index >= 0) {
-        queue_key_list.splice(old_index, 1, new_key)
-    }
-
-    // Update the song in the recent key list.
-    old_index = recent_key_list.indexOf(value_key)
-    while (old_index >= 0) {
-        recent_key_list.splice(old_index, 1, new_key)
-        old_index = recent_key_list.indexOf(value_key)
-    }
-
-    // Update the database, and store extra lists.
-    send_to_extra_lists()
-    send_to_database()
-
-    // Return the song's new key.
-    return new_key
+    to_server('extra_lists')
 }
 
 
@@ -357,38 +281,14 @@ function export_songs(filename, song_list) {
 
 
 
-// Deletes a song in the song list.
-function delete_song(value_key) {
-    // Delete the song from the list.
-    let old_index = song_key_list.indexOf(value_key)
-    if (old_index >= 0) {
-        song_key_list.splice(old_index, 1)
-    }
-
-    // Delete the song from the queue key list.
-    old_index = queue_key_list.indexOf(value_key)
-    if (old_index >= 0) {
-        queue_key_list.splice(old_index, 1)
-    }
-
-    // Delete the song from the recent key list.
-    old_index = recent_key_list.indexOf(value_key)
-    while (old_index >= 0) {
-        recent_key_list.splice(old_index, 1)
-        old_index = recent_key_list.indexOf(value_key)
-    }
-}
-
-
-
 // Queues a song.
 function add_to_queue(value_key) {
     // Check if the song is already in the queue.
     if (queue_key_list.includes(value_key)) {
         // Delete the original item.
-        let old_index = queue_key_list.indexOf(value_key)
-        if (old_index >= 0) {
-            queue_key_list.splice(old_index, 1)
+        let old_ix = queue_key_list.indexOf(value_key)
+        if (old_ix >= 0) {
+            queue_key_list.splice(old_ix, 1)
         }
     }
 

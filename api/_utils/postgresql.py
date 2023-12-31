@@ -157,6 +157,9 @@ def create_track(cur, owner, record):
         record['end_time'],
     ])
 
+    # Return the track ID for referencing the new track.
+    return track_id
+
 
 
 # Read a track from the "tracks" table, for a given user.
