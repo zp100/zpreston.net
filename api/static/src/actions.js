@@ -101,17 +101,18 @@ function do_edit_save() {
     reload_list_tab()
 }
 
-
+/*
 
 // Exports a song as a JSON file.
 function do_edit_export() {
     // Get the file name and song, and export.
-    let filename = all_songs[edit_key].title
-    const song_list = [all_songs[edit_key]]
+    const export_track = from_id(edit_key)
+    let filename = export_track.title
+    const song_list = [export_track]
     export_songs(filename, song_list)
 }
 
-
+*/
 
 // Deletes a song.
 function do_edit_delete() {
@@ -134,10 +135,10 @@ function do_edit_delete() {
         old_ix = recent_key_list.indexOf(edit_key)
     }
 
-    // Update the edit key to the next track.
-    edit_key = id_from_index(
-        index_from_id(edit_key) % track_list.length + 1
-    )
+    // Update the edit key to the track with the next index.
+    edit_key = from_index(
+        from_id(edit_key).index % track_list.length + 1
+    ).track_id
 
     // Delete the song.
     to_server('delete')
@@ -176,7 +177,7 @@ function do_account_change() {
     to_server('change_password')
 }
 
-
+/*
 
 // Imports a list of songs.
 function do_account_import() {
@@ -214,7 +215,7 @@ function do_account_import() {
     }
 }
 
-
+*/
 
 // Logs into an existing account.
 function do_account_login() {
@@ -254,7 +255,7 @@ function reload_all(is_scroll=true) {
     to_server('extra_lists')
 }
 
-
+/*
 
 // Exports a list of songs as a JSON file.
 function export_songs(filename, song_list) {
@@ -279,7 +280,7 @@ function export_songs(filename, song_list) {
     document.body.removeChild(download_el)
 }
 
-
+*/
 
 // Queues a song.
 function add_to_queue(value_key) {

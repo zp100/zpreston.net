@@ -241,14 +241,16 @@ function reload_options_tab(tab_id=null) {
 
         // "Edit track" tab.
         case 'edit-tab': {
-            // Loop through the fields.
-            for (const field of ['url', 'title', 'tags', 'volume', 'start-time', 'fade-in-sec', 'fade-out-sec', 'end-time']) {
-                // Add value to options.
-                document.querySelector(`#edit-tab input[name="${field}"]`).value = (edit_key !== null ? all_songs[edit_key][field] : '')
-            }
-
-            // Set index.
-            document.querySelector(`#edit-tab input[name="index"]`).value = song_key_list.indexOf(edit_key) + 1
+            // Add values to the option fields.
+            document.querySelector(`#edit-tab input[name="index"]`).value = (from_id(edit_key).index ?? '')
+            document.querySelector(`#edit-tab input[name="title"]`).value = (from_id(edit_key).title ?? '')
+            document.querySelector(`#edit-tab input[name="tags"]`).value = (from_id(edit_key).tags ?? '')
+            document.querySelector(`#edit-tab input[name="url"]`).value = (from_id(edit_key).url ?? '')
+            document.querySelector(`#edit-tab input[name="volume"]`).value = (from_id(edit_key).volume ?? '')
+            document.querySelector(`#edit-tab input[name="start-time"]`).value = (from_id(edit_key).start_time ?? '')
+            document.querySelector(`#edit-tab input[name="fade-in-sec"]`).value = (from_id(edit_key).fade_in_sec ?? '')
+            document.querySelector(`#edit-tab input[name="fade-out-sec"]`).value = (from_id(edit_key).fade_out_sec ?? '')
+            document.querySelector(`#edit-tab input[name="end-time"]`).value = (from_id(edit_key).end_time ?? '')
         } break
 
         // "Edit results" tab.
@@ -260,12 +262,9 @@ function reload_options_tab(tab_id=null) {
             // Check if the user is not a guest.
             if (user_record.username !== '<guest>') {
                 // Add values to options.
-                document.querySelector(`#account-tab input[name="default-volume"]`).value = default_volume
-                if (save_extra) {
-                    document.querySelector(`#account-tab button.true[name="save-extra"]`).classList.add('selected')
-                } else {
-                    document.querySelector(`#account-tab button.false[name="save-extra"]`).classList.add('selected')
-                }
+                document.querySelector(`#account-tab input[name="default-volume"]`).value = user_record.default_volume
+                if (user_record.save_extra) document.querySelector(`#account-tab button.true[name="save-extra"]`).classList.add('selected')
+                else document.querySelector(`#account-tab button.false[name="save-extra"]`).classList.add('selected')
             }
         } break
 

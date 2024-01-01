@@ -1,21 +1,26 @@
-// Gets the ID of the track at the given index.
-function id_from_index(index) {
-    // Get the track with the given index.
+// Gets the track at the given index.
+function from_index(index) {
+    // Return the track with the given index.
     const track = track_list.find(item => item.index === index)
-
-    // Return its ID.
-    return track.track_id
+    return track
 }
 
 
 
-// Gets the index of the track with the given track ID.
-function index_from_id(track_id) {
-    // Get the track with the given ID.
+// Gets the track with the given track ID.
+function from_id(track_id) {
+    // Return the track with the given ID.
     const track = track_list.find(item => item.track_id === track_id)
+    return track
+}
 
-    // Return its index.
-    return track.index
+
+
+// Gets the full list of track IDs.
+function get_key_list() {
+    // Return the list of IDs.
+    const key_list = track_list.map(track => track.track_id)
+    return key_list
 }
 
 
@@ -25,7 +30,7 @@ function load_next_song(mode) {
     // Get the filtered list of songs.
     const filter_tree = filters_syntax_tree()
     const filter_title = document.querySelector('input[name="filter-title"]').value
-    let new_key_list = filtered_key_list(song_key_list, filter_tree, filter_title)
+    let new_key_list = filtered_key_list(get_key_list(), filter_tree, filter_title)
 
     // Check if an autoplay mode was selected.
     switch (mode) {
@@ -140,18 +145,18 @@ function load_video() {
 
     // Get the video ID and store it in an object.
     const load_obj = {
-        'videoId': parse_video_id(all_songs[key]['url']),
+        'videoId': parse_video_id(from_id(key).url),
     }
 
     // Check if valid start time was provided.
-    const start_sec = parse_time(all_songs[key]['start-time'])
+    const start_sec = parse_time(from_id(key).start_time)
     if (!Number.isNaN(start_sec)) {
         // Add start time to the object.
         load_obj.startSeconds = start_sec
     }
 
     // Check if valid end time was provided.
-    const end_sec = parse_time(all_songs[key]['end-time'])
+    const end_sec = parse_time(from_id(key).end_time)
     if (!Number.isNaN(end_sec)) {
         // Add end time to the object.
         load_obj.endSeconds = end_sec
@@ -161,12 +166,12 @@ function load_video() {
     player.cueVideoById(load_obj)
 
     // Update page title.
-    document.title = `${all_songs[key].title} | ${user_record.username}'s tracks | YouTune`
+    document.title = `${from_id(key).title} | ${user_record.username}'s tracks | YouTune`
 
     // Update track info.
     const track_name_el = document.querySelector('span.main-name[name="track-info"]')
-    track_name_el.innerHTML = all_songs[key].title
-    track_name_el.title = `${all_songs[key].title} (${all_songs[key].tags})`
+    track_name_el.innerHTML = from_id(key).title
+    track_name_el.title = `${from_id(key).title} (${from_id(key).tags})`
 
     // Replace placeholder with video player.
     document.querySelector('#video').hidden = 0
@@ -238,12 +243,12 @@ function filtered_key_list(key_list, filter_tree, search) {
     // Loop through the songs to create HTML for the div to display the song list.
     for (const k of key_list) {
         // Get the tag list.
-        const tag_list = tokenize_tags(all_songs[k].tags)
+        const tag_list = tokenize_tags(from_id(k).tags)
 
         // Check if this song matches the filters.
         if (
           (filter_tree === null || filter_tree === '' || (tag_list !== null && is_tag_list_match_filters(tag_list, filter_tree)))
-          && (search === '' || all_songs[k].title.toLowerCase().includes(search.toLowerCase()))
+          && (search === '' || from_id(k).title.toLowerCase().includes(search.toLowerCase()))
         ) {
             // Add its key to the new key list.
             new_key_list.push(k)

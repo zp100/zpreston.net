@@ -69,8 +69,8 @@ function ended_video() {
 // Runs when a video is cued.
 function cued_video() {
     // Check if fade-in or a valid volume percent was provided.
-    const fade_in_sec = Number(all_songs[key]['fade-in-sec'])
-    const volume = Number(all_songs[key]['volume'])
+    const fade_in_sec = Number(from_id(key).fade_in_sec)
+    const volume = Number(from_id(key).volume)
     if (!Number.isNaN(fade_in_sec) && fade_in_sec > 0) {
         // Set volume to 0 to start fade-in.
         player.setVolume(0)
@@ -79,7 +79,7 @@ function cued_video() {
         player.setVolume(volume)
     } else {
         // Set volume to default.
-        player.setVolume(default_volume)
+        player.setVolume(user_record.default_volume)
     }
 
     // Play the video.
@@ -98,7 +98,7 @@ function started_video() {
     player.unMute()
 
     // Check if valid start time was provided, and this isn't the first time the video was started.
-    const start_sec = parse_time(all_songs[key]['start-time'])
+    const start_sec = parse_time(from_id(key).start_time)
     if (!Number.isNaN(start_sec) && player.__custom__.play_loop > 0) {
         // Skip to the start time.
         player.seekTo(start_sec, true)
@@ -113,8 +113,8 @@ function started_video() {
         const current_sec = Math.floor(player.getCurrentTime())
         if (current_sec != player.__custom__.current_sec) {
             // Update the track info timers.
-            const start_sec = parse_time(all_songs[key]['start-time'])
-            const end_sec = parse_time(all_songs[key]['end-time'])
+            const start_sec = parse_time(from_id(key).start_time)
+            const end_sec = parse_time(from_id(key).end_time)
             const duration_sec = Math.floor(player.getDuration() + 0.9)
             document.querySelector('span.track-before[name="track-info"]').innerHTML = format_time('before', start_sec, current_sec, end_sec, duration_sec)
             document.querySelector('span.track-total[name="track-info"]').innerHTML = format_time('total', start_sec, current_sec, end_sec, duration_sec)
@@ -124,14 +124,14 @@ function started_video() {
     }, 100)
 
     // Check if valid fade-in was provided.
-    const fade_in_sec = Number(all_songs[key]['fade-in-sec'])
+    const fade_in_sec = Number(from_id(key).fade_in_sec)
     if (!Number.isNaN(fade_in_sec) && fade_in_sec > 0 && window.Worker) {
         // Get the song's intended volume.
         player.setVolume(0)
-        let target_volume = Number(all_songs[key]['volume'])
+        let target_volume = Number(from_id(key).volume)
         if (!(!Number.isNaN(target_volume) && target_volume > 0 && target_volume <= 100)) {
             // If it's invalid, get the default.
-            target_volume = default_volume
+            target_volume = user_record.default_volume
         }
 
         // Set the worker to update the fade-in volume.
@@ -150,8 +150,8 @@ function started_video() {
     }
 
     // Check if valid end time was provided, and valid fade-out was provided.
-    const end_sec = parse_time(all_songs[key]['end-time'])
-    const fade_out_sec = Number(all_songs[key]['fade-out-sec'])
+    const end_sec = parse_time(from_id(key).end_time)
+    const fade_out_sec = Number(from_id(key).fade_out_sec)
     if (!Number.isNaN(end_sec) && !Number.isNaN(fade_out_sec) && fade_out_sec > 0 && window.Worker) {
         // Create an interval to check the video's time.
         player.__custom__.test_fade_out = setInterval(() => {

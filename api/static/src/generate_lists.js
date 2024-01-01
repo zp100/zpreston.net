@@ -54,15 +54,15 @@ function add_list_tab_html(tab_id, message_el, key_list) {
         // Create song text.
         const song_text_el = document.createElement('div')
         song_text_el.classList.add('song-text')
-        let index = song_key_list.indexOf(k)
+        let index = from_id(k).index
         song_text_el.insertAdjacentHTML('beforeend', `<span class="song-index">${(index + 1)}.&nbsp;&nbsp; </span>`)
 
         // Create song title and tags.
         const song_title_el = document.createElement('div')
-        song_title_el.insertAdjacentHTML('beforeend', `${all_songs[k].title}&nbsp;&nbsp; `)
+        song_title_el.insertAdjacentHTML('beforeend', `${from_id(k).title}&nbsp;&nbsp; `)
 
         // Check if the tag list has no errors.
-        const tag_list = tokenize_tags(all_songs[k].tags)
+        const tag_list = tokenize_tags(from_id(k).tags)
         if (tag_list !== null) {
             // Add tags.
             for (const tag of tag_list) {
@@ -204,7 +204,7 @@ function get_song_list_items() {
     // Get filters for songs.
     const filter_tree = filters_syntax_tree()
     const filter_title = document.querySelector('input[name="filter-title"]').value
-    let new_key_list = filtered_key_list(song_key_list, filter_tree, filter_title)
+    let new_key_list = filtered_key_list(get_key_list(), filter_tree, filter_title)
 
     // Create mix results message element.
     const message_el = document.createElement('section')
@@ -235,9 +235,9 @@ function get_queue_items() {
 // Gets the items for the "All tracks" tab.
 function get_sorted_items() {
     // Get a list of song keys, sorted by title.
-    let new_key_list = [...song_key_list]
-        .sort((k1, k2) => all_songs[k1].tags.localeCompare(all_songs[k2].tags))
-        .sort((k1, k2) => all_songs[k1].title.localeCompare(all_songs[k2].title))
+    let new_key_list = get_key_list()
+        .sort((k1, k2) => from_id(k1).tags.localeCompare(from_id(k2).tags))
+        .sort((k1, k2) => from_id(k1).title.localeCompare(from_id(k2).title))
 
     // Check if search values were used.
     const search_tree = filters_syntax_tree('search-tags')
@@ -300,7 +300,7 @@ function load_count_tags(key_list) {
     // Loop through the songs to get their tags.
     for (const k of key_list) {
         // Get the tags.
-        const tag_list = tokenize_tags(all_songs[k].tags)
+        const tag_list = tokenize_tags(from_id(k).tags)
         for (const tag of tag_list) {
             // Check if the tag is already in the count-tags list.
             let index = count_tag_list.findIndex(count_tag => count_tag.name === tag)
