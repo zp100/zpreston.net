@@ -220,7 +220,7 @@ def user_record():
             }
     elif action == 'change_password':
         # Check if not all necessary fields were provided.
-        if 'password' not in flask.request.json or \
+        if 'current_password' not in flask.request.json or \
         'new_password' not in flask.request.json:
             # Return error message.
             return {
@@ -228,7 +228,7 @@ def user_record():
             }
 
         # Get the old and new password.
-        password = flask.request.json['password']
+        current_password = flask.request.json['current_password']
         new_password = flask.request.json['new_password']
 
         # Check if the new password is blank.
@@ -239,14 +239,14 @@ def user_record():
             }
 
         # Check if the passwords are the same.
-        if new_password == password:
+        if new_password == current_password:
             # Return error message.
             return {
                 'error': f"New password is the same as current password.",
             }
 
         # Check if the old password is invalid.
-        if not postgresql.is_valid_login(username, password):
+        if not postgresql.is_valid_login(username, current_password):
             # Return error message.
             return {
                 'error': f"Incorrect current password.",
@@ -427,7 +427,7 @@ def tracks():
 
 
 # Route function for reloading the track list.
-@app.route('/reload_track_list/', methods=['GET'])
+@app.route('/reload_track_list/', methods=['POST'])
 def reload_track_list():
     # Cancel if user is NOT logged in.
     if 'username' not in flask.session:

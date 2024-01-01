@@ -29,10 +29,12 @@ function generate_options_tabs() {
     add_options_tab_html('info-tab', group_list)
 
     // DEBUG: Disable "Import" and "Export" buttons.
-    button_el_list = document.querySelectorAll('#account-tab button.action')
-    button_el_list[3].disabled = true
-    button_el_list = document.querySelectorAll('#edit-tab button.action')
-    button_el_list[3].disabled = true
+    if (user_record.username !== '<guest>') {
+        button_el_list = document.querySelectorAll('#account-tab button.action')
+        button_el_list[3].disabled = true
+        button_el_list = document.querySelectorAll('#edit-tab button.action')
+        button_el_list[3].disabled = true
+    }
 }
 
 
@@ -242,15 +244,15 @@ function reload_options_tab(tab_id=null) {
         // "Edit track" tab.
         case 'edit-tab': {
             // Add values to the option fields.
-            document.querySelector(`#edit-tab input[name="index"]`).value = (from_id(edit_key).index ?? '')
-            document.querySelector(`#edit-tab input[name="title"]`).value = (from_id(edit_key).title ?? '')
-            document.querySelector(`#edit-tab input[name="tags"]`).value = (from_id(edit_key).tags ?? '')
-            document.querySelector(`#edit-tab input[name="url"]`).value = (from_id(edit_key).url ?? '')
-            document.querySelector(`#edit-tab input[name="volume"]`).value = (from_id(edit_key).volume ?? '')
-            document.querySelector(`#edit-tab input[name="start-time"]`).value = (from_id(edit_key).start_time ?? '')
-            document.querySelector(`#edit-tab input[name="fade-in-sec"]`).value = (from_id(edit_key).fade_in_sec ?? '')
-            document.querySelector(`#edit-tab input[name="fade-out-sec"]`).value = (from_id(edit_key).fade_out_sec ?? '')
-            document.querySelector(`#edit-tab input[name="end-time"]`).value = (from_id(edit_key).end_time ?? '')
+            document.querySelector(`#edit-tab input[name="index"]`).value = (from_id(edit_key)?.index ?? '')
+            document.querySelector(`#edit-tab input[name="title"]`).value = (from_id(edit_key)?.title ?? '')
+            document.querySelector(`#edit-tab input[name="tags"]`).value = (from_id(edit_key)?.tags ?? '')
+            document.querySelector(`#edit-tab input[name="url"]`).value = (from_id(edit_key)?.url ?? '')
+            document.querySelector(`#edit-tab input[name="volume"]`).value = (from_id(edit_key)?.volume ?? '')
+            document.querySelector(`#edit-tab input[name="start-time"]`).value = (from_id(edit_key)?.start_time ?? '')
+            document.querySelector(`#edit-tab input[name="fade-in-sec"]`).value = (from_id(edit_key)?.fade_in_sec ?? '')
+            document.querySelector(`#edit-tab input[name="fade-out-sec"]`).value = (from_id(edit_key)?.fade_out_sec ?? '')
+            document.querySelector(`#edit-tab input[name="end-time"]`).value = (from_id(edit_key)?.end_time ?? '')
         } break
 
         // "Edit results" tab.

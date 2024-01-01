@@ -99,7 +99,7 @@ def get_end_index(cur, owner):
     ])
 
     # Test for record found.
-    record = cur.fetchone()
+    record = cur.fetchone()[0]
     if record is not None:
         # Return 1 more than the largest index.
         return record + 1
@@ -140,8 +140,9 @@ def add_index(cur, owner, index):
     # Adds 1 to all tracks for this owner with an index at or above the given index.
     cur.execute("""
         update tracks
-        set index += 1
-        where lower(owner) = lower(%s), index >= %s;
+        set index = index + 1
+        where lower(owner) = lower(%s)
+        and index >= %s;
     """, [
         owner,
         index,
@@ -154,8 +155,9 @@ def remove_index(cur, owner, index):
     # Subtracts 1 from all tracks for this owner with an index at or above the given index.
     cur.execute("""
         update tracks
-        set index -= 1
-        where lower(owner) = lower(%s), index >= %s;
+        set index = index - 1
+        where lower(owner) = lower(%s)
+        and index >= %s;
     """, [
         owner,
         index,
@@ -169,7 +171,8 @@ def fetch_track(cur, track_id, owner):
     cur.execute("""
         select *
         from tracks
-        where track_id = %s, lower(owner) = lower(%s);
+        where track_id = %s
+        and lower(owner) = lower(%s);
     """, [
         track_id,
         owner,

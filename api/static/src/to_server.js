@@ -77,7 +77,7 @@ function to_server(action) {
             if (user_record.username !== '<guest>') {
                 // Make request JSON object.
                 request_json = {
-                    'password': document.querySelector('input[name="password"]').value,
+                    'current_password': document.querySelector('input[name="current-password"]').value,
                     'new_password': document.querySelector('input[name="new-password"]').value,
                 }
     
@@ -103,7 +103,7 @@ function to_server(action) {
                     'start_time': document.querySelector(`#new-tab input[name="start-time"]`).value,
                     'fade_in_sec': document.querySelector(`#new-tab input[name="fade-in-sec"]`).value,
                     'fade_out_sec': document.querySelector(`#new-tab input[name="fade-out-sec"]`).value,
-                    'end_sec': document.querySelector(`#new-tab input[name="end-time"]`).value,
+                    'end_time': document.querySelector(`#new-tab input[name="end-time"]`).value,
                 }
 
                 // POST for "add".
@@ -132,7 +132,7 @@ function to_server(action) {
                     'start_time': document.querySelector(`#edit-tab input[name="start-time"]`).value,
                     'fade_in_sec': document.querySelector(`#edit-tab input[name="fade-in-sec"]`).value,
                     'fade_out_sec': document.querySelector(`#edit-tab input[name="fade-out-sec"]`).value,
-                    'end_sec': document.querySelector(`#edit-tab input[name="end-time"]`).value,
+                    'end_time': document.querySelector(`#edit-tab input[name="end-time"]`).value,
                 }
 
                 // POST for "save".
@@ -225,7 +225,7 @@ function login_callback(response_json) {
             login_error_el.innerHTML = error_message
         } else {
             // Create the error if its element doesn't exist.
-            const new_password_el = document.querySelector('input[name="password"]')
+            const new_password_el = document.querySelector('input[name="new-password"]')
             new_password_el.insertAdjacentHTML('afterend', `<i name="login-error" class="text-danger">${error_message}</i>`)
         }
     } else {

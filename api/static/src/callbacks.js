@@ -356,9 +356,9 @@ function song_button_click(tab_id, value) {
     // Check if the song was selected from the queue.
     if (tab_id === 'queue-tab') {
         // Remove the song from the queue.
-        let old_ix = queue_key_list.indexOf(value)
+        let old_ix = extra_lists.queue_key_list.indexOf(value)
         if (old_ix >= 0) {
-            queue_key_list.splice(old_ix, 1)
+            extra_lists.queue_key_list.splice(old_ix, 1)
         }
     }
 
@@ -382,13 +382,13 @@ function queue_button_click(tab_id, value) {
 // Callback function for clicking queue move buttons.
 function queue_move_button_click(tab_id, value) {
     // Delete the original item.
-    let old_ix = queue_key_list.indexOf(value)
+    let old_ix = extra_lists.queue_key_list.indexOf(value)
     if (old_ix >= 0) {
-        queue_key_list.splice(old_ix, 1)
+        extra_lists.queue_key_list.splice(old_ix, 1)
     }
 
     // Copy the song to the top.
-    queue_key_list.unshift(value)
+    extra_lists.queue_key_list.unshift(value)
 
     // Reload the list.
     reload_list_tab()
@@ -402,9 +402,9 @@ function queue_move_button_click(tab_id, value) {
 // Callback function for clicking queue delete buttons.
 function queue_delete_button_click(tab_id, value) {
     // Delete the item.
-    let old_ix = queue_key_list.indexOf(value)
+    let old_ix = extra_lists.queue_key_list.indexOf(value)
     if (old_ix >= 0) {
-        queue_key_list.splice(old_ix, 1)
+        extra_lists.queue_key_list.splice(old_ix, 1)
     }
 
     // Reload the list.

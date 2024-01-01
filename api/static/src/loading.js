@@ -44,7 +44,7 @@ function load_next_song(mode) {
         case 'auto': {
             // Go to the next video.
             let index = new_key_list.indexOf(key)
-            index = (index + 1) % new_key_list.length
+            index = index % new_key_list.length + 1
             key = new_key_list[index]
             reload_all()
         } break
@@ -63,9 +63,9 @@ function load_next_song(mode) {
         // Queue.
         case 'queue': {
             // Check if the queue has songs.
-            if (queue_key_list.length > 0) {
+            if (extra_lists.queue_key_list.length > 0) {
                 // Play the next song in the queue.
-                key = queue_key_list.shift()
+                key = extra_lists.queue_key_list.shift()
                 to_server('extra_lists')
                 reload_all()
             }
@@ -74,13 +74,13 @@ function load_next_song(mode) {
         // Shuffle queue.
         case 'shuffle-queue': {
             // Check if the queue has songs.
-            if (queue_key_list.length > 0) {
+            if (extra_lists.queue_key_list.length > 0) {
                 // Choose a random song from the queue.
-                const new_key = random_song(queue_key_list)
+                const new_key = random_song(extra_lists.queue_key_list)
                 if (new_key !== null) {
                     // Play the new song.
-                    let index = queue_key_list.indexOf(new_key)
-                    queue_key_list.splice(index, 1)
+                    let index = extra_lists.queue_key_list.indexOf(new_key)
+                    extra_lists.queue_key_list.splice(index, 1)
                     key = new_key
                     to_server('extra_lists')
                     reload_all()
@@ -91,9 +91,9 @@ function load_next_song(mode) {
         // Queue, then shuffle.
         case 'queue-shuffle': {
             // Check if the queue has songs.
-            if (queue_key_list.length > 0) {
+            if (extra_lists.queue_key_list.length > 0) {
                 // Play the next song in the queue.
-                key = queue_key_list.shift()
+                key = extra_lists.queue_key_list.shift()
                 to_server('extra_lists')
                 reload_all()
             } else {
@@ -110,13 +110,13 @@ function load_next_song(mode) {
         // Shuffle queue, then shuffle.
         case 'shuffle-queue-shuffle': {
             // Check if the queue has songs.
-            if (queue_key_list.length > 0) {
+            if (extra_lists.queue_key_list.length > 0) {
                 // Choose a random song from the queue.
-                const new_key = random_song(queue_key_list)
+                const new_key = random_song(extra_lists.queue_key_list)
                 if (new_key !== null) {
                     // Play the new song.
-                    let index = queue_key_list.indexOf(new_key)
-                    queue_key_list.splice(index, 1)
+                    let index = extra_lists.queue_key_list.indexOf(new_key)
+                    extra_lists.queue_key_list.splice(index, 1)
                     key = new_key
                     to_server('extra_lists')
                     reload_all()

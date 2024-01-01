@@ -45,7 +45,7 @@ function do_mix_edit() {
 // Empties the song queue.
 function do_mix_empty_queue() {
     // Empty the queue.
-    queue_key_list = []
+    extra_lists.queue_key_list = []
 
     // Reload the list.
     reload_list_tab()
@@ -123,16 +123,16 @@ function do_edit_delete() {
     }
 
     // Delete the song from the queue key list.
-    old_ix = queue_key_list.indexOf(edit_key)
+    old_ix = extra_lists.queue_key_list.indexOf(edit_key)
     if (old_ix >= 0) {
-        queue_key_list.splice(old_ix, 1)
+        extra_lists.queue_key_list.splice(old_ix, 1)
     }
 
     // Delete the song from the recent key list.
-    old_ix = recent_key_list.indexOf(edit_key)
+    old_ix = extra_lists.recent_key_list.indexOf(edit_key)
     while (old_ix >= 0) {
-        recent_key_list.splice(old_ix, 1)
-        old_ix = recent_key_list.indexOf(edit_key)
+        extra_lists.recent_key_list.splice(old_ix, 1)
+        old_ix = extra_lists.recent_key_list.indexOf(edit_key)
     }
 
     // Update the edit key to the track with the next index.
@@ -285,18 +285,18 @@ function export_songs(filename, song_list) {
 // Queues a song.
 function add_to_queue(value_key) {
     // Check if the song is already in the queue.
-    if (queue_key_list.includes(value_key)) {
+    if (extra_lists.queue_key_list.includes(value_key)) {
         // Delete the original item.
-        let old_ix = queue_key_list.indexOf(value_key)
+        let old_ix = extra_lists.queue_key_list.indexOf(value_key)
         if (old_ix >= 0) {
-            queue_key_list.splice(old_ix, 1)
+            extra_lists.queue_key_list.splice(old_ix, 1)
         }
     }
 
     // Check if the queue is not full (999 songs).
-    if (queue_key_list.length < 999) {
+    if (extra_lists.queue_key_list.length < 999) {
         // Add the song to the end of the queue.
-        queue_key_list.push(value_key)
+        extra_lists.queue_key_list.push(value_key)
     }
 
     // Check which play mode is selected.
@@ -321,12 +321,12 @@ function add_to_queue(value_key) {
 // Adds a song to the recent songs.
 function add_to_recent(value_key) {
     // Add the song to the beginning of the list.
-    recent_key_list.unshift(value_key)
+    extra_lists.recent_key_list.unshift(value_key)
 
     // Check if the recent list is full (999 songs).
-    if (recent_key_list.length > 999) {
+    if (extra_lists.recent_key_list.length > 999) {
         // Remove the last song.
-        recent_key_list.pop()
+        extra_lists.recent_key_list.pop()
     }
 
     // Reload the list.

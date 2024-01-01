@@ -55,7 +55,7 @@ function add_list_tab_html(tab_id, message_el, key_list) {
         const song_text_el = document.createElement('div')
         song_text_el.classList.add('song-text')
         let index = from_id(k).index
-        song_text_el.insertAdjacentHTML('beforeend', `<span class="song-index">${(index + 1)}.&nbsp;&nbsp; </span>`)
+        song_text_el.insertAdjacentHTML('beforeend', `<span class="song-index">${index}.&nbsp;&nbsp; </span>`)
 
         // Create song title and tags.
         const song_title_el = document.createElement('div')
@@ -204,7 +204,10 @@ function get_song_list_items() {
     // Get filters for songs.
     const filter_tree = filters_syntax_tree()
     const filter_title = document.querySelector('input[name="filter-title"]').value
+
+    // Filter the keys and sort by index.
     let new_key_list = filtered_key_list(get_key_list(), filter_tree, filter_title)
+        .sort((k1, k2) => from_id(k1).index - from_id(k2).index)
 
     // Create mix results message element.
     const message_el = document.createElement('section')
@@ -224,10 +227,10 @@ function get_queue_items() {
     const message_el = document.createElement('section')
     message_el.classList.add('list-item')
     message_el.classList.add('message')
-    message_el.insertAdjacentHTML('beforeend', `Tracks in queue: <span class="emph">${queue_key_list.length}</span>`)
+    message_el.insertAdjacentHTML('beforeend', `Tracks in queue: <span class="emph">${extra_lists.queue_key_list.length}</span>`)
 
     // Return the items.
-    return [message_el, queue_key_list]
+    return [message_el, extra_lists.queue_key_list]
 }
 
 
@@ -287,7 +290,7 @@ function get_recent_items() {
     message_el.insertAdjacentHTML('beforeend', `Tracks finished this session (including duplicates): <span class="emph">${finished_song_count}</span>`)
 
     // Return the items.
-    return [message_el, recent_key_list]
+    return [message_el, extra_lists.recent_key_list]
 }
 
 

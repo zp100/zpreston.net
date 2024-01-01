@@ -239,7 +239,7 @@ function random_song(key_list, bias=10) {
     }
 
     // Filter out duplicates from recent key list.
-    const recent_set = [...new Set(recent_key_list)]
+    const recent_set = [...new Set(extra_lists.recent_key_list)]
 
     // Loop through the recent key list to pick out songs that shouldn't be replayed.
     // The keys will be sorted by how recently the songs were played.

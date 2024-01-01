@@ -112,11 +112,16 @@ def change_password(cur, username, password):
 # Checks if the password is correct for the given username.
 @pg_utils.transaction
 def is_valid_login(cur, username, password):
-    # Fetch and validate the user's data.
-    record = pg_utils.fetch_user(cur, username)
+    # Check if the user's data exists.
+    try:
+        # Fetch and validate the user's data.
+        record = pg_utils.fetch_user(cur, username)
+    except pg_errors.UsersError as exc:
+        # User not found.
+        return False
 
     # Get the hashed password for this user.
-    hash_password = record['hash_password']
+    hash_password = record[1].tobytes()
 
     # Return whether or not the password matches.
     return bcrypt.checkpw(
@@ -195,7 +200,8 @@ def update_track(cur, track_id, owner, record):
     cur.execute("""
         select index
         from tracks
-        where track_id = %s, lower(owner) = lower(%s);
+        where track_id = %s
+        and lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
@@ -215,7 +221,8 @@ def update_track(cur, track_id, owner, record):
     cur.execute("""
         update tracks
         set index = %s, title = %s, tags = %s, url = %s, volume = %s, start_time = %s, fade_in_sec = %s, fade_out_sec = %s, end_time = %s
-        where track_id = %s, lower(owner) = lower(%s);
+        where track_id = %s
+        and lower(owner) = lower(%s);
     """, [
         record['index'],
         record['title'],
@@ -242,7 +249,8 @@ def delete_track(cur, track_id, owner):
     cur.execute("""
         select index
         from tracks
-        where track_id = %s, lower(owner) = lower(%s);
+        where track_id = %s
+        and lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
@@ -256,7 +264,8 @@ def delete_track(cur, track_id, owner):
     cur.execute("""
         delete
         from tracks
-        where track_id = %s, lower(owner) = lower(%s);
+        where track_id = %s
+        and lower(owner) = lower(%s);
     """, [
         track_id,
         owner,
