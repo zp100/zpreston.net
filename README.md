@@ -30,7 +30,7 @@ Once the local Flask server is running, access it by going to http://127.0.0.1:5
 -   Content: [HTML](https://developer.mozilla.org/en-US/docs/Glossary/HTML) with [Jinja 3.1](https://jinja.palletsprojects.com/en/3.1.x/).
 -   Style: [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) with [Bootstrap 5.3](https://getbootstrap.com/docs/5.3/).
 -   Client-side code (frontend): [JavaScript ES6](https://developer.mozilla.org/en-US/docs/Web/JavaScript) (vanilla) with [YouTube player API](https://developers.google.com/youtube/iframe_api_reference).
--   Server-side code (backend): [Python 3.9](https://www.python.org/downloads/release/python-390/) with [Flask 3.0](https://flask.palletsprojects.com/en/3.0.x/), [Psycopg 2.9.9](https://www.psycopg.org/docs/), [bcrypt](https://pypi.org/project/bcrypt/).
+-   Server-side code (backend): [Python 3.9](https://www.python.org/downloads/release/python-390/) with [Flask 3.0](https://flask.palletsprojects.com/en/3.0.x/), [Psycopg 2.9.9](https://www.psycopg.org/docs/), [bcrypt 4.1.2](https://pypi.org/project/bcrypt/).
 -   Database: [PostgreSQL](https://www.postgresql.org/).
 -   Website hosting: [Vercel](https://vercel.com/) directly hosting this repository.
 -   Domain control: [Namecheap](https://www.namecheap.com/).
