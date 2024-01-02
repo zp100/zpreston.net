@@ -62,7 +62,7 @@ export POSTGRES_USER="default"                              # username for a use
 export POSTGRES_PASSWORD="admin"                            # [optional] password for the user
 export POSTGRES_DATABASE="verceldb"                         # name of the database
 ```
-Replace the values in double quotes with the credentials for your own database. These variables are used by the `transaction` function in "api/_utils/pg_utils.py".
+Replace the values in double quotes with the credentials for your own database. These variables are used by the `transaction` function in [pg_utils.py](/api/_utils/pg_utils.py#L21).
 
 To run the site on a local server, make sure your terminal is in the top-level "zpreston.net" directory (and the virtual environment is active, if you created it), and then run the following commands:
 ```
