@@ -117,7 +117,7 @@ function to_server(action) {
                     // Do "track" callback.
                     track_callback(response_json)
 
-                    // Open the new song to edit.
+                    // Open the new track to edit.
                     edit_key = response_json.track_id
                     switch_options_tab('edit-tab')
                 })
@@ -164,6 +164,41 @@ function to_server(action) {
                     // Do "track" callback.
                     track_callback(response_json)
                 })
+            }
+        } break
+
+        // Import track(s).
+        case 'import': {
+            // Check if the user is logged in.
+            if (user_record.username !== '<guest>') {
+                // Get the extra tags for the tracks.
+                const import_tags = document.querySelector('input[name="import-tags"]').value
+
+                // Loop through the imported files.
+                const file_list = document.querySelector('input[name="import-file"]').files
+                for (const file of file_list) {
+                    // Read the file as text.
+                    const file_reader = new FileReader()
+                    file_reader.addEventListener('load', ev => {
+                        // Loop through the tracks in the text.
+                        const tracks = JSON.parse(ev.target.result).tracks
+                        for (const track of tracks) {
+                            // Add the extra tags to the track.
+                            if (import_tags !== '' && track.tags !== '') track.tags = track.tags.concat(', ')
+                            track.tags = track.tags.concat(import_tags)
+
+                            // Add a blank "index" field.
+                            track.index = ''
+
+                            // POST for "add".
+                            fetch_json_post(`${tracks_url}?action=add`, track, response_json => {
+                                // Do "track" callback.
+                                track_callback(response_json)
+                            })
+                        }
+                    })
+                    file_reader.readAsText(file)
+                }
             }
         } break
 

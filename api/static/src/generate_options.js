@@ -27,14 +27,6 @@ function generate_options_tabs() {
     // Add "Info" tab.
     group_list = get_info_items()
     add_options_tab_html('info-tab', group_list)
-
-    // DEBUG: Disable "Import" and "Export" buttons.
-    if (user_record.username !== '<guest>') {
-        button_el_list = document.querySelectorAll('#account-tab button.action')
-        button_el_list[3].disabled = true
-        button_el_list = document.querySelectorAll('#edit-tab button.action')
-        button_el_list[3].disabled = true
-    }
 }
 
 

@@ -92,18 +92,33 @@ function do_edit_save() {
     to_server('save')
 }
 
-/*
+
 
 // Exports a song as a JSON file.
 function do_edit_export() {
-    // Get the file name and song, and export.
-    const export_track = from_id(edit_key)
-    let filename = export_track.title
-    const song_list = [export_track]
-    export_songs(filename, song_list)
+    // Get the track to export.
+    const track = from_id(edit_key)
+    
+    // Convert the track to a list (with only that track).
+    const tracks = [
+        {
+            'title': track['title'],
+            'tags': track['tags'],
+            'url': track['url'],
+            'volume': track['volume'],
+            'start_time': track['start_time'],
+            'fade_in_sec': track['fade_in_sec'],
+            'fade_out_sec': track['fade_out_sec'],
+            'end_time': track['end_time'],
+        },
+    ]
+    
+    // Export the track.
+    const filename = track.title
+    export_songs(filename, tracks)
 }
 
-*/
+
 
 // Deletes a song.
 function do_edit_delete() {
@@ -165,45 +180,15 @@ function do_account_change() {
     to_server('change_password')
 }
 
-/*
+
 
 // Imports a list of songs.
 function do_account_import() {
-    // Get the extra tags for the songs.
-    const import_tags = document.querySelector('input[name="import-tags"]').value
-
-    // Loop through the imported files.
-    const file_list = document.querySelector('input[name="import-file"]').files
-    for (const file of file_list) {
-        // Read the file as text.
-        const file_reader = new FileReader()
-        file_reader.addEventListener('load', (ev) => {
-            // Loop through the songs in the text.
-            const song_list = JSON.parse(ev.target.result).song_list
-            for (const song of song_list) {
-                // Add the extra tags to the song.
-                if (import_tags !== '' && song.tags !== '') song.tags = song.tags.concat(', ')
-                song.tags = song.tags.concat(import_tags)
-
-                // Add the new song.
-                all_songs.push(song)
-
-                // Add the new song's key.
-                edit_key = all_songs.length - 1
-                song_key_list.push(edit_key)
-            }
-
-            // Reload the list.
-            reload_list_tab()
-
-            // Update the database.
-            send_to_database()
-        })
-        file_reader.readAsText(file)
-    }
+    // Import the tracks.
+    to_server('import')
 }
 
-*/
+
 
 // Logs into an existing account.
 function do_account_login() {
@@ -243,24 +228,24 @@ function reload_all(is_scroll=true) {
     to_server('extra_lists')
 }
 
-/*
+
 
 // Exports a list of songs as a JSON file.
-function export_songs(filename, song_list) {
-    // Convert song list to JSON file contents.
+function export_songs(filename, tracks) {
+    // Convert track list to JSON file contents.
     const contents = encodeURIComponent(
         JSON.stringify(
             {
-                'song_list': song_list,
+                'tracks': tracks,
             }
         )
     )
 
     // Create a download link.
     const download_el = document.createElement('a')
+    download_el.style.display = 'none'
     download_el.setAttribute('href', 'data:text/json;charset=utf-8,' + contents)
     download_el.setAttribute('download', filename + '.json')
-    download_el.style.display = 'none'
 
     // Click the link.
     document.body.appendChild(download_el)
@@ -268,7 +253,7 @@ function export_songs(filename, song_list) {
     document.body.removeChild(download_el)
 }
 
-*/
+
 
 // Queues a song.
 function add_to_queue(value_key) {
