@@ -163,7 +163,7 @@ function info_button_click(tab_id, value) {
         },
         'index': {
             'header': 'List index',
-            'content': `The position of the track within the playlist. Change the list index to rearrange the playlist.`,
+            'content': `The position of the track within the mix list. Change the list index to rearrange the playlist. Leave it blank to move the track to the end of the mix.`,
         },
         'tags': {
             'header': 'Tags',
