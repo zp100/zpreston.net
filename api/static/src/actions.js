@@ -90,9 +90,6 @@ function do_edit_queue() {
 function do_edit_save() {
     // Update the song.
     to_server('save')
-
-    // Reload the list.
-    reload_list_tab()
 }
 
 /*
@@ -134,14 +131,11 @@ function do_edit_delete() {
         from_id(edit_key).index % track_list.length + 1
     ).track_id
 
-    // Delete the song.
-    to_server('delete')
-
     // Switch back to the "Mix" tab.
     switch_options_tab('mix-tab')
 
-    // Reload the list.
-    reload_list_tab()
+    // Delete the song.
+    to_server('delete')
 
     // Store extra lists.
     to_server('extra_lists')

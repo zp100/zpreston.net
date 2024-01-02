@@ -509,12 +509,12 @@ function get_edit_items() {
     // Return the items.
     return [
         [
-            // Video URL.
+            // List index.
             {
                 'item_type': 'field',
-                'value': 'url',
-                'display': 'Video URL',
-                'type': 'text',
+                'value': 'index',
+                'display': 'List index',
+                'type': 'number',
             },
 
             // Title.
@@ -525,19 +525,19 @@ function get_edit_items() {
                 'type': 'text',
             },
 
-            // List index.
-            {
-                'item_type': 'field',
-                'value': 'index',
-                'display': 'List index',
-                'type': 'number',
-            },
-
             // Tags.
             {
                 'item_type': 'field',
                 'value': 'tags',
                 'display': 'Tags',
+                'type': 'text',
+            },
+
+            // Video URL.
+            {
+                'item_type': 'field',
+                'value': 'url',
+                'display': 'Video URL',
                 'type': 'text',
             },
 
