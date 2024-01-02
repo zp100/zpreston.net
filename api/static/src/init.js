@@ -6,7 +6,6 @@ let extra_lists
 let session_url
 let user_record_url
 let tracks_url
-let reload_track_list_url
 let video_fade_url
 let key
 let edit_key
@@ -16,7 +15,7 @@ let player
 
 
 // Initialize values.
-function init(ur, tl, el, su, uru, tu, rtlu, vfu) {
+function init(ur, tl, el, su, uru, tu, vfu) {
     // Grab data.
     user_record = ur
     track_list = tl
@@ -24,7 +23,6 @@ function init(ur, tl, el, su, uru, tu, rtlu, vfu) {
     session_url = su
     user_record_url = uru
     tracks_url = tu
-    reload_track_list_url = rtlu
     video_fade_url = vfu
 
     // Load the video setup.

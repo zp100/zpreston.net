@@ -4,6 +4,9 @@ function to_server(action) {
     switch (action) {
         // Log in.
         case 'login': {
+            // Add loading message.
+            login_loading()
+
             // Make request JSON object.
             request_json = {
                 'username': document.querySelector('input[name="username"]').value,
@@ -19,6 +22,9 @@ function to_server(action) {
 
         // Sign up.
         case 'signup': {
+            // Add loading message.
+            login_loading()
+
             // Make request JSON object.
             request_json = {
                 'username': document.querySelector('input[name="username"]').value,
@@ -108,11 +114,12 @@ function to_server(action) {
 
                 // POST for "add".
                 fetch_json_post(`${tracks_url}?action=add`, request_json, response_json => {
-                    // Set the edit key to the new track's ID.
-                    edit_key = response_json.track_id
+                    // Do "track" callback.
+                    track_callback(response_json)
 
-                    // Reload the track list.
-                    to_server('reload_track_list')
+                    // Open the new song to edit.
+                    edit_key = response_json.track_id
+                    switch_options_tab('edit-tab')
                 })
             }
         } break
@@ -137,8 +144,8 @@ function to_server(action) {
 
                 // POST for "save".
                 fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
-                    // Reload the track list.
-                    to_server('reload_track_list')
+                    // Do "track" callback.
+                    track_callback(response_json)
                 })
             }
         } break
@@ -154,20 +161,8 @@ function to_server(action) {
 
                 // POST for "delete".
                 fetch_json_post(`${tracks_url}?action=delete`, request_json, response_json => {
-                    // Reload the track list.
-                    to_server('reload_track_list')
-                })
-            }
-        } break
-
-        // Reload track list.
-        case 'reload_track_list': {
-            // Check if the user is logged in.
-            if (user_record.username !== '<guest>') {
-                // POST for "reload_track_list".
-                fetch_json_post(reload_track_list_url, {}, response_json => {
-                    // Do "reload_track_list" callback.
-                    reload_track_list_callback(response_json)
+                    // Do "track" callback.
+                    track_callback(response_json)
                 })
             }
         } break
@@ -211,6 +206,24 @@ function fetch_json_post(url, request_json, response_func=response_json=>{}) {
 
 
 
+// Adds a loading message for login features.
+function login_loading() {
+    // Display the message above the "Log in" button.
+    const login_message_el = document.querySelector('i[name="login-message"]')
+    if (login_message_el) {
+        // Update the message.
+        login_message_el.innerHTML = 'Loading...'
+        login_message_el.classList.remove('text-danger')
+        login_message_el.classList.add('text-info')
+    } else {
+        // Create the message if its element doesn't exist.
+        const password_el = document.querySelector('input[name="password"]')
+        password_el.insertAdjacentHTML('afterend', `<i name="login-message" class="text-info">Loading...</i>`)
+    }
+}
+
+
+
 // Callback function for "login" and "signup" actions.
 function login_callback(response_json) {
     // Check if an error occured.
@@ -219,14 +232,16 @@ function login_callback(response_json) {
         const error_message = `Error: ${response_json.error}`
 
         // Display the error above the "Log in" button.
-        const login_error_el = document.querySelector('i[name="login-error"]')
-        if (login_error_el) {
+        const login_message_el = document.querySelector('i[name="login-message"]')
+        if (login_message_el) {
             // Update the error.
-            login_error_el.innerHTML = error_message
+            login_message_el.innerHTML = error_message
+            login_message_el.classList.remove('text-info')
+            login_message_el.classList.add('text-danger')
         } else {
             // Create the error if its element doesn't exist.
-            const new_password_el = document.querySelector('input[name="new-password"]')
-            new_password_el.insertAdjacentHTML('afterend', `<i name="login-error" class="text-danger">${error_message}</i>`)
+            const password_el = document.querySelector('input[name="password"]')
+            password_el.insertAdjacentHTML('afterend', `<i name="login-message" class="text-danger">${error_message}</i>`)
         }
     } else {
         // Reload the page.
@@ -270,8 +285,8 @@ function change_password_callback(response_json) {
 
 
 
-// Callback function for "reload_track_list" action.
-function reload_track_list_callback(response_json) {
+// Callback function for "add", "save", and "delete" actions.
+function track_callback(response_json) {
     // Check if the track list was included.
     if ('track_list' in response_json) {
         // Update the track list.

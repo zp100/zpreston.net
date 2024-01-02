@@ -60,12 +60,6 @@ function do_mix_empty_queue() {
 function do_new_save() {
     // Add the song.
     to_server('add')
-
-    // Open the new song to edit.
-    switch_options_tab('edit-tab')
-
-    // Reload the list.
-    reload_list_tab()
 }
 
 

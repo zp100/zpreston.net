@@ -20,20 +20,30 @@ def root():
         # Get the user.
         username = flask.session['username']
 
-        # Check if the user's data exists.
-        try:
-            # Load the user's data.
-            user_record = postgresql.read_user(username)
-            track_list = postgresql.get_all_tracks(username)
-        except pg_errors.UsersError as exc:
-            # Error: User not found.
-            # Print the error and redirect to logout page.
-            print(exc)
-            return flask.redirect(
-                flask.url_for('session', action='logout')
-            )
+        # Check if the user's data is cached.
+        if ('user_record' in flask.session) and ('track_list' in flask.session):
+            # Copy from cache.
+            user_record = flask.session['user_record']
+            track_list = flask.session['track_list']
+        else:
+            # Check if the user's data exists.
+            try:
+                # Load the user's data.
+                user_record = postgresql.read_user(username)
+                track_list = postgresql.get_all_tracks(username)
 
-        # Add extra lists if they're stored.
+                # Store in cache.
+                flask.session['user_record'] = user_record
+                flask.session['track_list'] = track_list
+            except pg_errors.UsersError as exc:
+                # Error: User not found.
+                # Print the error and redirect to logout page.
+                print(exc)
+                return flask.redirect(
+                    flask.url_for('session', action='logout')
+                )
+
+        # Add extra lists if they're cached.
         extra_lists = {
             'queue_key_list': (flask.session['queue_key_list'] if 'queue_key_list' in flask.session else []),
             'recent_key_list': (flask.session['recent_key_list'] if 'recent_key_list' in flask.session else []),
@@ -142,7 +152,7 @@ def session():
             return {
                 'error': f"Not all fields provided.",
             }
-        
+
         # Get the lists.
         queue_key_list = flask.request.json['queue_key_list']
         recent_key_list = flask.request.json['recent_key_list']
@@ -267,6 +277,10 @@ def user_record():
         return {
             'error': f"Invalid action \"{action}\".",
         }
+    
+    # Store user data in cache.
+    user_record = postgresql.read_user(username)
+    flask.session['user_record'] = user_record
 
     # Return successful.
     return {}
@@ -339,10 +353,10 @@ def tracks():
         # Add the track.
         track_id = postgresql.create_track(username, record)
 
-        # Return the track ID.
-        return {
-            'track_id': track_id,
-        }
+        # Return the updated track list, with the new track's ID included.
+        response_json = get_track_list_json(username)
+        response_json['track_id'] = track_id
+        return response_json
     elif action == 'save':
         # Check if not all necessary fields were provided.
         if 'track_id' not in flask.request.json or \
@@ -394,6 +408,9 @@ def tracks():
             return {
                 'error': f"Track doesn't exist.",
             }
+        
+        # Return the updated track list.
+        return get_track_list_json(username)
     elif action == 'delete':
         # Check if not all necessary fields were provided.
         if 'track_id' not in flask.request.json:
@@ -414,6 +431,9 @@ def tracks():
             return {
                 'error': f"Track doesn't exist.",
             }
+        
+        # Return the updated track list.
+        return get_track_list_json(username)
     else:
         # Invalid action.
         # Return error message.
@@ -426,23 +446,15 @@ def tracks():
 
 
 
-# Route function for reloading the track list.
-@app.route('/reload_track_list/', methods=['POST'])
-def reload_track_list():
-    # Cancel if user is NOT logged in.
-    if 'username' not in flask.session:
-        # Return error message.
-        return {
-            'error': f"Not logged in.",
-        }
-
-    # Get the user.
-    username = flask.session['username']
-
+# Gets the track list as a REST response for the given user.
+def get_track_list_json(username):
     # Check if the user exists.
     try:
         # Load the user's tracks.
         track_list = postgresql.get_all_tracks(username)
+
+        # Store in cache.
+        flask.session['track_list'] = track_list
     except pg_errors.UsersError as exc:
         # Return error message.
         return {
