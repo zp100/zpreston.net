@@ -1,15 +1,12 @@
+# Import packages.
 import flask
 
+# App setup.
 app = flask.Flask(__name__)
 
-@app.route('/')
-def home():
-    return 'Hello, World!'
 
-@app.route('/about')
-def about():
-    return 'About'
 
-@app.route('/test/')
-def test():
-    return flask.render_template('test.html')
+# Route function for root page.
+@app.route('/', methods=['GET'])
+def root():
+    return flask.render_template('index.html')
