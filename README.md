@@ -25,7 +25,7 @@ source .env/bin/activate                                    # [optional] activat
 pip install -r requirements.txt                             # install the requirements
 ```
 
-You'll also need to [set up your own PostgreSQL database](https://www.postgresql.org/docs/current/tutorial-start.html) to store the tracks. This can either be a local database created on your computer, or one hosted online. Once that's done, run these SQL queries to create the tables for the project:
+You'll also need to set up your own PostgreSQL database to store the tracks. This can either be [a local database created on your computer](https://www.postgresql.org/docs/current/tutorial-start.html), or one hosted online. Once that's done, run these SQL queries to create the tables for the project:
 ```
 create table users(
     username        text not null,
