@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="/api/static/images/YouTune.png" alt="YouTune"/>
+</p>
+
 # YouTune
 
 An interface for YouTube that makes it easy to catalog and organize music to create playlists. Visit it at https://youtune.zpreston.net.
