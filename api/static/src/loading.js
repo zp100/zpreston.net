@@ -17,9 +17,22 @@ function from_id(track_id) {
 
 
 // Gets the full list of track IDs.
-function get_key_list() {
+function get_key_list(sort_list=['index']) {
+    // Copy the track list and loop through the sorting fields.
+    const sorted_track_list = [...track_list]
+    for (const sort of sort_list) {
+        // Check the type for this sort.
+        if (typeof track_list[0][sort] === 'string') {
+            // Sort alphabetically.
+            sorted_track_list.sort((t1, t2) => t1[sort].localeCompare(t2[sort]))
+        } else {
+            // Sort numerically, implicitly casting to numbers if needed.
+            sorted_track_list.sort((t1, t2) => t1[sort] - t2[sort])
+        }
+    }
+
     // Return the list of IDs.
-    const key_list = track_list.map(track => track.track_id)
+    const key_list = sorted_track_list.map(track => track.track_id)
     return key_list
 }
 

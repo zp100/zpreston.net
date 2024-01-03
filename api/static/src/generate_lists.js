@@ -205,9 +205,8 @@ function get_song_list_items() {
     const filter_tree = filters_syntax_tree()
     const filter_title = document.querySelector('input[name="filter-title"]').value
 
-    // Filter the keys and sort by index.
+    // Filter the keys.
     let new_key_list = filtered_key_list(get_key_list(), filter_tree, filter_title)
-        .sort((k1, k2) => from_id(k1).index - from_id(k2).index)
 
     // Create mix results message element.
     const message_el = document.createElement('section')
@@ -238,9 +237,7 @@ function get_queue_items() {
 // Gets the items for the "All tracks" tab.
 function get_sorted_items() {
     // Get a list of song keys, sorted by title.
-    let new_key_list = get_key_list()
-        .sort((k1, k2) => from_id(k1).tags.localeCompare(from_id(k2).tags))
-        .sort((k1, k2) => from_id(k1).title.localeCompare(from_id(k2).title))
+    let new_key_list = get_key_list(sort=['tags', 'title'])
 
     // Check if search values were used.
     const search_tree = filters_syntax_tree('search-tags')

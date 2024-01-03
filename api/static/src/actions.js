@@ -122,12 +122,6 @@ function do_edit_export() {
 
 // Deletes a song.
 function do_edit_delete() {
-    // Check if the song being deleted is the one currently playing.
-    if (key === edit_key) {
-        // Skip to the next song.
-        do_mix_skip()
-    }
-
     // Delete the song from the queue key list.
     old_ix = extra_lists.queue_key_list.indexOf(edit_key)
     if (old_ix >= 0) {
@@ -141,10 +135,11 @@ function do_edit_delete() {
         old_ix = extra_lists.recent_key_list.indexOf(edit_key)
     }
 
-    // Update the edit key to the track with the next index.
-    edit_key = from_index(
-        from_id(edit_key).index % track_list.length + 1
-    ).track_id
+    // Check if the song being deleted is the one currently playing.
+    if (key === edit_key) {
+        // Skip to the next song.
+        do_mix_skip()
+    }
 
     // Switch back to the "Mix" tab.
     switch_options_tab('mix-tab')
@@ -154,6 +149,10 @@ function do_edit_delete() {
 
     // Store extra lists.
     to_server('extra_lists')
+
+    // Un-set the edit key and re-disable the edit tab.
+    edit_key = undefined
+    document.querySelector('button.mini[name="edit-tab"]').disabled = true
 }
 
 
