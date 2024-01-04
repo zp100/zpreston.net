@@ -20,28 +20,18 @@ def root():
         # Get the user.
         username = flask.session['username']
 
-        # Check if the user's data is cached.
-        if ('user_record' in flask.session) and ('track_list' in flask.session):
-            # Copy from cache.
-            user_record = flask.session['user_record']
-            track_list = flask.session['track_list']
-        else:
-            # Check if the user's data exists.
-            try:
-                # Load the user's data.
-                user_record = postgresql.read_user(username)
-                track_list = postgresql.get_all_tracks(username)
-
-                # Store in cache.
-                flask.session['user_record'] = user_record
-                flask.session['track_list'] = track_list
-            except pg_errors.UsersError as exc:
-                # Error: User not found.
-                # Print the error and redirect to logout page.
-                print(exc)
-                return flask.redirect(
-                    flask.url_for('session', action='logout')
-                )
+        # Check if the user's data exists.
+        try:
+            # Load the user's data.
+            user_record = postgresql.read_user(username)
+            track_list = postgresql.get_all_tracks(username)
+        except pg_errors.UsersError as exc:
+            # Error: User not found.
+            # Print the error and redirect to logout page.
+            print(exc)
+            return flask.redirect(
+                flask.url_for('session', action='logout')
+            )
 
         # Add extra lists if they're cached.
         extra_lists = {
@@ -278,10 +268,6 @@ def user_record():
             'error': f"Invalid action \"{action}\".",
         }
     
-    # Store user data in cache.
-    user_record = postgresql.read_user(username)
-    flask.session['user_record'] = user_record
-
     # Return successful.
     return {}
 
@@ -452,9 +438,6 @@ def get_track_list_json(username):
     try:
         # Load the user's tracks.
         track_list = postgresql.get_all_tracks(username)
-
-        # Store in cache.
-        flask.session['track_list'] = track_list
     except pg_errors.UsersError as exc:
         # Return error message.
         return {

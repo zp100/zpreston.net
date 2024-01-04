@@ -30,8 +30,8 @@ function do_mix_skip() {
 
 // Edits the current song.
 function do_mix_edit() {
-    // Check if a song is playing.
-    if (key !== null) {
+    // Check if a song is selected.
+    if (key ?? false) {
         // Update the edit key.
         edit_key = key
 
@@ -207,21 +207,39 @@ function do_account_signup() {
 
 // Reloads the current song and the song list.
 function reload_all(is_scroll=true) {
-    // Recent.
-    add_to_recent(key)
+    // Check if a song is selected.
+    if (key ?? false) {
+        // Recent.
+        add_to_recent(key)
+
+        // Check if scrolling was specified.
+        if (is_scroll) {
+            // Reload the scroll.
+            scroll_to_selected()
+        }
+
+        // Load the video.
+        load_video()
+    } else {
+        // Load a fake video to get the other code to work properly.
+        player.cueVideoById({'videoId': ''})
+
+        // Update page title.
+        document.title = `${user_record.username}'s tracks | YouTune`
+
+        // Update track info.
+        const track_name_el = document.querySelector('span.main-name[name="track-info"]')
+        track_name_el.innerHTML = '<i>No track selected</i>'
+        track_name_el.title = 'No track selected'
+
+        // Replace video player with placeholder.
+        document.querySelector('#video').hidden = 1
+        document.querySelector('#video-placeholder').hidden = 0
+    }
 
     // Reload the options and list.
     reload_options_tab()
     reload_list_tab()
-
-    // Check if scrolling was specified.
-    if (is_scroll) {
-        // Reload the scroll.
-        scroll_to_selected()
-    }
-
-    // Load the video.
-    load_video()
 
     // Store extra lists.
     to_server('extra_lists')

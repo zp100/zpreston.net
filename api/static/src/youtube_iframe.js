@@ -23,22 +23,36 @@ setTimeout(check_yt, 100)
 
 // Callback function to detect when the video ends.
 function on_player_state_change(ev) {
-    // Check if the state is end of video.
-    if (ev.data === 0) {
-        // Bugfix: Ignore if triggered at the start of the next video.
-        if (player.getCurrentTime() > 0) {
-            ended_video()
+    // Check if a song is selected.
+    if (key ?? false) {
+        // Check if the state is end of video.
+        if (ev.data === 0) {
+            // Bugfix: Ignore if triggered at the start of the next video.
+            if (player.getCurrentTime() > 0) {
+                ended_video()
+            }
         }
-    }
 
-    // Check if the state is video cued.
-    if (ev.data === 5) {
-        cued_video()
-    }
+        // Check if the state is video cued.
+        if (ev.data === 5) {
+            cued_video()
+        }
 
-    // Check if the video started playing.
-    if (ev.data === 1 && player.__custom__.play_loop < 2) {
-        started_video()
+        // Check if the video started playing.
+        if (ev.data === 1 && player.__custom__.play_loop < 2) {
+            started_video()
+        }
+    } else {
+        // Clear existing intervals for the video.
+        clearInterval(player.__custom__.update_time)
+        clearInterval(player.__custom__.test_fade_out)
+        if (window.video_fade_worker) window.video_fade_worker.terminate()
+        player.unMute()
+
+        // Reset the timers.
+        document.querySelector('span.track-before[name="track-info"]').innerHTML = '&ndash;:&ndash;&ndash;'
+        document.querySelector('span.track-total[name="track-info"]').innerHTML = '&ndash;:&ndash;&ndash;'
+        document.querySelector('span.track-after[name="track-info"]').innerHTML = '&ndash;:&ndash;&ndash;'
     }
 }
 

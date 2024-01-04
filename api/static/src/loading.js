@@ -18,6 +18,12 @@ function from_id(track_id) {
 
 // Gets the full list of track IDs.
 function get_key_list(sort_list=['index']) {
+    // Check if the track list is empty.
+    if (track_list.length <= 0) {
+        // Return an empty list.
+        return []
+    }
+
     // Copy the track list and loop through the sorting fields.
     const sorted_track_list = [...track_list]
     for (const sort of sort_list) {
@@ -66,7 +72,7 @@ function load_next_song(mode) {
         case 'shuffle': {
             // Choose a random song.
             const new_key = random_song(new_key_list)
-            if (new_key !== null) {
+            if (new_key ?? false) {
                 // Select the new song.
                 key = new_key
                 reload_all()
@@ -90,7 +96,7 @@ function load_next_song(mode) {
             if (extra_lists.queue_key_list.length > 0) {
                 // Choose a random song from the queue.
                 const new_key = random_song(extra_lists.queue_key_list)
-                if (new_key !== null) {
+                if (new_key ?? false) {
                     // Play the new song.
                     let index = extra_lists.queue_key_list.indexOf(new_key)
                     extra_lists.queue_key_list.splice(index, 1)
@@ -112,7 +118,7 @@ function load_next_song(mode) {
             } else {
                 // Choose a random song.
                 const new_key = random_song(new_key_list)
-                if (new_key !== null) {
+                if (new_key ?? false) {
                     // Play the new song.
                     key = new_key
                     reload_all()
@@ -126,7 +132,7 @@ function load_next_song(mode) {
             if (extra_lists.queue_key_list.length > 0) {
                 // Choose a random song from the queue.
                 const new_key = random_song(extra_lists.queue_key_list)
-                if (new_key !== null) {
+                if (new_key ?? false) {
                     // Play the new song.
                     let index = extra_lists.queue_key_list.indexOf(new_key)
                     extra_lists.queue_key_list.splice(index, 1)
@@ -137,7 +143,7 @@ function load_next_song(mode) {
             } else {
                 // Choose a random song.
                 const new_key = random_song(new_key_list)
-                if (new_key !== null) {
+                if (new_key ?? false) {
                     // Play the new song.
                     key = new_key
                     reload_all()
@@ -151,11 +157,6 @@ function load_next_song(mode) {
 
 // Loads the video for the current key.
 function load_video() {
-    // Skip if no song is selected.
-    if (key === null) {
-        return
-    }
-
     // Get the video ID and store it in an object.
     const load_obj = {
         'videoId': parse_video_id(from_id(key).url),
