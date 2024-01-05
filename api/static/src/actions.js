@@ -98,7 +98,7 @@ function do_edit_save() {
 function do_edit_export() {
     // Get the track to export.
     const track = from_id(edit_key)
-    
+
     // Convert the track to a list (with only that track).
     const tracks = [
         {
@@ -112,7 +112,7 @@ function do_edit_export() {
             'end_time': track['end_time'],
         },
     ]
-    
+
     // Export the track.
     const filename = track.title
     export_songs(filename, tracks)

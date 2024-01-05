@@ -86,7 +86,7 @@ function to_server(action) {
                     'current_password': document.querySelector('input[name="current-password"]').value,
                     'new_password': document.querySelector('input[name="new-password"]').value,
                 }
-    
+
                 // POST for "change_password".
                 fetch_json_post(`${user_record_url}?action=change_password`, request_json, response_json => {
                     // Do "change_password" callback.

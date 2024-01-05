@@ -184,7 +184,7 @@ def user_record():
         return {
             'error': f"Not logged in.",
         }
-    
+
     # Get the user.
     username = flask.session['username']
 
@@ -267,7 +267,7 @@ def user_record():
         return {
             'error': f"Invalid action \"{action}\".",
         }
-    
+
     # Return successful.
     return {}
 
@@ -290,7 +290,7 @@ def tracks():
         return {
             'error': f"Not logged in.",
         }
-    
+
     # Get the user.
     username = flask.session['username']
 
@@ -394,7 +394,7 @@ def tracks():
             return {
                 'error': f"Track doesn't exist.",
             }
-        
+
         # Return the updated track list.
         return get_track_list_json(username)
     elif action == 'delete':
@@ -417,7 +417,7 @@ def tracks():
             return {
                 'error': f"Track doesn't exist.",
             }
-        
+
         # Return the updated track list.
         return get_track_list_json(username)
     else:
@@ -443,7 +443,7 @@ def get_track_list_json(username):
         return {
             'error': f"User \"{username}\" doesn't exist.",
         }
-    
+
     # Return the tracks.
     return {
         'track_list': track_list,

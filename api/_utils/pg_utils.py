@@ -13,7 +13,7 @@ from api._utils import pg_errors
 # Functions that this decorates must use their first parameter for the cursor argument (similar to "self" in classes).
 # Queries can be executed using the "cur.execute(query, vars=None)" function.
 # Returned records can be accessed using the "cur.fetchone()", "cur.fetchmany(size=cur.arraysize)", or "cur.fetchall()" functions.
-# Records can be iterated over using the "for record in cur:" block. 
+# Records can be iterated over using the "for record in cur:" block.
 def transaction(func):
     # Define inner function.
     def inner(*args, **kwargs):
@@ -46,7 +46,7 @@ def transaction(func):
         finally:
             # Regardless of exceptions, close the connection.
             conn.close()
-        
+
         # Return the wrapped function's return value.
         return ret
 
@@ -121,7 +121,7 @@ def parse_index(cur, owner, index_str):
     except ValueError as exc:
         # Default to end index.
         index = end_index
-    
+
     # Check if it's out-of-bounds.
     if index < 1:
         # Clamp up to 1.
@@ -129,7 +129,7 @@ def parse_index(cur, owner, index_str):
     elif index > end_index:
         # Clamp down to end index.
         index = end_index
-    
+
     # Return the final index.
     return index
 
