@@ -257,8 +257,13 @@ function reload_options_tab(tab_id=null) {
             if (user_record.username !== '<guest>') {
                 // Add values to options.
                 document.querySelector(`#account-tab input[name="default-volume"]`).value = user_record.default_volume
-                if (user_record.save_extra) document.querySelector(`#account-tab button.true[name="save-extra"]`).classList.add('selected')
-                else document.querySelector(`#account-tab button.false[name="save-extra"]`).classList.add('selected')
+                if (user_record.save_extra) {
+                    document.querySelector(`#account-tab button.true[name="save-extra"]`).classList.add('selected')
+                    document.querySelector(`#account-tab button.false[name="save-extra"]`).classList.remove('selected')
+                } else {
+                    document.querySelector(`#account-tab button.true[name="save-extra"]`).classList.remove('selected')
+                    document.querySelector(`#account-tab button.false[name="save-extra"]`).classList.add('selected')
+                }
             }
         } break
 
