@@ -100,3 +100,6 @@ label, p {
 span.emph, input, select, input:focus, select:focus {
     color: white;
 }
+span.emph {
+    font-weight: bold;
+}

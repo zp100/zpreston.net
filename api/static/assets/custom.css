@@ -88,6 +88,7 @@ section.list-item.empty {
     display: flex;
     justify-content: center;
     color: var(--border);
+    font-weight: bold;
 }
 
 /* Style for song indices. */
