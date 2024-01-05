@@ -14,71 +14,88 @@ select {
 button, input, select {
     width: 100%;
     margin-right: 0.1rem;
-    background-color: var(--darker-gray);
-    color: var(--light-gray);
-    border-color: var(--dark-gray);
+    background-color: var(--light-bg);
+    border-color: var(--border);
     border-style: solid;
     border-radius: 0.2rem;
+    color: var(--dim-text);
 }
 button.mini {
     width: 1.6rem;
     font-size: small;
     color: transparent;
-    text-shadow: 0 0 0 var(--light-gray)
+    text-shadow: 0 0 0 var(--dim-text)
 }
 button.song-button {
     background-color: transparent;
-    color: white;
     border-color: transparent;
     border-radius: 0.5rem;
+    color: white;
     padding: 0;
 }
 
-/* Effects for selected inputs. */
-button.selected, button:hover, input:focus, select:focus {
-    background-color: var(--mid-gray);
-    color: var(--light-gray);
-    border-color: var(--mid-gray);
+/* Effects for hovered/focused inputs. */
+button:hover, button:focus, input:focus, select:focus {
+    background-color: var(--border);
+    border-color: var(--border);
+    color: var(--dim-text);
 }
-button.mini.selected, button.mini:hover {
+button.mini:hover, button.mini:focus {
     color: transparent;
-    text-shadow: 0 0 0 var(--light-gray)
+    text-shadow: 0 0 0 var(--dim-text)
 }
-button.song-button.selected, button.song-button:hover {
-    background-color: var(--darker-gray);
+button.song-button:hover, button.song-button:focus {
+    background-color: var(--light-bg);
+    border-color: transparent;
+    color: white;
+}
+
+/* Effects for selected buttons. */
+button.selected {
+    background-color: var(--highlight);
+    color: var(--dim-text);
+    border-color: var(--highlight);
+}
+button.mini.selected {
+    color: transparent;
+    text-shadow: 0 0 0 var(--dim-text);
+}
+button.song-button.selected, button.song-button:active {
+    background-color: var(--highlight);
     color: white;
     border-color: transparent;
+
+    span.tag {
+        background-color: var(--bright-highlight);
+    }
 }
 
 /* Effects for clicked buttons. */
 button:active {
-    background-color: var(--light-gray);
-    color: var(--mid-gray);
-    border-color: var(--light-gray);
+    background-color: var(--bright-highlight);
+    color: white;
+    border-color: var(--bright-highlight);
 }
 button.mini:active {
     color: transparent;
-    text-shadow: 0 0 0 var(--dark-gray)
-}
-button.song-button:active {
-    background-color: var(--dark-gray);
+    text-shadow: 0 0 0 white;
 }
 
 /* Effects for disabled buttons. */
 button:disabled {
-    background-color: var(--darker-gray);
-    color: var(--dark-gray);
-    border-color: var(--dark-gray);
+    background-color: var(--light-bg);
+    color: var(--border);
+    border-color: var(--border);
 }
 button.mini:disabled {
     color: transparent;
-    text-shadow: 0 0 0 var(--dark-gray);
-    border-color: var(--dark-gray);
+    text-shadow: 0 0 0 var(--border);
+    border-color: var(--border);
 }
 
 /* Highlight text colors. */
 label, p {
-    color: var(--light-gray);
+    color: var(--dim-text);
 }
 span.emph, input, select, input:focus, select:focus {
     color: white;
