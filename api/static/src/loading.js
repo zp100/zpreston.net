@@ -62,9 +62,9 @@ function load_next_song(mode) {
         // Next.
         case 'auto': {
             // Go to the next video.
-            let index = new_key_list.indexOf(key)
-            index = index % new_key_list.length + 1
-            key = new_key_list[index]
+            old_ix = new_key_list.indexOf(key)
+            new_ix = (old_ix + 1) % new_key_list.length
+            key = new_key_list[new_ix]
             reload_all()
         } break
 
@@ -98,8 +98,8 @@ function load_next_song(mode) {
                 const new_key = random_song(extra_lists.queue_key_list)
                 if (new_key ?? false) {
                     // Play the new song.
-                    let index = extra_lists.queue_key_list.indexOf(new_key)
-                    extra_lists.queue_key_list.splice(index, 1)
+                    new_ix = extra_lists.queue_key_list.indexOf(new_key)
+                    extra_lists.queue_key_list.splice(new_ix, 1)
                     key = new_key
                     to_server('extra_lists')
                     reload_all()
@@ -134,8 +134,8 @@ function load_next_song(mode) {
                 const new_key = random_song(extra_lists.queue_key_list)
                 if (new_key ?? false) {
                     // Play the new song.
-                    let index = extra_lists.queue_key_list.indexOf(new_key)
-                    extra_lists.queue_key_list.splice(index, 1)
+                    new_ix = extra_lists.queue_key_list.indexOf(new_key)
+                    extra_lists.queue_key_list.splice(new_ix, 1)
                     key = new_key
                     to_server('extra_lists')
                     reload_all()

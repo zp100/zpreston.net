@@ -303,10 +303,10 @@ function load_count_tags(key_list) {
         const tag_list = tokenize_tags(from_id(k).tags)
         for (const tag of tag_list) {
             // Check if the tag is already in the count-tags list.
-            let index = count_tag_list.findIndex(count_tag => count_tag.name === tag)
-            if (index >= 0) {
+            old_ix = count_tag_list.findIndex(count_tag => count_tag.name === tag)
+            if (old_ix >= 0) {
                 // Add to the tag count.
-                count_tag_list[index].count++
+                count_tag_list[old_ix].count++
             } else {
                 // Add the tag.
                 count_tag_list.push({

@@ -277,7 +277,7 @@ function add_to_queue(value_key) {
     // Check if the song is already in the queue.
     if (extra_lists.queue_key_list.includes(value_key)) {
         // Delete the original item.
-        let old_ix = extra_lists.queue_key_list.indexOf(value_key)
+        old_ix = extra_lists.queue_key_list.indexOf(value_key)
         if (old_ix >= 0) {
             extra_lists.queue_key_list.splice(old_ix, 1)
         }
