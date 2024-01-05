@@ -112,6 +112,23 @@ function to_server(action) {
                     'end_time': document.querySelector(`#new-tab input[name="end-time"]`).value,
                 }
 
+                // Check if the title is blank.
+                if (request_json.title === '') {
+                    // Get the title from the video, and POST when that's done.
+                    load_video_title(request_json, request_json => {
+                        // POST for "add".
+                        fetch_json_post(`${tracks_url}?action=add`, request_json, response_json => {
+                            // Do "track" callback.
+                            track_callback(response_json)
+
+                            // Open the new track to edit.
+                            edit_key = response_json.track_id
+                            switch_options_tab('edit-tab')
+                        })
+                    })
+                    return
+                }
+
                 // POST for "add".
                 fetch_json_post(`${tracks_url}?action=add`, request_json, response_json => {
                     // Do "track" callback.
@@ -139,6 +156,29 @@ function to_server(action) {
 
                 // Sort the list of tracks by index.
                 track_list.sort((t1, t2) => t1.index - t2.index)
+
+                // Check if the title is blank.
+                if (request_json.title === '') {
+                    // Get the title from the video, and POST when that's done.
+                    load_video_title(track, track => {
+                        // Insert the track at its index.
+                        track_list.splice(track.index - 1, 0, track)
+
+                        // Update the index of every track.
+                        for (const i in track_list) {
+                            // Set index based on its position in the list.
+                            track_list[i].index = Number(i) + 1
+                        }
+
+                        // Reload the list.
+                        reload_list_tab()
+
+                        // Open the new track to edit.
+                        edit_key = track.track_id
+                        switch_options_tab('edit-tab')
+                    })
+                    return
+                }
 
                 // Insert the track at its index.
                 track_list.splice(track.index - 1, 0, track)
@@ -440,4 +480,45 @@ function parse_index(index_str) {
 
     // Return the final index.
     return index
+}
+
+
+
+// Gets the title for a video asynchronously.
+function load_video_title(track, done_callback) {
+    // Create a wrapper for the YouTube player's container so that it isn't lost when the player is added.
+    const title_wrapper_el = document.createElement('div')
+    title_wrapper_el.style.display = 'none'
+    document.body.appendChild(title_wrapper_el)
+
+    // Create a container for the YouTube player, and add it to the wrapper.
+    const title_video_el = document.createElement('div')
+    title_video_el.style.display = 'none'
+    title_video_el.setAttribute('id', '--title-video')
+    title_wrapper_el.appendChild(title_video_el)
+
+    // Create video player.
+    const title_player = new YT.Player('--title-video', {
+        events: {
+            'onReady': function (ev) {
+                // Load the video.
+                title_player.cueVideoById({
+                    'videoId': parse_video_id(track.url),
+                })
+            },
+            'onStateChange': function (ev) {
+                // Check if the state is video cued.
+                if (ev.data === 5) {
+                    // Set the title.
+                    track.title = title_player.getVideoData().title
+
+                    // Delete the wrapper for the player container.
+                    document.body.removeChild(title_wrapper_el)
+
+                    // Call the "done" callback.
+                    done_callback(track)
+                }
+            }
+        }
+    })
 }
