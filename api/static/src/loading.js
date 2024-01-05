@@ -157,9 +157,16 @@ function load_next_song(mode) {
 
 // Loads the video for the current key.
 function load_video() {
+    // Check if the video ID is blank.
+    let video_id = parse_video_id(from_id(key).url)
+    if (video_id === '') {
+        // Don't try to cue the video because it'll act erroneously.
+        video_id = '{URL&nbsp;ERROR}'
+    }
+
     // Get the video ID and store it in an object.
     const load_obj = {
-        'videoId': parse_video_id(from_id(key).url),
+        'videoId': video_id,
     }
 
     // Check if valid start time was provided.

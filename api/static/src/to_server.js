@@ -486,6 +486,22 @@ function parse_index(index_str) {
 
 // Gets the title for a video asynchronously.
 function load_video_title(track, done_callback) {
+    // Check if the video ID is blank.
+    let video_id = parse_video_id(track.url)
+    if (video_id === '') {
+        // Don't try to cue the video because it'll act erroneously.
+        video_id = '{URL&nbsp;ERROR}'
+
+        // Set an error for the title.
+        track.title = '{TITLE&nbsp;ERROR}'
+
+        // Call the "done" callback.
+        done_callback(track)
+
+        // Stop the function.
+        return
+    }
+
     // Create a wrapper for the YouTube player's container so that it isn't lost when the player is added.
     const title_wrapper_el = document.createElement('div')
     title_wrapper_el.style.display = 'none'
@@ -503,11 +519,11 @@ function load_video_title(track, done_callback) {
             'onReady': function (ev) {
                 // Load the video.
                 title_player.cueVideoById({
-                    'videoId': parse_video_id(track.url),
+                    'videoId': video_id,
                 })
             },
             'onStateChange': function (ev) {
-                // Check if the state is video cued.
+                // Check if the video's title has loaded.
                 if (ev.data === 5) {
                     // Set the title.
                     track.title = title_player.getVideoData().title

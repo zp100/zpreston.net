@@ -159,7 +159,7 @@ function info_button_click(tab_id, value) {
         },
         'title': {
             'header': 'Title',
-            'content': `The title of the track. Displayed in all of the track lists and the browser tab's title.`,
+            'content': `The title of the track. Displayed in all of the track lists and the browser tab's title. When adding a new track, if this field is left blank, the title will be auto-filled using the title of the provided video.`,
         },
         'index': {
             'header': 'List index',

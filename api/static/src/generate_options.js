@@ -411,6 +411,14 @@ function get_new_items() {
     // Return the items.
     return [
         [
+            // Video URL.
+            {
+                'item_type': 'field',
+                'value': 'url',
+                'display': 'Video URL',
+                'type': 'text',
+            },
+
             // List index.
             {
                 'item_type': 'field',
@@ -432,14 +440,6 @@ function get_new_items() {
                 'item_type': 'field',
                 'value': 'tags',
                 'display': 'Tags',
-                'type': 'text',
-            },
-
-            // Video URL.
-            {
-                'item_type': 'field',
-                'value': 'url',
-                'display': 'Video URL',
                 'type': 'text',
             },
 
@@ -501,6 +501,14 @@ function get_edit_items() {
     // Return the items.
     return [
         [
+            // Video URL.
+            {
+                'item_type': 'field',
+                'value': 'url',
+                'display': 'Video URL',
+                'type': 'text',
+            },
+
             // List index.
             {
                 'item_type': 'field',
@@ -522,14 +530,6 @@ function get_edit_items() {
                 'item_type': 'field',
                 'value': 'tags',
                 'display': 'Tags',
-                'type': 'text',
-            },
-
-            // Video URL.
-            {
-                'item_type': 'field',
-                'value': 'url',
-                'display': 'Video URL',
                 'type': 'text',
             },
 

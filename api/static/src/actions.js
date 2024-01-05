@@ -222,7 +222,7 @@ function reload_all(is_scroll=true) {
         load_video()
     } else {
         // Load a fake video to get the other code to work properly.
-        player.cueVideoById({'videoId': ''})
+        player.cueVideoById({'videoId': '{URL&nbsp;ERROR}'})
 
         // Update page title.
         document.title = `${user_record.username}'s tracks | YouTune`
