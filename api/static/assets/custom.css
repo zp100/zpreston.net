@@ -84,6 +84,11 @@ section.list-item.message {
     display: block;
     color: var(--light-gray);
 }
+section.list-item.empty {
+    display: flex;
+    justify-content: center;
+    color: var(--mid-gray);
+}
 
 /* Style for song indices. */
 span.song-index {

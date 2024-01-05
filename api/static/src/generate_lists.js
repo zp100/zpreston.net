@@ -34,75 +34,87 @@ function add_list_tab_html(tab_id, message_el, key_list) {
     tab_el.appendChild(message_el)
     tab_el.insertAdjacentHTML('beforeend', '<hr>')
 
-    // Loop through the song keys.
-    for (const k of key_list) {
+    // Check if the key list has items.
+    if (key_list.length > 0) {
+        // Loop through the song keys.
+        for (const k of key_list) {
+            // Create song list item.
+            const item_el = document.createElement('section')
+            item_el.classList.add('list-item')
+
+            // Create song button.
+            const song_el = document.createElement('button')
+            song_el.classList.add('song-button')
+            song_el.addEventListener('click', () => song_button_click(tab_id, k))
+
+            // Check if this is the current song.
+            if (k === key) {
+                // Add extra class.
+                song_el.classList.add('selected')
+            }
+
+            // Create song text.
+            const song_text_el = document.createElement('div')
+            song_text_el.classList.add('song-text')
+            let index = from_id(k).index
+            song_text_el.insertAdjacentHTML('beforeend', `<span class="song-index">${index}.&nbsp;&nbsp; </span>`)
+
+            // Create song title and tags.
+            const song_title_el = document.createElement('div')
+            song_title_el.insertAdjacentHTML('beforeend', `${from_id(k).title}&nbsp;&nbsp; `)
+
+            // Check if the tag list has no errors.
+            const tag_list = tokenize_tags(from_id(k).tags)
+            if (tag_list !== null) {
+                // Add tags.
+                for (const tag of tag_list) {
+                    song_title_el.insertAdjacentHTML('beforeend', `<span class="tag">${tag.replaceAll(' ', '&nbsp;')}</span>&nbsp;&nbsp; `)
+                }
+            } else {
+                // Add error message.
+                song_title_el.insertAdjacentHTML('beforeend', '<span class="tag">{TAGS&nbsp;ERROR}</span>&nbsp;&nbsp; ')
+            }
+
+            // Append song title and tags to song text.
+            song_text_el.appendChild(song_title_el)
+
+            // Append song text to song button.
+            song_el.appendChild(song_text_el)
+
+            // Append song button to list item.
+            item_el.appendChild(song_el)
+
+            // Check if this is the queue list.
+            const side_buttons_el = document.createElement('div')
+            side_buttons_el.classList.add('side-buttons')
+            if (tab_id === 'queue-tab') {
+                // Add queue's buttons.
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Move to top of queue">🔝</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => queue_move_button_click(tab_id, k))
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Remove from queue">❌</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => queue_delete_button_click(tab_id, k))
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
+            } else {
+                // Add normal buttons.
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Add to end of queue">☰</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => queue_button_click(tab_id, k))
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
+            }
+
+            // Append side buttons to list item.
+            item_el.appendChild(side_buttons_el)
+
+            // Append list item to tab.
+            tab_el.appendChild(item_el)
+        }
+    } else {
         // Create song list item.
         const item_el = document.createElement('section')
         item_el.classList.add('list-item')
-
-        // Create song button.
-        const song_el = document.createElement('button')
-        song_el.classList.add('song-button')
-        song_el.addEventListener('click', () => song_button_click(tab_id, k))
-
-        // Check if this is the current song.
-        if (k === key) {
-            // Add extra class.
-            song_el.classList.add('selected')
-        }
-
-        // Create song text.
-        const song_text_el = document.createElement('div')
-        song_text_el.classList.add('song-text')
-        let index = from_id(k).index
-        song_text_el.insertAdjacentHTML('beforeend', `<span class="song-index">${index}.&nbsp;&nbsp; </span>`)
-
-        // Create song title and tags.
-        const song_title_el = document.createElement('div')
-        song_title_el.insertAdjacentHTML('beforeend', `${from_id(k).title}&nbsp;&nbsp; `)
-
-        // Check if the tag list has no errors.
-        const tag_list = tokenize_tags(from_id(k).tags)
-        if (tag_list !== null) {
-            // Add tags.
-            for (const tag of tag_list) {
-                song_title_el.insertAdjacentHTML('beforeend', `<span class="tag">${tag.replaceAll(' ', '&nbsp;')}</span>&nbsp;&nbsp; `)
-            }
-        } else {
-            // Add error message.
-            song_title_el.insertAdjacentHTML('beforeend', '<span class="tag">{TAGS&nbsp;ERROR}</span>&nbsp;&nbsp; ')
-        }
-
-        // Append song title and tags to song text.
-        song_text_el.appendChild(song_title_el)
-
-        // Append song text to song button.
-        song_el.appendChild(song_text_el)
-
-        // Append song button to list item.
-        item_el.appendChild(song_el)
-
-        // Check if this is the queue list.
-        const side_buttons_el = document.createElement('div')
-        side_buttons_el.classList.add('side-buttons')
-        if (tab_id === 'queue-tab') {
-            // Add queue's buttons.
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Move to top of queue">🔝</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => queue_move_button_click(tab_id, k))
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Remove from queue">❌</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => queue_delete_button_click(tab_id, k))
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
-        } else {
-            // Add normal buttons.
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Add to end of queue">☰</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => queue_button_click(tab_id, k))
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
-        }
-
-        // Append side buttons to list item.
-        item_el.appendChild(side_buttons_el)
+        item_el.classList.add('empty')
+        item_el.insertAdjacentHTML('beforeend', '<i>Tracks for this list will appear here</i>')
 
         // Append list item to tab.
         tab_el.appendChild(item_el)
