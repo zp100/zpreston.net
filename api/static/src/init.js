@@ -27,6 +27,7 @@ function init(ur, tl, el, su, uru, tu, vfu) {
 
     // Load the video setup.
     window.addEventListener('keydown', window_keydown)
+    document.querySelector('#options-box').addEventListener('keydown', options_keydown)
     add_view_selection_callbacks()
 
     // Load the options tabs.

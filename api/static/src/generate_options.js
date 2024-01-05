@@ -141,6 +141,7 @@ function add_options_tab_html(tab_id, group_list) {
                     // Add HTML and event listeners.
                     item_el.insertAdjacentHTML('beforeend', '<button class="action" title="' + item.title + '">' + item.display + '</button>')
                     item_el.lastElementChild.addEventListener('click', () => action_button_click(tab_id, item.value))
+                    if (item.primary) item_el.lastElementChild.classList.add('primary')
                 } break
 
                 // Field info.
@@ -307,8 +308,9 @@ function get_mix_items() {
             {
                 'item_type': 'action',
                 'value': 'skip',
-                'display': 'Skip',
+                'display': '⋆Skip',
                 'title': 'Skip this track',
+                'primary': true,
             },
 
             // Edit.
@@ -492,8 +494,9 @@ function get_new_items() {
             {
                 'item_type': 'action',
                 'value': 'save',
-                'display': 'Add',
+                'display': '⋆Add',
                 'title': 'Add track to list',
+                'primary': true,
             },
         ],
     ]
@@ -598,8 +601,9 @@ function get_edit_items() {
             {
                 'item_type': 'action',
                 'value': 'save',
-                'display': 'Save',
+                'display': '⋆Save',
                 'title': 'Save changes to track',
+                'primary': true,
             },
 
             // Export.
@@ -696,8 +700,9 @@ function get_results_items() {
             {
                 'item_type': 'action',
                 'value': 'save',
-                'display': 'Save',
+                'display': '⋆Save',
                 'title': 'Save changes to track',
+                'primary': true,
             },
 
             // Export.
@@ -756,8 +761,9 @@ function get_account_items() {
             {
                 'item_type': 'action',
                 'value': 'update',
-                'display': 'Update',
+                'display': '⋆Update',
                 'title': 'Update user settings',
+                'primary': true,
             },
         ],
 
@@ -851,8 +857,9 @@ function get_guest_items() {
             {
                 'item_type': 'action',
                 'value': 'login',
-                'display': 'Log in',
+                'display': '⋆Log in',
                 'title': 'Sign in to an existing account',
+                'primary': true,
             },
 
             // Change button.

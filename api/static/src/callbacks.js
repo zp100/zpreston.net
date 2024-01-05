@@ -2,7 +2,7 @@
 function window_keydown(ev) {
     // Check if it's the spacebar.
     if (ev.key === ' ' && ev.target === document.body) {
-        // Prev the default behavior (scrolling the page).
+        // Prevent the default behavior.
         ev.preventDefault()
 
         // Check which state the video is in.
@@ -13,6 +13,21 @@ function window_keydown(ev) {
             // Play the video.
             player.playVideo()
         }
+    }
+}
+
+
+
+// Callback function for key pressed in options.
+function options_keydown(ev) {
+    // Check if it's the "Enter" key while in an input.
+    if (ev.key === 'Enter' && ev.target.tagName === 'INPUT') {
+        // Prevent the default behavior.
+        ev.preventDefault()
+
+        // Click the primary button for the current options tab.
+        const primary_button_el = document.querySelector('#options-box div.options-tab:not(div[hidden]) button.action.primary')
+        if (primary_button_el) primary_button_el.click()
     }
 }
 
