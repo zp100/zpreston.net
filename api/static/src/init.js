@@ -9,8 +9,8 @@ let tracks_url
 let video_fade_url
 let key
 let edit_key
-let move_key
-let move_top
+let drag_key
+let drag_top
 let finished_song_count = 0
 let player
 

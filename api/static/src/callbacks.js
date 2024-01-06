@@ -442,76 +442,74 @@ function edit_button_click(tab_id, value) {
 
 
 
-// Callback function for starting a click on move buttons. 
-function move_mousedown(tab_id, value, ev) {
+// Callback function for starting a click on drag buttons. 
+function drag_mousedown(tab_id, value, ev) {
     // Skip if it wasn't a left-click.
     if (ev.button !== 0) return
 
-    // Set the currently-selected move button.
-    move_key = value
+    // Set the currently-selected drag button.
+    drag_key = value
 
-    // Reset the move position.
-    move_top = 0
+    // Reset the drag position.
+    drag_top = 0
 
     // Highlight the button's list item.
-    const move_el = document.querySelector(`#${tab_id} section[name="${move_key}"]`)
-    move_el.classList.add('moving')
+    const drag_el = document.querySelector(`#${tab_id} section[name="${drag_key}"]`)
+    drag_el.classList.add('moving')
 }
 
 
 
-// Callback function for moving the mouse on move buttons.
+// Callback function for moving the mouse on drag buttons.
 function window_mousemove(ev) {
-    // Skip if no move button is active.
-    if (!move_key) return
+    // Skip if no drag button is active.
+    if (!drag_key) return
 
-    // Get the moved list item.
+    // Get the dragged list item.
     const tab_id = document.querySelector('div.list-tab:not([hidden])').id
-    const move_el = document.querySelector(`#${tab_id} section[name="${move_key}"]`)
+    const drag_el = document.querySelector(`#${tab_id} section[name="${drag_key}"]`)
 
     // Move the list item.
-    move_top += ev.movementY
-    move_el.style.top = `${move_top}px`
+    drag_top += ev.movementY
+    drag_el.style.top = `${drag_top}px`
 }
 
 
 
-// Callback function for ending a click on move buttons. 
+// Callback function for ending a click on drag buttons. 
 function window_mouseup(ev) {
-    // Skip if no move button is active.
-    if (!move_key) return
+    // Skip if no drag button is active.
+    if (!drag_key) return
 
-    // Get the moved list item.
+    // Get the dragged list item.
     const tab_id = document.querySelector('div.list-tab:not([hidden])').id
-    const move_el = document.querySelector(`#${tab_id} section[name="${move_key}"]`)
+    const drag_el = document.querySelector(`#${tab_id} section[name="${drag_key}"]`)
 
-    // Find the list item that's closest to the moved one, and set all of them to not moving.
+    // Find the list item that's closest to the dragged one, and set all of them to not moving.
     let closest_el
     let closest_distance = Infinity
     document.querySelectorAll('section.list-item').forEach(el => {
         // Check if it's not a message item.
         if (!el.classList.contains('message')) {
-            // Check if it's closest to the moved item.
-            const distance = Math.abs(el.getBoundingClientRect().top - move_el.getBoundingClientRect().top)
-            if (el !== move_el && distance < closest_distance) {
+            // Check if it's closest to the dragged item.
+            const distance = Math.abs(el.getBoundingClientRect().top - drag_el.getBoundingClientRect().top)
+            if (el !== drag_el && distance < closest_distance) {
                 // Update closest.
                 closest_el = el
                 closest_distance = distance
             }
         }
-            
+
         // Remove class.
         el.classList.remove('moving')
     })
 
     // Check if a position to move to was found.
-    if (closest_el && closest_distance < Math.abs(move_top)) {
-        console.log(move_top, closest_distance)
-        
+    if (closest_el && closest_distance < Math.abs(drag_top)) {
         // Make request JSON object, and set its index to that of the closest item.
-        const request_json = track_list.find(t => t.track_id === move_key)
+        const request_json = track_list.find(t => t.track_id === drag_key)
         request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
-        
+
         // POST for "save".
         fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
             // Do "track" callback.
@@ -522,6 +520,6 @@ function window_mouseup(ev) {
         reload_list_tab()
     }
 
-    // Un-set the current move button.
-    move_key = undefined
+    // Un-set the current drag button.
+    drag_key = undefined
 }
