@@ -526,3 +526,24 @@ function window_mouseup(ev) {
     // Un-set the current drag button.
     drag_key = undefined
 }
+
+
+
+// Callback function for clicking the "View next" button.
+function view_next_button_click() {
+    // Loop through the view options to make a list.
+    const option_list = []
+    document.querySelector('#view-box select[name="view"]').querySelectorAll('option').forEach(el => {
+        option_list.push(el.value)
+    })
+    
+    // Get the next option in the list after the current one.
+    const list_tab_select = document.querySelector('#view-box select[name="view"]').value
+    const new_select = option_list[
+        (option_list.indexOf(list_tab_select) + 1) % option_list.length
+    ]
+
+    // Switch to the selected list tab.
+    document.querySelector('#view-box select[name="view"]').value = new_select
+    switch_list_tab(new_select)
+}

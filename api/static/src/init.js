@@ -50,9 +50,13 @@ function init(ur, tl, el, su, uru, tu, vfu) {
 
 // Adds callbacks for view selection.
 function add_view_selection_callbacks() {
-    // Add callbacks.
-    const view_box_el_list = document.querySelector('#view-box').children
-    view_box_el_list[view_box_el_list.length - 1].addEventListener('input', () => select_input(null, 'view'))
+    // Add callback for view selection.
+    const view_box_el = document.querySelector('#view-box select[name="view"]')
+    view_box_el.addEventListener('input', () => select_input(null, 'view'))
+    
+    // Add callback for "View next" button.
+    const view_next_el = document.querySelector('#view-box button[name="view-next"]')
+    view_next_el.addEventListener('click', () => view_next_click())
 }
 
 

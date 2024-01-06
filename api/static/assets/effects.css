@@ -51,6 +51,10 @@ button.drag {
     background-color: transparent;
     color: var(--border);
 }
+select.view {
+    padding-top: 0;
+    padding-bottom: 0;
+}
 
 /* Effects for hovered/focused inputs. */
 button:hover, button:focus, input:focus, select:focus {
