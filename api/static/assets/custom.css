@@ -92,7 +92,8 @@ section.list-item.empty {
     font-weight: bold;
 }
 section.list-item.moving {
-    background-color: var(--border);
+    z-index: 9999;
+    background-color: var(--light-bg);
     border-style: solid;
     border-color: var(--dim-text);
     border-width: 1px;

@@ -451,7 +451,7 @@ function move_mousedown(tab_id, value, ev) {
     move_top = 0
 
     // Highlight the button's list item.
-    const move_el = document.querySelector(`#song-list-tab section[name="${move_key}"]`)
+    const move_el = document.querySelector(`#${tab_id} section[name="${move_key}"]`)
     move_el.classList.add('moving')
 }
 
@@ -459,25 +459,58 @@ function move_mousedown(tab_id, value, ev) {
 
 // Callback function for moving the mouse on move buttons.
 function window_mousemove(ev) {
-    // Check if a move button is active.
-    if (move_key) {
-        // Move the list item.
-        move_top += ev.movementY
-        const move_el = document.querySelector(`#song-list-tab section[name="${move_key}"]`)
-        move_el.style.top = `${move_top}px`
-    }
+    // Skip if no move button is active.
+    if (!move_key) return
+
+    // Get the moved list item.
+    const tab_id = document.querySelector('div.list-tab:not([hidden])').id
+    const move_el = document.querySelector(`#${tab_id} section[name="${move_key}"]`)
+
+    // Move the list item.
+    move_top += ev.movementY
+    move_el.style.top = `${move_top}px`
 }
 
 
 
 // Callback function for ending a click on move buttons. 
 function window_mouseup(ev) {
-    // Un-set the current move button.
-    move_key = undefined
+    // Skip if no move button is active.
+    if (!move_key) return
 
-    // Set all list items to not moving.
+    // Get the moved list item.
+    const tab_id = document.querySelector('div.list-tab:not([hidden])').id
+    const move_el = document.querySelector(`#${tab_id} section[name="${move_key}"]`)
+
+    // Find the list item that's closest to the moved one, and set all of them to not moving.
+    let closest_el
+    let closest_distance = Infinity
     document.querySelectorAll('section.list-item').forEach(el => {
+        // Check if it's not a message item.
+        if (!el.classList.contains('message')) {
+            // Check if it's closest to the moved item.
+            const distance = Math.abs(el.getBoundingClientRect().top - move_el.getBoundingClientRect().top)
+            if (el !== move_el && distance < closest_distance) {
+                // Update closest.
+                closest_el = el
+                closest_distance = distance
+            }
+        }
+            
         // Remove class.
         el.classList.remove('moving')
     })
+
+    // Make request JSON object, and set its index to that of the closest item.
+    const request_json = track_list.find(t => t.track_id === move_key)
+    request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
+
+    // POST for "save".
+    fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
+        // Do "track" callback.
+        track_callback(response_json)
+    })
+
+    // Un-set the current move button.
+    move_key = undefined
 }
