@@ -394,26 +394,6 @@ function queue_button_click(tab_id, value) {
 
 
 
-// Callback function for clicking queue move buttons.
-function queue_move_button_click(tab_id, value) {
-    // Delete the original item.
-    old_ix = extra_lists.queue_key_list.indexOf(value)
-    if (old_ix >= 0) {
-        extra_lists.queue_key_list.splice(old_ix, 1)
-    }
-
-    // Copy the song to the top.
-    extra_lists.queue_key_list.unshift(value)
-
-    // Reload the list.
-    reload_list_tab()
-
-    // Store extra lists.
-    to_server('extra_lists')
-}
-
-
-
 // Callback function for clicking queue delete buttons.
 function queue_delete_button_click(tab_id, value) {
     // Delete the item.
@@ -442,7 +422,7 @@ function edit_button_click(tab_id, value) {
 
 
 
-// Callback function for starting a click on drag buttons. 
+// Callback function for starting a click on drag buttons.
 function drag_mousedown(tab_id, value, ev) {
     // Skip if it wasn't a left-click.
     if (ev.button !== 0) return
@@ -476,7 +456,7 @@ function window_mousemove(ev) {
 
 
 
-// Callback function for ending a click on drag buttons. 
+// Callback function for ending a click on drag buttons.
 function window_mouseup(ev) {
     // Skip if no drag button is active.
     if (!drag_key) return
@@ -506,15 +486,38 @@ function window_mouseup(ev) {
 
     // Check if a position to move to was found.
     if (closest_el && closest_distance < Math.abs(drag_top)) {
-        // Make request JSON object, and set its index to that of the closest item.
-        const request_json = track_list.find(t => t.track_id === drag_key)
-        request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
+        // Check which list was changed.
+        if (tab_id === 'song-list-tab') {
+            // Make request JSON object, and set its index to that of the closest item.
+            const request_json = track_list.find(t => t.track_id === drag_key)
+            request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
 
-        // POST for "save".
-        fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
-            // Do "track" callback.
-            track_callback(response_json)
-        })
+            // POST for "save".
+            fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
+                // Do "track" callback.
+                track_callback(response_json)
+            })
+        } else if (tab_id === 'queue-tab') {
+            // Find the position of the new item.
+            new_ix = extra_lists.queue_key_list.indexOf(closest_el.getAttribute('name'))
+
+            // Delete the original item.
+            old_ix = extra_lists.queue_key_list.indexOf(drag_key)
+            if (old_ix >= 0) {
+                extra_lists.queue_key_list.splice(old_ix, 1)
+            }
+
+            // Insert the key in the list.
+            if (new_ix >= 0) {
+                extra_lists.queue_key_list.splice(new_ix, 0, drag_key)
+            }
+
+            // Reload the list.
+            reload_list_tab()
+
+            // Store extra lists.
+            to_server('extra_lists')
+        }
     } else {
         // Reload the list.
         reload_list_tab()
