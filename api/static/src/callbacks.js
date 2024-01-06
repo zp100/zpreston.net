@@ -439,3 +439,39 @@ function edit_button_click(tab_id, value) {
     // Open the selected song and load its values.
     switch_options_tab('edit-tab')
 }
+
+
+
+// Callback function for starting a click on move buttons. 
+function move_mousedown(tab_id, value, ev) {
+    // Set the currently-selected move button.
+    move_key = value
+
+    // Reset the move position.
+    move_top = 0
+}
+
+
+
+// Callback function for moving the mouse on move buttons.
+function move_mousemove(tab_id, value, ev) {
+    // Check if this is the current move button.
+    if (value === move_key) {
+        //
+        move_top += ev.movementY
+        ev.target.parentElement.style.top = `${move_top}px`
+        ev.target.parentElement.style.borderStyle = 'solid'
+        ev.target.parentElement.style.borderColor = 'white'
+    }
+}
+
+
+
+// Callback function for ending a click on move buttons. 
+function move_mouseup(tab_id, value, ev) {
+    // Un-set the current move button.
+    move_key = undefined
+
+    //
+    ev.target.parentElement.style.borderStyle = 'none'
+}

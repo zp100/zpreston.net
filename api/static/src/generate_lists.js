@@ -42,6 +42,12 @@ function add_list_tab_html(tab_id, message_el, key_list) {
             const item_el = document.createElement('section')
             item_el.classList.add('list-item')
 
+            // Add move button.
+            item_el.insertAdjacentHTML('beforeend', '<button class="move" title="Press and drag to re-order track">⇕</button>')
+            item_el.lastElementChild.addEventListener('mousedown', (ev) => move_mousedown(tab_id, k, ev))
+            item_el.lastElementChild.addEventListener('mousemove', (ev) => move_mousemove(tab_id, k, ev))
+            item_el.lastElementChild.addEventListener('mouseup', (ev) => move_mouseup(tab_id, k, ev))
+
             // Create song button.
             const song_el = document.createElement('button')
             song_el.classList.add('song-button')

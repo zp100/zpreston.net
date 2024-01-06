@@ -56,6 +56,7 @@ section.group {
 
 /* Size and arrangement for song list items. */
 section.list-item {
+    position: relative;
     display: flex;
     line-height: 1.8;
     margin-top: 3px;
