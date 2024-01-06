@@ -91,6 +91,14 @@ section.list-item.empty {
     color: var(--border);
     font-weight: bold;
 }
+section.list-item.moving {
+    background-color: var(--border);
+    border-style: solid;
+    border-color: var(--dim-text);
+    border-width: 1px;
+    border-radius: 0.2rem;
+    margin-top: 1px;
+}
 
 /* Style for song indices. */
 span.song-index {

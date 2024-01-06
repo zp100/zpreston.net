@@ -454,24 +454,29 @@ function move_mousedown(tab_id, value, ev) {
 
 
 // Callback function for moving the mouse on move buttons.
-function move_mousemove(tab_id, value, ev) {
-    // Check if this is the current move button.
-    if (value === move_key) {
-        //
+function window_mousemove(ev) {
+    // Check if a move button is active.
+    if (move_key) {
+        // Get the list item.
+        const move_el = document.querySelector(`#song-list-tab section[name="${move_key}"]`)
+
+        // Move the list item.
         move_top += ev.movementY
-        ev.target.parentElement.style.top = `${move_top}px`
-        ev.target.parentElement.style.borderStyle = 'solid'
-        ev.target.parentElement.style.borderColor = 'white'
+        move_el.style.top = `${move_top}px`
+        move_el.classList.add('moving')
     }
 }
 
 
 
 // Callback function for ending a click on move buttons. 
-function move_mouseup(tab_id, value, ev) {
+function window_mouseup(ev) {
     // Un-set the current move button.
     move_key = undefined
 
-    //
-    ev.target.parentElement.style.borderStyle = 'none'
+    // Set all list items to not moving.
+    document.querySelectorAll('section.list-item').forEach(el => {
+        // Remove class.
+        el.classList.remove('moving')
+    })
 }
