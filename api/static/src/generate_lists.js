@@ -44,7 +44,7 @@ function add_list_tab_html(tab_id, message_el, key_list) {
             item_el.setAttribute('name', k)
 
             // Add move button.
-            item_el.insertAdjacentHTML('beforeend', '<button class="move" title="Press and drag to re-order track">⇕</button>')
+            item_el.insertAdjacentHTML('beforeend', '<button class="move" title="Press and drag to re-order track">⠿</button>')
             item_el.lastElementChild.addEventListener('mousedown', (ev) => move_mousedown(tab_id, k, ev))
 
             // Create song button.

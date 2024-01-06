@@ -444,6 +444,9 @@ function edit_button_click(tab_id, value) {
 
 // Callback function for starting a click on move buttons. 
 function move_mousedown(tab_id, value, ev) {
+    // Skip if it wasn't a left-click.
+    if (ev.button !== 0) return
+
     // Set the currently-selected move button.
     move_key = value
 
@@ -501,15 +504,23 @@ function window_mouseup(ev) {
         el.classList.remove('moving')
     })
 
-    // Make request JSON object, and set its index to that of the closest item.
-    const request_json = track_list.find(t => t.track_id === move_key)
-    request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
-
-    // POST for "save".
-    fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
-        // Do "track" callback.
-        track_callback(response_json)
-    })
+    // Check if a position to move to was found.
+    if (closest_el && closest_distance < Math.abs(move_top)) {
+        console.log(move_top, closest_distance)
+        
+        // Make request JSON object, and set its index to that of the closest item.
+        const request_json = track_list.find(t => t.track_id === move_key)
+        request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
+        
+        // POST for "save".
+        fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
+            // Do "track" callback.
+            track_callback(response_json)
+        })
+    } else {
+        // Reload the list.
+        reload_list_tab()
+    }
 
     // Un-set the current move button.
     move_key = undefined

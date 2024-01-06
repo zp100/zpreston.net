@@ -34,16 +34,19 @@ button.song-button {
     padding: 0;
 }
 button.move {
+    z-index: 9997;
     display: flex;
     align-items: center;
-    width: auto;
-    padding: 0;
+    justify-content: center;
+    width: 2rem;
+    margin-left: -1.5rem;
+    margin-right: -0.5rem;
     padding-left: 0.1rem;
     padding-right: 0.1rem;
     border-width: 0;
-    border-color: transparent;
+    border-radius: 1rem;
     background-color: transparent;
-    color: var(--border);
+    color: var(--light-bg);
 }
 
 /* Effects for hovered/focused inputs. */
@@ -60,11 +63,6 @@ button.song-button:hover, button.song-button:focus {
     background-color: var(--light-bg);
     border-color: transparent;
     color: white;
-}
-button.move:hover, button.move:focus {
-    background-color: transparent;
-    border-color: transparent;
-    color: var(--border);
 }
 
 /* Effects for selected buttons. */
@@ -96,11 +94,6 @@ button:active {
 button.mini:active {
     color: transparent;
     text-shadow: 0 0 0 white;
-}
-button.move:active {
-    background-color: transparent;
-    border-color: transparent;
-    color: var(--dim-text);
 }
 
 /* Effects for disabled buttons. */

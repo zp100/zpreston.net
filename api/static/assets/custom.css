@@ -98,7 +98,8 @@ section.list-item.moving {
     border-color: var(--dim-text);
     border-width: 1px;
     border-radius: 0.2rem;
-    margin-top: 1px;
+    margin: -1px;
+    margin-top: 2px;
 }
 
 /* Style for song indices. */
