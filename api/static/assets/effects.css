@@ -98,11 +98,10 @@ button.mini:active {
     text-shadow: 0 0 0 white;
 }
 button.move:active {
-    background-color: var(--border);
+    background-color: transparent;
     border-color: transparent;
     color: var(--dim-text);
 }
-
 
 /* Effects for disabled buttons. */
 button:disabled {

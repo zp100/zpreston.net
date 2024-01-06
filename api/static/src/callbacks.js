@@ -449,6 +449,10 @@ function move_mousedown(tab_id, value, ev) {
 
     // Reset the move position.
     move_top = 0
+
+    // Highlight the button's list item.
+    const move_el = document.querySelector(`#song-list-tab section[name="${move_key}"]`)
+    move_el.classList.add('moving')
 }
 
 
@@ -457,13 +461,10 @@ function move_mousedown(tab_id, value, ev) {
 function window_mousemove(ev) {
     // Check if a move button is active.
     if (move_key) {
-        // Get the list item.
-        const move_el = document.querySelector(`#song-list-tab section[name="${move_key}"]`)
-
         // Move the list item.
         move_top += ev.movementY
+        const move_el = document.querySelector(`#song-list-tab section[name="${move_key}"]`)
         move_el.style.top = `${move_top}px`
-        move_el.classList.add('moving')
     }
 }
 
