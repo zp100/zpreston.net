@@ -41,6 +41,14 @@ function add_list_tab_html(tab_id, message_el, key_list) {
             // Create song list item.
             const item_el = document.createElement('section')
             item_el.classList.add('list-item')
+            item_el.setAttribute('name', k)
+
+            // Check if this is the mix list or queue list.
+            if (tab_id === 'song-list-tab' || tab_id === 'queue-tab') {
+                // Add drag button.
+                item_el.insertAdjacentHTML('beforeend', '<button class="drag" title="Press and drag to re-order track">⠿</button>')
+                item_el.lastElementChild.addEventListener('mousedown', (ev) => drag_mousedown(tab_id, k, ev))
+            }
 
             // Create song button.
             const song_el = document.createElement('button')
@@ -84,24 +92,13 @@ function add_list_tab_html(tab_id, message_el, key_list) {
             // Append song button to list item.
             item_el.appendChild(song_el)
 
-            // Check if this is the queue list.
+            // Add side buttons.
             const side_buttons_el = document.createElement('div')
             side_buttons_el.classList.add('side-buttons')
-            if (tab_id === 'queue-tab') {
-                // Add queue's buttons.
-                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Move to top of queue">🔝</button>')
-                side_buttons_el.lastElementChild.addEventListener('click', () => queue_move_button_click(tab_id, k))
-                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Remove from queue">❌</button>')
-                side_buttons_el.lastElementChild.addEventListener('click', () => queue_delete_button_click(tab_id, k))
-                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
-                side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
-            } else {
-                // Add normal buttons.
-                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Add to end of queue">☰</button>')
-                side_buttons_el.lastElementChild.addEventListener('click', () => queue_button_click(tab_id, k))
-                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
-                side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
-            }
+            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Add to end of queue">☰</button>')
+            side_buttons_el.lastElementChild.addEventListener('click', () => queue_button_click(tab_id, k))
+            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
+            side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
 
             // Append side buttons to list item.
             item_el.appendChild(side_buttons_el)

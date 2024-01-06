@@ -9,6 +9,8 @@ let tracks_url
 let video_fade_url
 let key
 let edit_key
+let drag_key
+let drag_top
 let finished_song_count = 0
 let player
 
@@ -27,6 +29,8 @@ function init(ur, tl, el, su, uru, tu, vfu) {
 
     // Load the video setup.
     window.addEventListener('keydown', window_keydown)
+    window.addEventListener('mousemove', window_mousemove)
+    window.addEventListener('mouseup', window_mouseup)
     document.querySelector('#options-box').addEventListener('keydown', options_keydown)
     add_view_selection_callbacks()
 

@@ -140,7 +140,7 @@ function to_server(action) {
                 })
             } else {
                 // Make track from inputs, with new ID.
-                const track = {
+                const request_json = {
                     'track_id': crypto.randomUUID(),
                     'owner': user_record.username,
                     'index': parse_index(document.querySelector(`#new-tab input[name="index"]`).value),
@@ -160,9 +160,9 @@ function to_server(action) {
                 // Check if the title is blank.
                 if (request_json.title === '') {
                     // Get the title from the video, and POST when that's done.
-                    load_video_title(track, track => {
+                    load_video_title(request_json, request_json => {
                         // Insert the track at its index.
-                        track_list.splice(track.index - 1, 0, track)
+                        track_list.splice(request_json.index - 1, 0, request_json)
 
                         // Update the index of every track.
                         for (const i in track_list) {
@@ -174,14 +174,14 @@ function to_server(action) {
                         reload_list_tab()
 
                         // Open the new track to edit.
-                        edit_key = track.track_id
+                        edit_key = request_json.track_id
                         switch_options_tab('edit-tab')
                     })
                     return
                 }
 
                 // Insert the track at its index.
-                track_list.splice(track.index - 1, 0, track)
+                track_list.splice(request_json.index - 1, 0, request_json)
 
                 // Update the index of every track.
                 for (const i in track_list) {
@@ -193,7 +193,7 @@ function to_server(action) {
                 reload_list_tab()
 
                 // Open the new track to edit.
-                edit_key = track.track_id
+                edit_key = request_json.track_id
                 switch_options_tab('edit-tab')
             }
         } break
@@ -223,7 +223,7 @@ function to_server(action) {
                 })
             } else {
                 // Make track from inputs.
-                const track = {
+                const request_json = {
                     'track_id': edit_key,
                     'owner': user_record.username,
                     'index': parse_index(document.querySelector(`#edit-tab input[name="index"]`).value),
@@ -244,7 +244,7 @@ function to_server(action) {
                 track_list.splice(track_list.findIndex(t => t.track_id === edit_key), 1)
 
                 // Insert the track at its index.
-                track_list.splice(track.index - 1, 0, track)
+                track_list.splice(request_json.index - 1, 0, request_json)
 
                 // Update the index of every track.
                 for (const i in track_list) {

@@ -56,6 +56,7 @@ section.group {
 
 /* Size and arrangement for song list items. */
 section.list-item {
+    position: relative;
     display: flex;
     line-height: 1.8;
     margin-top: 3px;
@@ -89,6 +90,16 @@ section.list-item.empty {
     justify-content: center;
     color: var(--border);
     font-weight: bold;
+}
+section.list-item.moving {
+    z-index: 9999;
+    background-color: var(--light-bg);
+    border-style: solid;
+    border-color: var(--dim-text);
+    border-width: 1px;
+    border-radius: 0.2rem;
+    margin: -1px;
+    margin-top: 2px;
 }
 
 /* Style for song indices. */

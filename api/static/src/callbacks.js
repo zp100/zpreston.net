@@ -394,26 +394,6 @@ function queue_button_click(tab_id, value) {
 
 
 
-// Callback function for clicking queue move buttons.
-function queue_move_button_click(tab_id, value) {
-    // Delete the original item.
-    old_ix = extra_lists.queue_key_list.indexOf(value)
-    if (old_ix >= 0) {
-        extra_lists.queue_key_list.splice(old_ix, 1)
-    }
-
-    // Copy the song to the top.
-    extra_lists.queue_key_list.unshift(value)
-
-    // Reload the list.
-    reload_list_tab()
-
-    // Store extra lists.
-    to_server('extra_lists')
-}
-
-
-
 // Callback function for clicking queue delete buttons.
 function queue_delete_button_click(tab_id, value) {
     // Delete the item.
@@ -438,4 +418,111 @@ function edit_button_click(tab_id, value) {
 
     // Open the selected song and load its values.
     switch_options_tab('edit-tab')
+}
+
+
+
+// Callback function for starting a click on drag buttons.
+function drag_mousedown(tab_id, value, ev) {
+    // Skip if it wasn't a left-click.
+    if (ev.button !== 0) return
+
+    // Set the currently-selected drag button.
+    drag_key = value
+
+    // Reset the drag position.
+    drag_top = 0
+
+    // Highlight the button's list item.
+    const drag_el = document.querySelector(`#${tab_id} section.list-item[name="${drag_key}"]`)
+    drag_el.classList.add('moving')
+}
+
+
+
+// Callback function for moving the mouse on drag buttons.
+function window_mousemove(ev) {
+    // Skip if no drag button is active.
+    if (!drag_key) return
+
+    // Get the dragged list item.
+    const tab_id = document.querySelector('div.list-tab:not([hidden])').id
+    const drag_el = document.querySelector(`#${tab_id} section.list-item[name="${drag_key}"]`)
+
+    // Move the list item.
+    drag_top += ev.movementY
+    drag_el.style.top = `${drag_top}px`
+}
+
+
+
+// Callback function for ending a click on drag buttons.
+function window_mouseup(ev) {
+    // Skip if no drag button is active.
+    if (!drag_key) return
+
+    // Get the dragged list item.
+    const tab_id = document.querySelector('div.list-tab:not([hidden])').id
+    const drag_el = document.querySelector(`#${tab_id} section.list-item[name="${drag_key}"]`)
+
+    // Find the list item that's closest to the dragged one, and set all of them to not moving.
+    let closest_el
+    let closest_distance = Infinity
+    document.querySelectorAll(`#${tab_id} section.list-item`).forEach(el => {
+        // Check if it's not a message item.
+        if (!el.classList.contains('message')) {
+            // Check if it's closest to the dragged item.
+            const distance = Math.abs(el.getBoundingClientRect().top - drag_el.getBoundingClientRect().top)
+            if (el !== drag_el && distance < closest_distance) {
+                // Update closest.
+                closest_el = el
+                closest_distance = distance
+            }
+        }
+
+        // Remove class.
+        el.classList.remove('moving')
+    })
+
+    // Check if a position to move to was found.
+    if (closest_el && closest_distance < Math.abs(drag_top)) {
+        // Check which list was changed.
+        if (tab_id === 'song-list-tab') {
+            // Make request JSON object, and set its index to that of the closest item.
+            const request_json = track_list.find(t => t.track_id === drag_key)
+            request_json.index = track_list.find(t => t.track_id === closest_el.getAttribute('name')).index
+
+            // POST for "save".
+            fetch_json_post(`${tracks_url}?action=save`, request_json, response_json => {
+                // Do "track" callback.
+                track_callback(response_json)
+            })
+        } else if (tab_id === 'queue-tab') {
+            // Find the position of the new item.
+            new_ix = extra_lists.queue_key_list.indexOf(closest_el.getAttribute('name'))
+
+            // Delete the original item.
+            old_ix = extra_lists.queue_key_list.indexOf(drag_key)
+            if (old_ix >= 0) {
+                extra_lists.queue_key_list.splice(old_ix, 1)
+            }
+
+            // Insert the key in the list.
+            if (new_ix >= 0) {
+                extra_lists.queue_key_list.splice(new_ix, 0, drag_key)
+            }
+
+            // Reload the list.
+            reload_list_tab()
+
+            // Store extra lists.
+            to_server('extra_lists')
+        }
+    } else {
+        // Reload the list.
+        reload_list_tab()
+    }
+
+    // Un-set the current drag button.
+    drag_key = undefined
 }

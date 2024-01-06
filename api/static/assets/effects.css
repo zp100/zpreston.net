@@ -33,6 +33,21 @@ button.song-button {
     color: white;
     padding: 0;
 }
+button.drag {
+    z-index: 9997;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    margin-left: -1.5rem;
+    margin-right: -0.5rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    border-width: 0;
+    border-radius: 1rem;
+    background-color: transparent;
+    color: var(--light-bg);
+}
 
 /* Effects for hovered/focused inputs. */
 button:hover, button:focus, input:focus, select:focus {
@@ -53,8 +68,8 @@ button.song-button:hover, button.song-button:focus {
 /* Effects for selected buttons. */
 button.selected {
     background-color: var(--highlight);
-    color: var(--dim-text);
     border-color: var(--highlight);
+    color: var(--dim-text);
 }
 button.mini.selected {
     color: transparent;
@@ -62,8 +77,8 @@ button.mini.selected {
 }
 button.song-button.selected, button.song-button:active {
     background-color: var(--highlight);
-    color: white;
     border-color: transparent;
+    color: white;
 
     span.tag {
         background-color: var(--bright-highlight);
@@ -73,8 +88,8 @@ button.song-button.selected, button.song-button:active {
 /* Effects for clicked buttons. */
 button:active {
     background-color: var(--bright-highlight);
-    color: white;
     border-color: var(--bright-highlight);
+    color: white;
 }
 button.mini:active {
     color: transparent;
@@ -84,13 +99,13 @@ button.mini:active {
 /* Effects for disabled buttons. */
 button:disabled {
     background-color: var(--light-bg);
-    color: var(--border);
     border-color: var(--border);
+    color: var(--border);
 }
 button.mini:disabled {
+    border-color: var(--border);
     color: transparent;
     text-shadow: 0 0 0 var(--border);
-    border-color: var(--border);
 }
 
 /* Highlight text colors. */
