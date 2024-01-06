@@ -117,9 +117,6 @@ function add_list_tab_html(tab_id, message_el, key_list) {
         tab_el.appendChild(item_el)
     }
 
-    // Append marker for the bottom of the list.
-    tab_el.insertAdjacentHTML('beforeend', '<hr>')
-
     // Append tab to list box.
     document.querySelector('#list-box').appendChild(tab_el)
 }

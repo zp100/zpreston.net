@@ -208,6 +208,9 @@ function switch_options_tab(tab_id) {
     document.querySelector(`#${tab_id}`).hidden = false
     document.querySelector(`button[name="${tab_id}"]`).disabled = false
     document.querySelector(`button[name="${tab_id}"]`).classList.add('selected')
+
+    // Scroll to the top of the options box.
+    document.querySelector('#options-box').scrollTo({'top': 0, 'behavior': 'instant'})
 }
 
 
@@ -308,7 +311,7 @@ function get_mix_items() {
             {
                 'item_type': 'action',
                 'value': 'skip',
-                'display': '⋆Skip',
+                'display': 'Skip',
                 'title': 'Skip this track',
                 'primary': true,
             },
@@ -494,7 +497,7 @@ function get_new_items() {
             {
                 'item_type': 'action',
                 'value': 'save',
-                'display': '⋆Add',
+                'display': 'Add',
                 'title': 'Add track to list',
                 'primary': true,
             },
@@ -601,7 +604,7 @@ function get_edit_items() {
             {
                 'item_type': 'action',
                 'value': 'save',
-                'display': '⋆Save',
+                'display': 'Save',
                 'title': 'Save changes to track',
                 'primary': true,
             },
@@ -700,7 +703,7 @@ function get_results_items() {
             {
                 'item_type': 'action',
                 'value': 'save',
-                'display': '⋆Save',
+                'display': 'Save',
                 'title': 'Save changes to track',
                 'primary': true,
             },
@@ -761,7 +764,7 @@ function get_account_items() {
             {
                 'item_type': 'action',
                 'value': 'update',
-                'display': '⋆Update',
+                'display': 'Update',
                 'title': 'Update user settings',
                 'primary': true,
             },
@@ -857,7 +860,7 @@ function get_guest_items() {
             {
                 'item_type': 'action',
                 'value': 'login',
-                'display': '⋆Log in',
+                'display': 'Log in',
                 'title': 'Sign in to an existing account',
                 'primary': true,
             },

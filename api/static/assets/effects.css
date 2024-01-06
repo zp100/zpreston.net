@@ -33,6 +33,9 @@ button.song-button {
     color: white;
     padding: 0;
 }
+button.primary {
+    font-weight: bold;
+}
 button.drag {
     z-index: 9997;
     display: flex;
