@@ -434,7 +434,7 @@ function drag_mousedown(tab_id, value, ev) {
     drag_top = 0
 
     // Highlight the button's list item.
-    const drag_el = document.querySelector(`#${tab_id} section[name="${drag_key}"]`)
+    const drag_el = document.querySelector(`#${tab_id} section.list-item[name="${drag_key}"]`)
     drag_el.classList.add('moving')
 }
 
@@ -447,7 +447,7 @@ function window_mousemove(ev) {
 
     // Get the dragged list item.
     const tab_id = document.querySelector('div.list-tab:not([hidden])').id
-    const drag_el = document.querySelector(`#${tab_id} section[name="${drag_key}"]`)
+    const drag_el = document.querySelector(`#${tab_id} section.list-item[name="${drag_key}"]`)
 
     // Move the list item.
     drag_top += ev.movementY
@@ -463,12 +463,12 @@ function window_mouseup(ev) {
 
     // Get the dragged list item.
     const tab_id = document.querySelector('div.list-tab:not([hidden])').id
-    const drag_el = document.querySelector(`#${tab_id} section[name="${drag_key}"]`)
+    const drag_el = document.querySelector(`#${tab_id} section.list-item[name="${drag_key}"]`)
 
     // Find the list item that's closest to the dragged one, and set all of them to not moving.
     let closest_el
     let closest_distance = Infinity
-    document.querySelectorAll('section.list-item').forEach(el => {
+    document.querySelectorAll(`#${tab_id} section.list-item`).forEach(el => {
         // Check if it's not a message item.
         if (!el.classList.contains('message')) {
             // Check if it's closest to the dragged item.

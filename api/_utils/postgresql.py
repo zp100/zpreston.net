@@ -224,7 +224,7 @@ def update_track(cur, track_id, owner, record):
         where track_id = %s
         and lower(owner) = lower(%s);
     """, [
-        record['index'],
+        index,
         record['title'],
         record['tags'],
         record['url'],
