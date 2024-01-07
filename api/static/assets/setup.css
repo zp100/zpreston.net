@@ -27,12 +27,9 @@ body {
     max-width: 100%;
 }
 
-/* Add margin and background to separate from options tabs. */
+/* Add margin to separate from options tabs. */
 .list-box {
     margin-top: 3rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background-color: var(--dark-bg);
 }
 
 /* Hide drag buttons on mobile. */
@@ -71,11 +68,15 @@ button.drag {
     }
 
     /* Add a margin to the list box to make room for the fixed sidebar. */
+    /* Also add background styling. */
     .list-box {
         margin-top: 0;
         margin-left: calc(
             var(--sidebar-size) + var(--divider-margin)
         );
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background-color: var(--dark-bg);
     }
 
     /* Show drag buttons. */
