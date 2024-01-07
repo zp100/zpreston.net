@@ -56,7 +56,7 @@ function add_view_selection_callbacks() {
     
     // Add callback for "View next" button.
     const view_next_el = document.querySelector('#view-box button[name="view-next"]')
-    view_next_el.addEventListener('click', () => view_next_click())
+    view_next_el.addEventListener('click', () => view_next_button_click())
 }
 
 
