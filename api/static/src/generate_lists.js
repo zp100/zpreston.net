@@ -92,13 +92,22 @@ function add_list_tab_html(tab_id, message_el, key_list) {
             // Append song button to list item.
             item_el.appendChild(song_el)
 
-            // Add side buttons.
+            // Check if this is the queue list.
             const side_buttons_el = document.createElement('div')
             side_buttons_el.classList.add('side-buttons')
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Add to end of queue">☰</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => queue_button_click(tab_id, k))
-            side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
-            side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
+            if (tab_id === 'queue-tab') {
+                // Add queue's buttons.
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Remove from queue">❌</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => queue_delete_button_click(tab_id, k))
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
+            } else {
+                // Add normal buttons.
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Add to end of queue">☰</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => queue_button_click(tab_id, k))
+                side_buttons_el.insertAdjacentHTML('beforeend', '<button class="mini" title="Edit without playing video">✏️</button>')
+                side_buttons_el.lastElementChild.addEventListener('click', () => edit_button_click(tab_id, k))
+            }
 
             // Append side buttons to list item.
             item_el.appendChild(side_buttons_el)
