@@ -38,7 +38,7 @@ button.primary {
 }
 button.drag {
     z-index: 9997;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
     width: 2rem;
