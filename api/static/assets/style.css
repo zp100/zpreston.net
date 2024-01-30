@@ -1,0 +1,24 @@
+/* Declare variables. */
+:root {
+    --dark: #444;
+    --light: #ccc;
+    --link: #99f;
+    --line-height: 1.2;
+    --dot-size: 1em;
+    --dot-units: 32;
+    --stroke-units: 7;
+}
+
+/* Document colors. */
+body {
+    color: var(--light);
+    background-color: black;
+}
+
+/* Sizing for nodes. */
+div.node {
+    display: flex;
+    align-items: flex-start;
+    line-height: var(--line-height);
+    margin-bottom: 0.2em;
+}

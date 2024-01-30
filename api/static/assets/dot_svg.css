@@ -1,0 +1,55 @@
+/* General style for dots. */
+/* Width of lines and borders is 1/4 of the dot. */
+/* Width of bullet points is 1/2 of the dot. */
+svg.dot {
+    width: calc(
+        var(--dot-size) * var(--line-height)
+    );
+    fill: var(--dark);
+    margin-right: 0.2em;
+
+    line {
+        stroke: var(--dark);
+        stroke-width: calc(
+            100% * var(--stroke-units) / var(--dot-units)
+        );
+        stroke-linecap: round;
+    }
+}
+
+/* Colors for dots. */
+svg.dot.light {
+    .colored {
+        fill: var(--light);
+    }
+}
+svg.dot.red {
+    .colored {
+        fill: #f00;
+    }
+}
+svg.dot.yellow {
+    .colored {
+        fill: #ff0;
+    }
+}
+svg.dot.green {
+    .colored {
+        fill: #0f0;
+    }
+}
+svg.dot.cyan {
+    .colored {
+        fill: #0ff;
+    }
+}
+svg.dot.blue {
+    .colored {
+        fill: #00f;
+    }
+}
+svg.dot.magenta {
+    .colored {
+        fill: #f0f;
+    }
+}
