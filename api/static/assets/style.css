@@ -31,7 +31,7 @@ div.tree {
 div.node {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 0.5em; /* DEBUG */
+    margin-bottom: 0.4em; /* DEBUG */
     
     textarea {
         width: 100%;

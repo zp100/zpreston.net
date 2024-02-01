@@ -4,7 +4,7 @@ svg.dot {
     fill: var(--dark);
     height: var(--row-total-size);
     margin-top: 1px;
-    margin-right: 0.5em; /* DEBUG */
+    margin-right: 0.4em; /* DEBUG */
 
     /* Style for lines. */
     line {
