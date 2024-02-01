@@ -4,21 +4,42 @@
     --light: #ccc;
     --link: #99f;
     --line-height: 1.2;
-    --dot-size: 1em;
+    --row-total-size: calc(1em * var(--line-height));
     --dot-units: 32;
     --stroke-units: 7;
 }
 
-/* Document colors. */
+/* Document colors and text. */
 body {
-    color: var(--light);
+    display: flex;
+    justify-content: center;
     background-color: black;
+}
+
+/* Sizing for tree. */
+div.tree {
+    width: 100%;
+    max-width: 60em;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    color: var(--light);
+    line-height: var(--line-height);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Sizing for nodes. */
 div.node {
     display: flex;
     align-items: flex-start;
-    line-height: var(--line-height);
-    margin-bottom: 0.2em;
+    margin-bottom: 0.5em; /* DEBUG */
+    
+    textarea {
+        width: 100%;
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        color: var(--light);
+        line-height: var(--line-height);
+        font-family: Arial, Helvetica, sans-serif;
+    }
 }
