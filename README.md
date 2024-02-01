@@ -27,7 +27,7 @@ pip install -r requirements.txt                             # install the requir
 
 You'll also need to set up your own PostgreSQL database to store the tracks. This can either be [a local database created on your computer](https://www.postgresql.org/docs/current/tutorial-start.html), or one hosted online. Once that's done, run these SQL queries to create the tables for the project:
 ```
-create table users(
+create table youtune_users(
     username        text not null,
     hash_password   bytea not null,
     default_volume  text,
@@ -36,7 +36,7 @@ create table users(
 );
 ```
 ```
-create table tracks(
+create table youtune_tracks(
     track_id        uuid not null,
     owner           text not null,
     index           integer not null,

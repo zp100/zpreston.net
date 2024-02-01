@@ -22,7 +22,7 @@ def create_user(cur, username, password):
         # Add the user to the "users" table.
         cur.execute("""
             insert
-            into users(username, hash_password, default_volume, save_extra)
+            into youtune_users(username, hash_password, default_volume, save_extra)
             values(%s, %s, 50, true);
         """, [
             username,
@@ -57,7 +57,7 @@ def update_user(cur, username, record):
 
     # Query and modify the user's record.
     cur.execute("""
-        update users
+        update youtune_users
         set default_volume = %s, save_extra = %s
         where lower(username) = lower(%s);
     """, [
@@ -77,7 +77,7 @@ def delete_user(cur, username):
     # Delete the user's record.
     cur.execute("""
         delete
-        from users
+        from youtune_users
         where lower(username) = lower(%s);
     """, [
         username,
@@ -99,7 +99,7 @@ def change_password(cur, username, password):
 
     # Update the user's password.
     cur.execute("""
-        update users
+        update youtune_users
         set hash_password = %s
         where lower(username) = lower(%s);
     """, [
@@ -146,7 +146,7 @@ def create_track(cur, owner, record):
     # Add the track to the "tracks" table.
     cur.execute("""
         insert
-        into tracks(track_id, owner, index, title, tags, url, volume, start_time, fade_in_sec, fade_out_sec, end_time)
+        into youtune_tracks(track_id, owner, index, title, tags, url, volume, start_time, fade_in_sec, fade_out_sec, end_time)
         values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
     """, [
         track_id,
@@ -199,7 +199,7 @@ def update_track(cur, track_id, owner, record):
     # Get the current index for this track.
     cur.execute("""
         select index
-        from tracks
+        from youtune_tracks
         where track_id = %s
         and lower(owner) = lower(%s);
     """, [
@@ -219,7 +219,7 @@ def update_track(cur, track_id, owner, record):
 
     # Query and modify the user's record.
     cur.execute("""
-        update tracks
+        update youtune_tracks
         set index = %s, title = %s, tags = %s, url = %s, volume = %s, start_time = %s, fade_in_sec = %s, fade_out_sec = %s, end_time = %s
         where track_id = %s
         and lower(owner) = lower(%s);
@@ -248,7 +248,7 @@ def delete_track(cur, track_id, owner):
     # Get the current index for this track.
     cur.execute("""
         select index
-        from tracks
+        from youtune_tracks
         where track_id = %s
         and lower(owner) = lower(%s);
     """, [
@@ -263,7 +263,7 @@ def delete_track(cur, track_id, owner):
     # Delete the tracks's record.
     cur.execute("""
         delete
-        from tracks
+        from youtune_tracks
         where track_id = %s
         and lower(owner) = lower(%s);
     """, [
@@ -282,7 +282,7 @@ def get_all_tracks(cur, username):
     # Query the user's tracks.
     cur.execute("""
         select *
-        from tracks
+        from youtune_tracks
         where lower(owner) = lower(%s);
     """, [
         username,

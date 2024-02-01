@@ -60,7 +60,7 @@ def fetch_user(cur, username):
     # Query the user's record.
     cur.execute("""
         select *
-        from users
+        from youtune_users
         where lower(username) = lower(%s);
     """, [
         username,
@@ -92,7 +92,7 @@ def get_end_index(cur, owner):
     # Query for the largest index.
     cur.execute("""
         select max(index)
-        from tracks
+        from youtune_tracks
         where lower(owner) = lower(%s);
     """, [
         owner,
@@ -139,7 +139,7 @@ def parse_index(cur, owner, index_str):
 def add_index(cur, owner, index):
     # Adds 1 to all tracks for this owner with an index at or above the given index.
     cur.execute("""
-        update tracks
+        update youtune_tracks
         set index = index + 1
         where lower(owner) = lower(%s)
         and index >= %s;
@@ -154,7 +154,7 @@ def add_index(cur, owner, index):
 def remove_index(cur, owner, index):
     # Subtracts 1 from all tracks for this owner with an index at or above the given index.
     cur.execute("""
-        update tracks
+        update youtune_tracks
         set index = index - 1
         where lower(owner) = lower(%s)
         and index >= %s;
@@ -170,7 +170,7 @@ def fetch_track(cur, track_id, owner):
     # Query the track's record.
     cur.execute("""
         select *
-        from tracks
+        from youtune_tracks
         where track_id = %s
         and lower(owner) = lower(%s);
     """, [
