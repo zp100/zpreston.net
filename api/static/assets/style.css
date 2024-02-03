@@ -7,6 +7,7 @@
     --row-total-size: calc(1em * var(--line-height));
     --dot-units: 32;
     --stroke-units: 7;
+    --gap-size: 0.4rem;
 }
 
 /* Document colors and text. */
@@ -14,6 +15,9 @@ body {
     display: flex;
     justify-content: center;
     background-color: black;
+    tab-size: calc(
+        var(--row-total-size) + var(--gap-size)
+    );
 }
 
 /* Sizing for tree. */
@@ -30,16 +34,17 @@ div.tree {
 /* Sizing for nodes. */
 div.node {
     display: flex;
+    flex-direction: row;
     align-items: flex-start;
-    margin-bottom: 0.4em; /* DEBUG */
-    
-    textarea {
-        width: 100%;
-        padding: 0;
-        border: none;
-        background-color: transparent;
-        color: var(--light);
-        line-height: var(--line-height);
-        font-family: Arial, Helvetica, sans-serif;
+
+    div.items {
+        flex-grow: 1;
+        margin-left: var(--gap-size);
+        display: flex;
+        flex-direction: column;
+
+        div.content {
+            margin-bottom: var(--gap-size);    
+        }
     }
 }

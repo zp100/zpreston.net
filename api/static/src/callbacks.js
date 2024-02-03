@@ -109,7 +109,3 @@ function get_dot_xml(type, color) {
         </svg>
     `
 }
-
-
-
-load_tree()

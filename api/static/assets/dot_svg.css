@@ -1,10 +1,9 @@
 /* General style for dots. */
 svg.dot {
     /* Default size and color. */
-    fill: var(--dark);
+    width: var(--row-total-size);
     height: var(--row-total-size);
-    margin-top: 1px;
-    margin-right: 0.4em; /* DEBUG */
+    fill: var(--dark);
 
     /* Style for lines. */
     line {
