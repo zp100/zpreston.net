@@ -44,6 +44,7 @@ div.items {
 
 /* General style for dots. */
 svg.dot {
+    min-width: var(--content-size);
     width: var(--content-size);
 
     /* Style for SVG text. */

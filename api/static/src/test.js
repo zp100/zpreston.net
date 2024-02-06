@@ -97,6 +97,9 @@ function load_tree() {
     // Load the tree into the document.
     const tree_html = get_tree_html(test_tree)
     document.querySelector('#tree').innerHTML = tree_html
+
+    // Update its dots' stems.
+    update_dots()
 }
 
 
@@ -141,20 +144,36 @@ function get_tree_html_rec(subtree) {
 
 // Draws the dot and stem for each node.
 function update_dots() {
-    // Loop through the SVG elements.
-    const dot_el_list = document.querySelectorAll('svg.dot')
-    for (el of dot_el_list) {
-        // Get the size of the element.
-        const width = el.clientWidth
-        const height = el.clientHeight
-        const box_height = 32 * height / width
+    // Recursively update the stem for the first node's dot and child nodes.
+    const node_el = document.querySelector('div.node')
+    rec_update_dots(node_el)
+}
 
-        // Update its view box to maintain proportional size.
-        el.setAttribute('viewBox', `0 0 32 ${box_height}`)
 
-        // ...
-        // el.querySelector('line.stem').setAttribute('y2', box_height - 16)
+
+// Recursive call for updating nodes' dots.
+function rec_update_dots(node_el) {
+    // Loop through the node's children.
+    const child_node_el_list = node_el.querySelectorAll('div.node')
+    for (const el of child_node_el_list) {
+        // Recurse.
+        rec_update_dots(el)
     }
+
+    // Get the dot for this node.
+    const dot_el = node_el.querySelector('svg.dot')
+
+    // Get the size of the dot (first shrink it so that it gets the correct measurements).
+    dot_el.setAttribute('viewBox', `0 0 32 32`)
+    const width = dot_el.clientWidth
+    const height = dot_el.clientHeight
+    const box_height = 32 * height / width
+
+    // Update its view box to maintain proportional size.
+    dot_el.setAttribute('viewBox', `0 0 32 ${box_height}`)
+
+    // Update the length of its stem.
+    dot_el.querySelector('line.stem').setAttribute('y2', box_height - 16)
 }
 
 
@@ -232,6 +251,7 @@ function get_dot_html(type, value) {
     // Return the full SVG image.
     return `
         <svg class="dot" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <line class="stem" x1="16" y1="16" x2="16" y2="16" style="stroke-width: 7" />
             ${shapes}
         </svg>        
     `
@@ -240,4 +260,3 @@ function get_dot_html(type, value) {
 
 
 load_tree()
-update_dots()
