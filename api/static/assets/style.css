@@ -31,8 +31,7 @@ div.node {
     margin-top: var(--gap-size);
     display: flex;
     flex-direction: row;
-    /* align-items: stretch; */
-    align-items: flex-start;
+    align-items: stretch;
 }
 
 /* Arrange content and child nodes. */

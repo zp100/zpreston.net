@@ -141,10 +141,19 @@ function get_tree_html_rec(subtree) {
 
 // Draws the dot and stem for each node.
 function update_dots() {
-    // Loop through the canvas elements.
-    const canvas_el_list = document.querySelectorAll('canvas.draw')
-    for (el of canvas_el_list) {
+    // Loop through the SVG elements.
+    const dot_el_list = document.querySelectorAll('svg.dot')
+    for (el of dot_el_list) {
+        // Get the size of the element.
+        const width = el.clientWidth
+        const height = el.clientHeight
+        const box_height = 32 * height / width
+
+        // Update its view box to maintain proportional size.
+        el.setAttribute('viewBox', `0 0 32 ${box_height}`)
+
         // ...
+        // el.querySelector('line.stem').setAttribute('y2', box_height - 16)
     }
 }
 
