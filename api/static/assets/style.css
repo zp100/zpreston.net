@@ -4,7 +4,7 @@
     --light: #ccc;
     --link: #99f;
     --line-height: 1.2;
-    --content-height: round(1em * var(--line-height), 1px);
+    --content-size: round(1em * var(--line-height), 1px);
     --gap-size: 0.5rem;
 }
 
@@ -31,19 +31,56 @@ div.node {
     margin-top: var(--gap-size);
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    /* align-items: stretch; */
+    align-items: flex-start;
+}
 
-    /* Resize canvases. */
-    canvas.draw {
-        width: var(--content-height);
-        height: auto;
+/* Arrange content and child nodes. */
+div.items {
+    flex-grow: 1;
+    margin-left: var(--gap-size);
+    display: flex;
+    flex-direction: column;
+}
+
+/* General style for dots. */
+svg.dot {
+    width: var(--content-size);
+
+    /* Style for SVG text. */
+    text {
+        text-anchor: middle;
+        dominant-baseline: central; /* VS Code gives a warning because it's an SVG-only attribute */
+        font-weight: bold;
     }
 
-    /* Arrange content and child nodes. */
-    div.items {
-        flex-grow: 1;
-        margin-left: var(--gap-size);
-        display: flex;
-        flex-direction: column;
+    /* Style for lines. */
+    line {
+        stroke: var(--dark);
+        stroke-linecap: round;
+    }
+
+    /* Color selection. */
+    fill: var(--dark);
+    .light {
+        fill: var(--light);
+    }
+    .red {
+        fill: #f00;
+    }
+    .yellow {
+        fill: #ff0;
+    }
+    .green {
+        fill: #0f0;
+    }
+    .cyan {
+        fill: #0ff;
+    }
+    .blue {
+        fill: #00f;
+    }
+    .magenta {
+        fill: #f0f;
     }
 }
