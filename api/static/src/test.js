@@ -107,14 +107,14 @@ function load_tree() {
 // Creates the elements for a given tree.
 function get_tree_html(tree) {
     // Recursively create the tree and return it.
-    const tree_html = get_tree_html_rec(tree)
+    const tree_html = rec_get_tree_html(tree)
     return tree_html
 }
 
 
 
 // Creates and returns the elements for a part of the tree.
-function get_tree_html_rec(subtree) {
+function rec_get_tree_html(subtree) {
     // Create an SVG image for the node's dot.
     let dot_html = get_dot_html(subtree.dot_type, subtree.dot_value)
 
@@ -125,7 +125,7 @@ function get_tree_html_rec(subtree) {
     let children_html = ''
     for (child of subtree.children) {
         // Add this node's HTML.
-        children_html += get_tree_html_rec(child)
+        children_html += rec_get_tree_html(child)
     }
 
     // Combine and return the HTML.
@@ -137,6 +137,87 @@ function get_tree_html_rec(subtree) {
                 ${children_html}
             </div>
         </div>
+    `
+}
+
+
+
+// Dynamically creates an SVG image for the dot that has the given type and value.
+function get_dot_html(type, value, scale=1) {
+    // Start with an empty image.
+    let shapes = ''
+
+    // Branch based on the type of dot to add its shapes.
+    switch (type) {
+        // Bullet point.
+        case 'bullet': {
+            shapes = `
+                <circle cx="${16 * scale}" cy="${16 * scale}" r="${9 * scale}" />
+            `
+        } break
+
+        // Empty circle.
+        case 'empty': {
+            shapes = `
+                <circle class="${value}" cx="${16 * scale}" cy="${16 * scale}" r="${16 * scale}" />
+                <circle cx="${16 * scale}" cy="${16 * scale}" r="${9 * scale}" />
+            `
+        } break
+
+        // Half-filled circle.
+        case 'half': {
+            shapes = `
+                <circle class="${value}" cx="${16 * scale}" cy="${16 * scale}" r="${16 * scale}" />
+                <circle cx="${16 * scale}" cy="${16 * scale}" r="${9 * scale}" />
+                <rect class="${value}" x="${6 * scale}" y="${16 * scale}" width="${20 * scale}" height="${10 * scale}" />
+            `
+        } break
+
+        // Full circle.
+        case 'full': {
+            shapes = `
+                <circle class="${value}" cx="${16 * scale}" cy="${16 * scale}" r="${16 * scale}" />
+            `
+        } break
+
+        // Check mark.
+        case 'check': {
+            shapes = `
+                <circle class="${value}" cx="${16 * scale}" cy="${16 * scale}" r="${16 * scale}" />
+                <line x1="${10 * scale}" y1="${17 * scale}" x2="${14 * scale}" y2="${21 * scale}" style="stroke-width: ${7 * scale}" />
+                <line x1="${14 * scale}" y1="${21 * scale}" x2="${22 * scale}" y2="${13 * scale}" style="stroke-width: ${7 * scale}" />
+            `
+        } break
+
+        // X mark.
+        case 'X': {
+            shapes = `
+                <circle class="${value}" cx="${16 * scale}" cy="${16 * scale}" r="${16 * scale}" />
+                <line x1="${11 * scale}" y1="${11 * scale}" x2="${21 * scale}" y2="${21 * scale}" style="stroke-width: ${7 * scale}" />
+                <line x1="${11 * scale}" y1="${21 * scale}" x2="${21 * scale}" y2="${11 * scale}" style="stroke-width: ${7 * scale}" />
+            `
+        } break
+
+        // Arrow.
+        case 'arrow': {
+            shapes = `
+                <circle class="${value}" cx="${16 * scale}" cy="${16 * scale}" r="${16 * scale}" />
+                <line x1="${10 * scale}" y1="${17 * scale}" x2="${14 * scale}" y2="${21 * scale}" style="stroke-width: ${7 * scale}" />
+                <line x1="${14 * scale}" y1="${21 * scale}" x2="${22 * scale}" y2="${13 * scale}" style="stroke-width: ${7 * scale}" />
+            `
+        } break
+
+        // Numbered.
+        case 'number': {
+        } break
+    }
+
+    // Return the full SVG image.
+    return `
+        <svg class="dot" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <line class="stem" x1="${16 * scale}" y1="${16 * scale}" x2="${16 * scale}" y2="${16 * scale}" style="stroke-width: ${7 * scale}" />
+            ${shapes}
+        </svg>        
     `
 }
 
@@ -174,87 +255,6 @@ function rec_update_dots(node_el) {
 
     // Update the length of its stem.
     dot_el.querySelector('line.stem').setAttribute('y2', box_height - 16)
-}
-
-
-
-// Dynamically creates an SVG image for the dot that has the given type and value.
-function get_dot_html(type, value) {
-    // Start with an empty image.
-    let shapes = ''
-
-    // Branch based on the type of dot to add its shapes.
-    switch (type) {
-        // Bullet point.
-        case 'bullet': {
-            shapes = `
-                <circle cx="16" cy="16" r="9" />
-            `
-        } break
-
-        // Empty circle.
-        case 'empty': {
-            shapes = `
-                <circle class="${value}" cx="16" cy="16" r="16" />
-                <circle cx="16" cy="16" r="9" />
-            `
-        } break
-
-        // Half-filled circle.
-        case 'half': {
-            shapes = `
-                <circle class="${value}" cx="16" cy="16" r="16" />
-                <circle cx="16" cy="16" r="9" />
-                <rect class="${value}" x="6" y="16" width="20" height="10" />
-            `
-        } break
-
-        // Full circle.
-        case 'full': {
-            shapes = `
-                <circle class="${value}" cx="16" cy="16" r="16" />
-            `
-        } break
-
-        // Check mark.
-        case 'check': {
-            shapes = `
-                <circle class="${value}" cx="16" cy="16" r="16" />
-                <line x1="10" y1="17" x2="14" y2="21" style="stroke-width: 7" />
-                <line x1="14" y1="21" x2="22" y2="13" style="stroke-width: 7" />
-            `
-        } break
-
-        // X mark.
-        case 'X': {
-            shapes = `
-                <circle class="${value}" cx="16" cy="16" r="16" />
-                <line x1="11" y1="11" x2="21" y2="21" style="stroke-width: 7" />
-                <line x1="11" y1="21" x2="21" y2="11" style="stroke-width: 7" />
-            `
-        } break
-
-        // Arrow.
-        case 'arrow': {
-            shapes = `
-                <circle class="${value}" cx="16" cy="16" r="16" />
-                <line x1="10" y1="17" x2="14" y2="21" style="stroke-width: 7" />
-                <line x1="14" y1="21" x2="22" y2="13" style="stroke-width: 7" />
-            `
-        } break
-
-        // Numbered.
-        case 'number': {
-        } break
-    }
-
-    // Return the full SVG image.
-    return `
-        <svg class="dot" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <line class="stem" x1="16" y1="16" x2="16" y2="16" style="stroke-width: 7" />
-            ${shapes}
-        </svg>        
-    `
 }
 
 
