@@ -119,7 +119,7 @@ function rec_get_tree_html(subtree) {
     let dot_html = get_dot_html(subtree.dot_type, subtree.dot_value)
 
     // Create an editable div that updates the dots when it's edited.
-    let content_html = `<div class="content" contenteditable="true" oninput="update_dots()">${subtree.content}</div>`
+    let content_html = `<span class="content" contenteditable="true" oninput="update_dots()">${subtree.content}</span>`
 
     // Loop through the children to recursively create their nodes.
     let children_html = ''
@@ -226,6 +226,8 @@ function get_dot_html(type, value) {
 // Draws the dot and stem for each node.
 function update_dots() {
     // Recursively update the stem for the first node's dot and child nodes.
+    // The dots must be updated with this recursive depth-first post-order search,
+    // so that child nodes are resized before their parents.
     const node_el = document.querySelector('div.node')
     rec_update_dots(node_el)
 }
