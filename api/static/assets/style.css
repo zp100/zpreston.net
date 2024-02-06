@@ -4,10 +4,8 @@
     --light: #ccc;
     --link: #99f;
     --line-height: 1.2;
-    --row-total-size: calc(1em * var(--line-height));
-    --dot-units: 32;
-    --stroke-units: 7;
-    --gap-size: 0.4rem;
+    --content-height: round(1em * var(--line-height), 1px);
+    --gap-size: 0.5rem;
 }
 
 /* Document colors and text. */
@@ -15,15 +13,12 @@ body {
     display: flex;
     justify-content: center;
     background-color: black;
-    tab-size: calc(
-        var(--row-total-size) + var(--gap-size)
-    );
 }
 
-/* Sizing for tree. */
+/* Sizing and text styling for tree. */
 div.tree {
     width: 100%;
-    max-width: 60em;
+    max-width: 60rem;
     margin-top: 2rem;
     margin-bottom: 2rem;
     color: var(--light);
@@ -33,18 +28,22 @@ div.tree {
 
 /* Sizing for nodes. */
 div.node {
+    margin-top: var(--gap-size);
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: stretch;
 
+    /* Resize canvases. */
+    canvas.draw {
+        width: var(--content-height);
+        height: auto;
+    }
+
+    /* Arrange content and child nodes. */
     div.items {
         flex-grow: 1;
         margin-left: var(--gap-size);
         display: flex;
         flex-direction: column;
-
-        div.content {
-            margin-bottom: var(--gap-size);    
-        }
     }
 }

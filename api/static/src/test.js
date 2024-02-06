@@ -112,29 +112,48 @@ function get_tree_html(tree) {
 
 // Creates and returns the elements for a part of the tree.
 function get_tree_html_rec(subtree) {
-    //
-    let dot_html = get_dot_html(subtree.dot_type, subtree.dot_value)
+    // Create a canvas for drawing the node's dot.
+    let draw_html = `<canvas class="draw" dot-type="${subtree.dot_type}" dot-value="${subtree.dot_value}"></canvas>`
 
-    //
-    let content_html = `<div class="content" contenteditable="true">${subtree.content}</div>`
+    // Create an editable div that updates the canvases when it's edited.
+    let content_html = `<div class="content" contenteditable="true" oninput="draw_dots()">${subtree.content}</div>`
 
-    //
+    // Loop through the children to recursively create their nodes.
     let children_html = ''
     for (child of subtree.children) {
-        //
+        // Add this node's HTML.
         children_html += get_tree_html_rec(child)
     }
 
-    //
+    // Combine and return the HTML.
     return `
         <div class="node">
-            ${dot_html}
+            ${draw_html}
             <div class="items">
                 ${content_html}
                 ${children_html}
             </div>
         </div>
     `
+}
+
+
+
+// Draws the dot and stem for each node.
+function draw_dots() {
+    // Loop through the canvas elements.
+    const canvas_el_list = document.querySelectorAll('canvas.draw')
+    for (el of canvas_el_list) {
+        // DEBUG
+        const width = el.clientWidth
+        const height = el.clientHeight
+        el.setAttribute('width', width)
+        el.setAttribute('height', height)
+
+        const ctx = el.getContext('2d')
+        ctx.fillStyle = '#ff0000'
+        ctx.fillRect(0, 0, width, width)
+    }
 }
 
 
@@ -220,3 +239,4 @@ function get_dot_html(type, value) {
 
 
 load_tree()
+draw_dots()
