@@ -1,0 +1,41 @@
+<!-- Login page. -->
+{% extends 'base.html' %}
+{% block stylesheets %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/style.css') }}"/>
+{% endblock %}
+
+<!-- Content. -->
+{% block content %}
+  <!-- Optional error panel. -->
+  {% if error %}
+    <div class="error panel">
+      <div class="form-line">
+        {{ error }}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Login panel. -->
+  <div class="panel">
+    <!-- Login form. -->
+    <form method="POST">
+      <!-- Username entry. -->
+      <div class="form-line">
+        <label for="username">Username</label>
+        <input type="text" name="username" />
+      </div>
+
+      <!-- Password entry. -->
+      <div class="form-line">
+        <label for="password">Password</label>
+        <input type="password" name="password" />
+      </div>
+
+      <!-- Buttons. -->
+      <div class="form-line">
+        <button type="submit" name="login">Log in</button>
+        <button type="submit" name="signup">Sign up</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

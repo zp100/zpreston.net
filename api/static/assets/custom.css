@@ -1,0 +1,58 @@
+/* Sizing for nodes. */
+div.node {
+    margin-top: var(--gap-size);
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+/* Arrange content and child nodes. */
+div.items {
+    flex: 1;
+    margin-left: var(--gap-size);
+    display: flex;
+    flex-direction: column;
+}
+
+/* General style for dots. */
+svg.dot {
+    min-width: var(--content-size);
+    width: var(--content-size);
+
+    /* Style for SVG text. */
+    text {
+        text-anchor: middle;
+        dominant-baseline: central; /* VS Code gives a warning because it's an SVG-only attribute */
+        font-weight: bold;
+    }
+
+    /* Style for lines. */
+    line {
+        stroke: var(--dark);
+        stroke-linecap: round;
+    }
+
+    /* Color selection. */
+    fill: var(--dark);
+    .light {
+        fill: var(--light);
+    }
+    .red {
+        fill: #f00;
+    }
+    .yellow {
+        fill: #ff0;
+    }
+    .green {
+        fill: #0f0;
+    }
+    .cyan {
+        fill: #0ff;
+    }
+    .blue {
+        fill: #00f;
+    }
+    .magenta {
+        fill: #f0f;
+    }
+}

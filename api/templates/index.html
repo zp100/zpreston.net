@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 {% block stylesheets %}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/style.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/custom.css') }}"/>
 {% endblock %}
 {% block scripts %}
   <script src="{{ url_for('static', filename='src/test.js') }}"></script>
@@ -9,7 +10,8 @@
 
 <!-- Content. -->
 {% block content %}
-  <div id="tree" class="tree">
+  <!-- Tree panel. -->
+  <div id="tree" class="tree panel">
     <!-- ... -->
   </div>
 {% endblock %}
