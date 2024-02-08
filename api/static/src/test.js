@@ -99,7 +99,9 @@ function load_tree() {
     document.querySelector('#tree').innerHTML = tree_html
 
     // Update its dots' stems.
+    // In case it's called when the HTML elements haven't loaded, do it again when the tab gains focus.
     update_dots()
+    addEventListener('focus', update_dots)
 }
 
 
