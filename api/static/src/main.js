@@ -1,5 +1,6 @@
 "use strict";
 const elements = {}
+const P_FIDELITY = 1024
 
 
 
@@ -31,11 +32,11 @@ function component_to_elements(comp=[]) {
             const el_type = comp[row][col]
             if (el_type !== ' ') {
                 // Set pressure.
-                let base_pressure = 0.5
+                let base_pressure = 0
                 if (el_type == 'S') {
-                    base_pressure = 1.0
+                    base_pressure = P_FIDELITY
                 } else if (el_type == 'D') {
-                    base_pressure = 0.0
+                    base_pressure = -P_FIDELITY
                 }
 
                 // Add to elements, keyed using its coordinates.
@@ -77,13 +78,21 @@ function draw_rec() {
             const el = elements[y][x]
             if (el.type === 'P') {
                 // For pipes, scale brightness and blue-ness with pressure.
-                const rg = Math.ceil(el.pressure * 119 + 51)
-                const blue = Math.ceil(el.pressure * 204 + 51)
+                const p_scaled = (el.pressure / P_FIDELITY + 1) / 2
+                const rg = Math.ceil(p_scaled * 119 + 51)
+                const blue = Math.ceil(p_scaled * 204 + 51)
                 ctx.fillStyle = `rgb(${rg}, ${rg}, ${blue})`
             } else {
                 ctx.fillStyle = color_map[el.type]
             }
             ctx.fillRect(x * scalar, y * scalar, scalar, scalar)
+
+            // Text test.
+            ctx.font = '20px Arial'
+            ctx.fillStyle = '#fff'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(el.pressure, (Number(x) + 0.5) * scalar, (Number(y) + 0.5) * scalar)
         }
     }
 
@@ -131,18 +140,18 @@ function update() {
 
             if (adj_count !== 0) {
                 const avg_pressure = total_pressure / adj_count
-                new_elements[y][x].pressure += (avg_pressure - el.pressure) * flow_speed
+                new_elements[y][x].pressure += true_round((avg_pressure - el.pressure) * flow_speed)
                 if (up_el) {
-                    new_elements[Number(y) - 1][x].pressure += (avg_pressure - up_el.pressure) * flow_speed
+                    new_elements[Number(y) - 1][x].pressure += true_round((avg_pressure - up_el.pressure) * flow_speed)
                 }
                 if (down_el) {
-                    new_elements[Number(y) + 1][x].pressure += (avg_pressure - down_el.pressure) * flow_speed
+                    new_elements[Number(y) + 1][x].pressure += true_round((avg_pressure - down_el.pressure) * flow_speed)
                 }
                 if (left_el) {
-                    new_elements[y][Number(x) - 1].pressure += (avg_pressure - left_el.pressure) * flow_speed
+                    new_elements[y][Number(x) - 1].pressure += true_round((avg_pressure - left_el.pressure) * flow_speed)
                 }
                 if (right_el) {
-                    new_elements[y][Number(x) + 1].pressure += (avg_pressure - right_el.pressure) * flow_speed
+                    new_elements[y][Number(x) + 1].pressure += true_round((avg_pressure - right_el.pressure) * flow_speed)
                 }
             }
         }
@@ -156,6 +165,13 @@ function update() {
             }
         }
     }
+}
+
+
+
+// Rounds half-increments away from 0 instead of towards +Inf.
+function true_round(num) {
+    return Math.sign(num) * Math.round(Math.abs(num))
 }
 
 
