@@ -1,6 +1,7 @@
 "use strict";
-const elements = {}
+const GRID_SCALAR = 32
 const P_FIDELITY = 1024
+const elements = {}
 
 
 
@@ -58,41 +59,44 @@ function draw_rec() {
     const color_map = {
         'S': '#ccf',
         'D': '#003',
-        'P': '#55b',
+        'P': '#669',
         'G': '#0f0',
         'V': '#f0f',
         'C': '#f73',
     }    
 
-    // Get canvas, adjust size, and clear.
     const canvas_el = document.querySelector('canvas.grid')
     canvas_el.width = canvas_el.clientWidth
     canvas_el.height = canvas_el.clientHeight
     const ctx = canvas_el.getContext('2d')
-    ctx.clearRect(0, 0, canvas_el.width, canvas_el.height)
 
-    // Draw.
-    const scalar = 64
-    for (const y in elements) {
-        for (const x in elements[y]) {
-            const el = elements[y][x]
-            if (el.type === 'P') {
-                // For pipes, scale brightness and blue-ness with pressure.
-                const p_scaled = (el.pressure / P_FIDELITY + 1) / 2
-                const rg = Math.ceil(p_scaled * 119 + 51)
-                const blue = Math.ceil(p_scaled * 204 + 51)
-                ctx.fillStyle = `rgb(${rg}, ${rg}, ${blue})`
+    for (let y = 0; y < canvas_el.height / GRID_SCALAR; y++) {
+        for (let x = 0; x < canvas_el.width / GRID_SCALAR; x++) {
+            const el = elements[y]?.[x]
+            if (el) {
+                // Element.
+                if (el.type === 'P') {
+                    // For pipes, scale brightness and blue-ness with pressure.
+                    const p_scaled = (el.pressure / P_FIDELITY + 1) / 2
+                    const rg = Math.ceil(p_scaled * 102 + 51)
+                    const blue = Math.ceil(p_scaled * 204 + 51)
+                    ctx.fillStyle = `rgb(${rg}, ${rg}, ${blue})`
+                } else {
+                    ctx.fillStyle = color_map[el.type]
+                }
+                ctx.fillRect(x * GRID_SCALAR, y * GRID_SCALAR, GRID_SCALAR, GRID_SCALAR)
+    
+                // Text test.
+                ctx.font = `${GRID_SCALAR / 4}px Arial`
+                ctx.fillStyle = '#fff'
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.fillText(el.pressure, (Number(x) + 0.5) * GRID_SCALAR, (Number(y) + 0.5) * GRID_SCALAR)
             } else {
-                ctx.fillStyle = color_map[el.type]
+                // Grid background (alternate between shades of light-gray).
+                ctx.fillStyle = ((x + y) % 2 === 0 ? '#eee' : '#fff')
+                ctx.fillRect(x * GRID_SCALAR, y * GRID_SCALAR, GRID_SCALAR, GRID_SCALAR)
             }
-            ctx.fillRect(x * scalar, y * scalar, scalar, scalar)
-
-            // Text test.
-            ctx.font = '20px Arial'
-            ctx.fillStyle = '#fff'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.fillText(el.pressure, (Number(x) + 0.5) * scalar, (Number(y) + 0.5) * scalar)
         }
     }
 
