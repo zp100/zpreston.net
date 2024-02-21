@@ -1,3 +1,4 @@
+"use strict";
 const elements = {}
 
 
@@ -25,8 +26,8 @@ function main() {
 
 
 function component_to_elements(comp=[]) {
-    for (row in comp) {
-        for (col in comp[row]) {
+    for (const row in comp) {
+        for (const col in comp[row]) {
             const el_type = comp[row][col]
             if (el_type !== ' ') {
                 // Set pressure.
@@ -42,8 +43,8 @@ function component_to_elements(comp=[]) {
                     elements[row] = {}
                 }
                 elements[row][col] = {
-                    'type': el_type,
-                    'pressure': base_pressure
+                    type: el_type,
+                    pressure: base_pressure,
                 }
             }
         }
@@ -66,13 +67,13 @@ function draw_rec() {
     const canvas_el = document.querySelector('canvas.grid')
     canvas_el.width = canvas_el.clientWidth
     canvas_el.height = canvas_el.clientHeight
-    ctx = canvas_el.getContext('2d')
+    const ctx = canvas_el.getContext('2d')
     ctx.clearRect(0, 0, canvas_el.width, canvas_el.height)
 
     // Draw.
     const scalar = 64
-    for (y in elements) {
-        for (x in elements[y]) {
+    for (const y in elements) {
+        for (const x in elements[y]) {
             const el = elements[y][x]
             if (el.type === 'P') {
                 // For pipes, scale brightness and blue-ness with pressure.
@@ -98,8 +99,8 @@ function update() {
 
     // Average out the pressure for each element.
     const flow_speed = 0.5 // higher than 0.5 causes "waves" where the pressure oscillates before settling
-    for (y in elements) {
-        for (x in elements[y]) {
+    for (const y in elements) {
+        for (const x in elements[y]) {
             const el = elements[y][x]
             let total_pressure = 0
             let adj_count = 0
@@ -148,8 +149,8 @@ function update() {
     }
 
     // Deep-copy new elements to old mapping.
-    for (y in elements) {
-        for (x in elements[y]) {
+    for (const y in elements) {
+        for (const x in elements[y]) {
             if (elements[y][x].type !== 'S' && elements[y][x].type !== 'D') {
                 elements[y][x] = new_elements[y][x]
             }
