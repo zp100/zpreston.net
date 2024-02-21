@@ -1,6 +1,6 @@
 "use strict";
-const GRID_SCALAR = 32
-const P_FIDELITY = 1024
+const GRID_SCALAR = 64
+const P_FIDELITY = 65536
 const elements = {}
 
 
@@ -57,12 +57,12 @@ function component_to_elements(comp=[]) {
 
 function draw_rec() {
     const color_map = {
-        'S': '#ccf',
+        'S': '#0cc',
         'D': '#003',
         'P': '#669',
         'G': '#0f0',
-        'V': '#f0f',
-        'C': '#f73',
+        'V': '#c0c',
+        'C': '#f00',
     }    
 
     const canvas_el = document.querySelector('canvas.grid')
@@ -92,9 +92,9 @@ function draw_rec() {
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
                 ctx.fillText(el.pressure, (Number(x) + 0.5) * GRID_SCALAR, (Number(y) + 0.5) * GRID_SCALAR)
-            } else {
+            } else if ((x + y) % 2 === 0) {
                 // Grid background (alternate between shades of light-gray).
-                ctx.fillStyle = ((x + y) % 2 === 0 ? '#eee' : '#fff')
+                ctx.fillStyle = '#eee'
                 ctx.fillRect(x * GRID_SCALAR, y * GRID_SCALAR, GRID_SCALAR, GRID_SCALAR)
             }
         }
