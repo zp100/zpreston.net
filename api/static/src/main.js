@@ -2,9 +2,9 @@
 const P_FIDELITY = 65536
 const elements = {}
 const camera = {
-    grid_x: -1,
-    grid_y: -1,
-    zoom: 64,
+    grid_x: 8,
+    grid_y: 8,
+    zoom: 32,
 }
 
 
@@ -78,10 +78,12 @@ function draw_rec() {
     canvas_el.height = canvas_el.clientHeight
     const ctx = canvas_el.getContext('2d')
 
-    for (let grid_x = Math.floor(camera.grid_x); grid_x <= Math.ceil(camera.grid_x + canvas_el.width / camera.zoom); grid_x++) {
-        for (let grid_y = Math.floor(camera.grid_y); grid_y <= Math.ceil(camera.grid_y + canvas_el.height / camera.zoom); grid_y++) {
-            const draw_x = (grid_x - camera.grid_x - 0.5) * camera.zoom
-            const draw_y = canvas_el.height - (grid_y - camera.grid_y + 0.5) * camera.zoom
+    const max_grid_x = (canvas_el.width / 2) / camera.zoom
+    const max_grid_y = (canvas_el.height / 2) / camera.zoom
+    for (let grid_x = Math.round(camera.grid_x - max_grid_x); grid_x <= Math.round(camera.grid_x + max_grid_x); grid_x++) {
+        for (let grid_y = Math.round(camera.grid_y - max_grid_y); grid_y <= Math.round(camera.grid_y + max_grid_y); grid_y++) {
+            const draw_x = (canvas_el.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
+            const draw_y = (canvas_el.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom 
             const el = elements[grid_x]?.[grid_y]
             if (el) {
                 // Element.
@@ -101,7 +103,7 @@ function draw_rec() {
                 ctx.fillStyle = '#fff'
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
-                ctx.fillText(el.pressure, (grid_x - camera.grid_x) * camera.zoom, canvas_el.height - (grid_y - camera.grid_y) * camera.zoom)
+                ctx.fillText(el.pressure, draw_x + 0.5 * camera.zoom, draw_y + 0.5 * camera.zoom)
             } else if (grid_x === 0 || grid_y === 0) {
                 // Axis lines.
                 if ((grid_x + grid_y) % 2 === 0) {
