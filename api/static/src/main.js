@@ -79,7 +79,8 @@ function draw_rec() {
     const ctx = canvas_el.getContext('2d')
 
     // Fill background if zoomed out too much to load the checkered bg.
-    if (camera.zoom <= 4) {
+    const zoom_bg_limit = 3
+    if (camera.zoom < zoom_bg_limit) {
         ctx.fillStyle = '#f7f7f7'
         ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
     }
@@ -119,7 +120,7 @@ function draw_rec() {
                     ctx.fillStyle = '#ffc'
                     ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
                 }
-            } else if (camera.zoom > 4 && (grid_x + grid_y) % 2 === 0) {
+            } else if (camera.zoom >= zoom_bg_limit && (grid_x + grid_y) % 2 === 0) {
                 // Checkered grid background.
                 ctx.fillStyle = '#eee'
                 ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
@@ -218,13 +219,23 @@ addEventListener('contextmenu', (ev) => ev.preventDefault())
 
 
 addEventListener('mousemove', (ev) => {
+    const canvas_el = document.querySelector('canvas.grid')
     if (ev.buttons === 4) {
         // Middle click drag.
+        canvas_el.style.cursor = 'zoom-in'
         zoom(ev.movementY)
     } else if (ev.buttons === 2) {
         // Right click drag.
+        canvas_el.style.cursor = 'all-scroll'
         pan(ev.movementX, ev.movementY)
     }
+})
+
+
+
+addEventListener('mouseup', (ev) => {
+    const canvas_el = document.querySelector('canvas.grid')
+    canvas_el.style.cursor = 'auto'
 })
 
 
