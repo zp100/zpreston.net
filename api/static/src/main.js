@@ -1,7 +1,11 @@
 "use strict";
-const GRID_SCALAR = 64
 const P_FIDELITY = 65536
 const elements = {}
+const camera = {
+    grid_x: -1,
+    grid_y: -1,
+    zoom: 64,
+}
 
 
 
@@ -32,6 +36,10 @@ function component_to_elements(comp=[]) {
         for (const col in comp[row]) {
             const el_type = comp[row][col]
             if (el_type !== ' ') {
+                // Rename variables for readability.
+                const grid_x = col
+                const grid_y = comp.length - 1 - row
+
                 // Set pressure.
                 let base_pressure = 0
                 if (el_type == 'S') {
@@ -41,10 +49,10 @@ function component_to_elements(comp=[]) {
                 }
 
                 // Add to elements, keyed using its coordinates.
-                if (!(row in elements)) {
-                    elements[row] = {}
+                if (!(grid_x in elements)) {
+                    elements[grid_x] = {}
                 }
-                elements[row][col] = {
+                elements[grid_x][grid_y] = {
                     type: el_type,
                     pressure: base_pressure,
                 }
@@ -63,16 +71,18 @@ function draw_rec() {
         'G': '#0f0',
         'V': '#c0c',
         'C': '#f00',
-    }    
+    }
 
     const canvas_el = document.querySelector('canvas.grid')
     canvas_el.width = canvas_el.clientWidth
     canvas_el.height = canvas_el.clientHeight
     const ctx = canvas_el.getContext('2d')
 
-    for (let y = 0; y < canvas_el.height / GRID_SCALAR; y++) {
-        for (let x = 0; x < canvas_el.width / GRID_SCALAR; x++) {
-            const el = elements[y]?.[x]
+    for (let grid_x = Math.floor(camera.grid_x); grid_x <= Math.ceil(camera.grid_x + canvas_el.width / camera.zoom); grid_x++) {
+        for (let grid_y = Math.floor(camera.grid_y); grid_y <= Math.ceil(camera.grid_y + canvas_el.height / camera.zoom); grid_y++) {
+            const draw_x = (grid_x - camera.grid_x - 0.5) * camera.zoom
+            const draw_y = canvas_el.height - (grid_y - camera.grid_y + 0.5) * camera.zoom
+            const el = elements[grid_x]?.[grid_y]
             if (el) {
                 // Element.
                 if (el.type === 'P') {
@@ -84,18 +94,27 @@ function draw_rec() {
                 } else {
                     ctx.fillStyle = color_map[el.type]
                 }
-                ctx.fillRect(x * GRID_SCALAR, y * GRID_SCALAR, GRID_SCALAR, GRID_SCALAR)
-    
+                ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+
                 // Text test.
-                ctx.font = `${GRID_SCALAR / 4}px Arial`
+                ctx.font = `${camera.zoom / 4}px Arial`
                 ctx.fillStyle = '#fff'
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
-                ctx.fillText(el.pressure, (Number(x) + 0.5) * GRID_SCALAR, (Number(y) + 0.5) * GRID_SCALAR)
-            } else if ((x + y) % 2 === 0) {
-                // Grid background (alternate between shades of light-gray).
+                ctx.fillText(el.pressure, (grid_x - camera.grid_x) * camera.zoom, canvas_el.height - (grid_y - camera.grid_y) * camera.zoom)
+            } else if (grid_x === 0 || grid_y === 0) {
+                // Axis lines.
+                if ((grid_x + grid_y) % 2 === 0) {
+                    ctx.fillStyle = '#eeb'
+                    ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+                } else {
+                    ctx.fillStyle = '#ffc'
+                    ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+                }
+            } else if ((grid_x + grid_y) % 2 === 0) {
+                // Checkered grid background.
                 ctx.fillStyle = '#eee'
-                ctx.fillRect(x * GRID_SCALAR, y * GRID_SCALAR, GRID_SCALAR, GRID_SCALAR)
+                ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
             }
         }
     }
@@ -112,60 +131,60 @@ function update() {
 
     // Average out the pressure for each element.
     const flow_speed = 0.5 // higher than 0.5 causes "waves" where the pressure oscillates before settling
-    for (const y in elements) {
-        for (const x in elements[y]) {
-            const el = elements[y][x]
+    for (const grid_x in elements) {
+        for (const grid_y in elements[grid_x]) {
+            const el = elements[grid_x][grid_y]
             let total_pressure = 0
             let adj_count = 0
 
-            const up_el = elements[Number(y) - 1]?.[x]
+            const up_el = elements[grid_x][Number(grid_y) + 1]
             if (up_el) {
                 total_pressure += up_el.pressure
                 adj_count++
             }
 
-            const down_el = elements[Number(y) + 1]?.[x]
+            const down_el = elements[grid_x][Number(grid_y) - 1]
             if (down_el) {
                 total_pressure += down_el.pressure
                 adj_count++
             }
 
-            const left_el = elements[y][Number(x) - 1]
-            if (left_el) {
-                total_pressure += left_el.pressure
-                adj_count++
-            }
-
-            const right_el = elements[y][Number(x) + 1]
+            const right_el = elements[Number(grid_x) + 1]?.[grid_y]
             if (right_el) {
                 total_pressure += right_el.pressure
                 adj_count++
             }
 
+            const left_el = elements[Number(grid_x) - 1]?.[grid_y]
+            if (left_el) {
+                total_pressure += left_el.pressure
+                adj_count++
+            }
+
             if (adj_count !== 0) {
                 const avg_pressure = total_pressure / adj_count
-                new_elements[y][x].pressure += true_round((avg_pressure - el.pressure) * flow_speed)
+                new_elements[grid_x][grid_y].pressure += true_round((avg_pressure - el.pressure) * flow_speed)
                 if (up_el) {
-                    new_elements[Number(y) - 1][x].pressure += true_round((avg_pressure - up_el.pressure) * flow_speed)
+                    new_elements[grid_x][Number(grid_y) + 1].pressure += true_round((avg_pressure - up_el.pressure) * flow_speed)
                 }
                 if (down_el) {
-                    new_elements[Number(y) + 1][x].pressure += true_round((avg_pressure - down_el.pressure) * flow_speed)
-                }
-                if (left_el) {
-                    new_elements[y][Number(x) - 1].pressure += true_round((avg_pressure - left_el.pressure) * flow_speed)
+                    new_elements[grid_x][Number(grid_y) - 1].pressure += true_round((avg_pressure - down_el.pressure) * flow_speed)
                 }
                 if (right_el) {
-                    new_elements[y][Number(x) + 1].pressure += true_round((avg_pressure - right_el.pressure) * flow_speed)
+                    new_elements[Number(grid_x) + 1][grid_y].pressure += true_round((avg_pressure - right_el.pressure) * flow_speed)
+                }
+                if (left_el) {
+                    new_elements[Number(grid_x) - 1][grid_y].pressure += true_round((avg_pressure - left_el.pressure) * flow_speed)
                 }
             }
         }
     }
 
     // Deep-copy new elements to old mapping.
-    for (const y in elements) {
-        for (const x in elements[y]) {
-            if (elements[y][x].type !== 'S' && elements[y][x].type !== 'D') {
-                elements[y][x] = new_elements[y][x]
+    for (const grid_x in elements) {
+        for (const grid_y in elements[grid_x]) {
+            if (elements[grid_x][grid_y].type !== 'S' && elements[grid_x][grid_y].type !== 'D') {
+                elements[grid_x][grid_y] = new_elements[grid_x][grid_y]
             }
         }
     }
