@@ -113,7 +113,7 @@ function draw_rec() {
                     ctx.fillStyle = '#ffc'
                     ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
                 }
-            } else if ((grid_x + grid_y) % 2 === 0) {
+            } else if (camera.zoom > 4 && (grid_x + grid_y) % 2 === 0) {
                 // Checkered grid background.
                 ctx.fillStyle = '#eee'
                 ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
@@ -191,6 +191,20 @@ function update() {
         }
     }
 }
+
+
+
+addEventListener('wheel', (ev) => {
+    ev.preventDefault()
+    if (ev.ctrlKey) {
+        camera.zoom *= 1 + (0.0005 * ev.deltaY)
+        if (camera.zoom < 2) camera.zoom = 2
+        if (camera.zoom > 256) camera.zoom = 256
+    } else {
+        camera.grid_x += 0.5 * ev.deltaX / camera.zoom
+        camera.grid_y -= 0.5 * ev.deltaY / camera.zoom
+    }
+}, {passive: false}) // prevents Ctrl + Scroll to zoom as well
 
 
 
