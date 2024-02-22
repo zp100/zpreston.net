@@ -78,6 +78,12 @@ function draw_rec() {
     canvas_el.height = canvas_el.clientHeight
     const ctx = canvas_el.getContext('2d')
 
+    // Fill background if zoomed out too much to load the checkered bg.
+    if (camera.zoom <= 4) {
+        ctx.fillStyle = '#f7f7f7'
+        ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
+    }
+
     const max_grid_x = (canvas_el.width / 2) / camera.zoom
     const max_grid_y = (canvas_el.height / 2) / camera.zoom
     for (let grid_x = Math.round(camera.grid_x - max_grid_x); grid_x <= Math.round(camera.grid_x + max_grid_x); grid_x++) {
@@ -195,22 +201,52 @@ function update() {
 
 
 addEventListener('wheel', (ev) => {
+    const wheel_scalar = -0.5
     ev.preventDefault()
     if (ev.ctrlKey) {
-        camera.zoom *= 1 + (0.0005 * ev.deltaY)
-        if (camera.zoom < 2) camera.zoom = 2
-        if (camera.zoom > 256) camera.zoom = 256
+        zoom(wheel_scalar * ev.deltaY)
     } else {
-        camera.grid_x += 0.5 * ev.deltaX / camera.zoom
-        camera.grid_y -= 0.5 * ev.deltaY / camera.zoom
+        pan(wheel_scalar * ev.deltaX, wheel_scalar * ev.deltaY)
     }
 }, {passive: false}) // prevents Ctrl + Scroll to zoom as well
+
+
+
+// Prevent right-click menu.
+addEventListener('contextmenu', (ev) => ev.preventDefault())
+
+
+
+addEventListener('mousemove', (ev) => {
+    if (ev.buttons === 4) {
+        // Middle click drag.
+        zoom(ev.movementY)
+    } else if (ev.buttons === 2) {
+        // Right click drag.
+        pan(ev.movementX, ev.movementY)
+    }
+})
 
 
 
 // Rounds half-increments away from 0 instead of towards +Inf.
 function true_round(num) {
     return Math.sign(num) * Math.round(Math.abs(num))
+}
+
+
+
+function pan(x, y) {
+    camera.grid_x -= x / camera.zoom
+    camera.grid_y += y / camera.zoom
+}
+
+
+
+function zoom(z) {
+    camera.zoom *= 1 + (-0.002 * z)
+    if (camera.zoom < 1) camera.zoom = 1
+    if (camera.zoom > 256) camera.zoom = 256
 }
 
 
