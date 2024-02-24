@@ -5,20 +5,15 @@ const camera = {
     grid_y: 8,
     zoom: 32,
 }
+const inputs = {}
 
 
 
 function main() {
     // Create elements.
     const test_component = [
-        ['S ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['  ', '  ', 'P ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', 'P ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', 'L ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', 'P ', '  ', '  ', 'L ', '  ', '  ', ],
-        ['  ', '  ', 'P ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'D ', ],
+        ['S ', 'P ', 'P ', 'P ', 'L ', 'P ', 'P ', 'P ', 'J ', 'P ', 'P ', 'P ', 'D ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'B1', '  ', '  ', '  ', '  ', ],
     ]
     component_to_elements(test_component)
 
@@ -46,7 +41,7 @@ function component_to_elements(comp=[]) {
                 elements[grid_x][grid_y] = {
                     type: el_type,
                     input: el_input,
-                    is_blocked: false,
+                    is_blocked: (el_type === 'J'),
                     has_outflow: {
                         to_up: false,
                         to_down: false,
@@ -115,7 +110,7 @@ function draw_rec() {
     for (let grid_x = Math.round(camera.grid_x - max_grid_x); grid_x <= Math.round(camera.grid_x + max_grid_x); grid_x++) {
         for (let grid_y = Math.round(camera.grid_y - max_grid_y); grid_y <= Math.round(camera.grid_y + max_grid_y); grid_y++) {
             const draw_x = (canvas_el.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
-            const draw_y = (canvas_el.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom 
+            const draw_y = (canvas_el.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
             const el = elements[grid_x]?.[grid_y]
             if (el) {
                 // Element.
@@ -188,25 +183,29 @@ function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, ad
     const adj_el = old_elements[adj_x]?.[adj_y]
     if (adj_el) {
         if (!old_el.is_blocked) {
-            // Pull outflow from adjacent cell (unless it's flowing into this cell).
-            el.has_outflow[flow_direction] =
-                (adj_el.type === 'D') ||
-                (flow_direction !== 'to_up' && adj_el.has_outflow['to_down']) ||
-                (flow_direction !== 'to_down' && adj_el.has_outflow['to_up']) ||
-                (flow_direction !== 'to_right' && adj_el.has_outflow['to_left']) ||
-                (flow_direction !== 'to_left' && adj_el.has_outflow['to_right'])
-            
+            // Pull outflow from adjacent cell (unless it's a valve or button, or is flowing into this cell).
+            el.has_outflow[flow_direction] = (
+                adj_el.type !== 'V' && adj_el.type !== 'B' && (
+                    (adj_el.type === 'D') ||
+                    (flow_direction !== 'to_up' && adj_el.has_outflow['to_down']) ||
+                    (flow_direction !== 'to_down' && adj_el.has_outflow['to_up']) ||
+                    (flow_direction !== 'to_right' && adj_el.has_outflow['to_left']) ||
+                    (flow_direction !== 'to_left' && adj_el.has_outflow['to_right'])
+                )
+            )
+
             // Become pressurized if adjacent cell is pressurized.
-            if (old_el.type === 'S' || adj_el.is_pressurized) {
+            if (old_el.type === 'S' || adj_el.is_pressurized || old_el.input in inputs) {
                 el.is_pressurized = true
             }
-            
-            //
-            const has_inflow = 
+
+            // Become flowing if a cell that flows into this one is flowing.
+            const has_inflow = (
                 (flow_direction === 'to_up' && adj_el.has_outflow['to_down']) ||
                 (flow_direction === 'to_down' && adj_el.has_outflow['to_up']) ||
                 (flow_direction === 'to_right' && adj_el.has_outflow['to_left']) ||
                 (flow_direction === 'to_left' && adj_el.has_outflow['to_right'])
+            )
             if (old_el.type === 'S' || (adj_el.is_flowing && has_inflow)) {
                 el.is_flowing = true
             }
@@ -263,10 +262,15 @@ addEventListener('mouseup', (ev) => {
 
 
 
-// Rounds half-increments away from 0 instead of towards +Inf.
-function true_round(num) {
-    return Math.sign(num) * Math.round(Math.abs(num))
-}
+addEventListener('keydown', (ev) => {
+    inputs[ev.key] = true
+})
+
+
+
+addEventListener('keyup', (ev) => {
+    delete inputs[ev.key]
+})
 
 
 
