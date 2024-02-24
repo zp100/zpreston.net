@@ -15,17 +15,20 @@ const current_inputs = {}
 function main() {
     // Create elements.
     const test_component = [
-        ['  ', '  ', 'P ', 'P ', 'P ', 'P ', 'P ', '  ', '  ', ],
-        ['  ', '  ', 'P ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', 'P ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', 'P ', '  ', '  ', '  ', 'B1', '  ', '  ', ],
-        ['S ', 'P ', 'P ', 'P ', 'L ', 'P ', 'J ', 'P ', 'D ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
+        ['P ', '  ', '  ', '  ', 'L ', '  ', '  ', 'L ', ],
+        ['S ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
+        ['D ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
+        ['P ', '  ', '  ', 'B1', 'J ', '  ', 'B2', 'J ', ],
+        ['P ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
     ]
     component_to_elements(test_component)
 
     // Draw loop and update loop.
     requestAnimationFrame(draw_rec)
-    const loop_handler = setInterval(update, 10)
+    setInterval(update, 0)
 }
 
 
@@ -165,6 +168,8 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         },
     }
 
+    const center_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x) * camera.zoom
+    const center_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y) * camera.zoom
     const draw_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
     const draw_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
     const draw_size = camera.zoom
@@ -181,6 +186,14 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.fillStyle = color_map[el.type]['default']
         }
         ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
+
+        if (el.type === 'B') {
+            ctx.font = `${camera.zoom / 2}px Arial`
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillStyle = (el.is_pressurized ? '#fff' : '#000')
+            ctx.fillText(el.input, center_x, center_y)
+        }
 
         // // DEBUG: Draw outflow directions.
         // ctx.fillStyle = '#7f7f7f'
