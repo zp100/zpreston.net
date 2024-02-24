@@ -11,15 +11,14 @@ const camera = {
 function main() {
     // Create elements.
     const test_component = [
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ],
-        [' ', 'S', 'P', 'L', 'P', 'P', 'L', 'P', ' ', ],
-        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
-        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
-        [' ', ' ', ' ', ' ', 'L', ' ', ' ', ' ', ' ', ],
-        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
-        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
-        [' ', 'L', 'P', 'P', 'P', 'P', 'P', 'D', ' ', ],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ],
+        ['S ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['  ', '  ', 'P ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', 'P ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', 'L ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', 'P ', '  ', '  ', 'L ', '  ', '  ', ],
+        ['  ', '  ', 'P ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'D ', ],
     ]
     component_to_elements(test_component)
 
@@ -33,7 +32,8 @@ function main() {
 function component_to_elements(comp=[]) {
     for (const row in comp) {
         for (const col in comp[row]) {
-            const el_type = comp[row][col]
+            const el_type = comp[row][col][0]
+            const el_input = comp[row][col][1]
             if (el_type !== ' ') {
                 // Rename variables for readability.
                 const grid_x = col
@@ -45,14 +45,16 @@ function component_to_elements(comp=[]) {
                 }
                 elements[grid_x][grid_y] = {
                     type: el_type,
-                    outflow: {
-                        to_up: (el_type === 'D'),
-                        to_down: (el_type === 'D'),
-                        to_right: (el_type === 'D'),
-                        to_left: (el_type === 'D'),
+                    input: el_input,
+                    is_blocked: false,
+                    has_outflow: {
+                        to_up: false,
+                        to_down: false,
+                        to_right: false,
+                        to_left: false,
                     },
-                    is_pressurized: (el_type === 'S'),
-                    is_flowing: (el_type === 'S'),
+                    is_pressurized: false,
+                    is_flowing: false,
                 }
             }
         }
@@ -63,14 +65,37 @@ function component_to_elements(comp=[]) {
 
 function draw_rec() {
     const color_map = {
-        'S': '#99f',
-        'D': '#003',
-        'P': '#333',
-        'P_pressurized': '#666',
-        'P_flowing': '#669',
-        'L': '#330',
-        'L_flowing': '#ff0',
-        // other elements
+        'P': {
+            default: '#222',
+            pressurized: '#223',
+            flowing: '#224',
+        },
+        'S': {
+            default: '#446',
+        },
+        'D': {
+            default: '#002',
+        },
+        'J': {
+            default: '#242',
+            blocked: '#020',
+        },
+        'G': {
+            default: '#422',
+            blocked: '#200',
+        },
+        'V': {
+            default: '#202',
+            pressurized: '#424',
+        },
+        'B': {
+            default: '#022',
+            pressurized: '#244',
+        },
+        'L': {
+            default: '#220',
+            flowing: '#ff0',
+        },
     }
 
     const canvas_el = document.querySelector('canvas.grid')
@@ -81,7 +106,7 @@ function draw_rec() {
     // Fill background if zoomed out too much to load the checkered bg.
     const zoom_bg_limit = 3
     if (camera.zoom < zoom_bg_limit) {
-        ctx.fillStyle = '#f7f7f7'
+        ctx.fillStyle = '#040404'
         ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
     }
 
@@ -94,27 +119,38 @@ function draw_rec() {
             const el = elements[grid_x]?.[grid_y]
             if (el) {
                 // Element.
-                ctx.fillStyle = color_map[el.type]
-                if (el.type === 'P' && el.is_flowing) {
-                    ctx.fillStyle = color_map.P_flowing
-                } else if (el.type === 'P' && el.is_pressurized) {
-                    ctx.fillStyle = color_map.P_pressurized
-                } else if (el.type === 'L' && el.is_flowing) {
-                    ctx.fillStyle = color_map.L_flowing
+                if (el.is_flowing && 'flowing' in color_map[el.type]) {
+                    ctx.fillStyle = color_map[el.type]['flowing']
+                } else if (el.is_pressurized && 'pressurized' in color_map[el.type]) {
+                    ctx.fillStyle = color_map[el.type]['pressurized']
+                } else if (el.is_blocked && 'blocked' in color_map[el.type]) {
+                    ctx.fillStyle = color_map[el.type]['blocked']
+                } else {
+                    ctx.fillStyle = color_map[el.type]['default']
                 }
                 ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+
+                // // DEBUG
+                // ctx.fillStyle = '#000'
+                // ctx.fillRect(draw_x, draw_y, 9, 9)
+                // ctx.fillStyle = '#fff'
+                // if (el.has_outflow.to_up) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+                // if (el.has_outflow.to_down) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+                // if (el.has_outflow.to_right) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+                // if (el.has_outflow.to_left) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
+
             } else if (grid_x === 0 || grid_y === 0) {
                 // Axis lines.
                 if ((grid_x + grid_y) % 2 === 0) {
-                    ctx.fillStyle = '#eeb'
+                    ctx.fillStyle = '#081008'
                     ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
                 } else {
-                    ctx.fillStyle = '#ffc'
+                    ctx.fillStyle = '#101810'
                     ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
                 }
-            } else if (camera.zoom >= zoom_bg_limit && (grid_x + grid_y) % 2 === 0) {
+            } else if (camera.zoom >= zoom_bg_limit && (grid_x + grid_y) % 2 !== 0) {
                 // Checkered grid background.
-                ctx.fillStyle = '#eee'
+                ctx.fillStyle = '#080808'
                 ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
             }
         }
@@ -135,58 +171,53 @@ function update() {
         for (const grid_y in elements[grid_x]) {
             const old_el = old_elements[grid_x][grid_y]
             const el = elements[grid_x][grid_y]
+            el.is_blocked = (el.type === 'J')
+            el.is_pressurized = false
+            el.is_flowing = false
+            calc_flow(old_elements, elements, old_el, el, 'to_up', grid_x, Number(grid_y) + 1)
+            calc_flow(old_elements, elements, old_el, el, 'to_down', grid_x, Number(grid_y) - 1)
+            calc_flow(old_elements, elements, old_el, el, 'to_right', Number(grid_x) + 1, grid_y)
+            calc_flow(old_elements, elements, old_el, el, 'to_left', Number(grid_x) - 1, grid_y)
+        }
+    }
+}
 
-            const up_el = old_elements[grid_x]?.[Number(grid_y) + 1]
-            if (up_el) {
-                if (up_el.outflow.to_up || up_el.outflow.to_right || up_el.outflow.to_left) {
-                    el.outflow.to_up = true
-                }
-                if (up_el.is_pressurized) {
-                    el.is_pressurized = true
-                }
-                if (old_el.is_flowing && old_el.outflow.to_up) {
-                    elements[grid_x][Number(grid_y) + 1].is_flowing = true
-                }
-            }
 
-            const down_el = old_elements[grid_x]?.[Number(grid_y) - 1]
-            if (down_el) {
-                if (down_el.outflow.to_down || down_el.outflow.to_right || down_el.outflow.to_left) {
-                    el.outflow.to_down = true
-                }
-                if (down_el.is_pressurized) {
-                    el.is_pressurized = true
-                }
-                if (old_el.is_flowing && old_el.outflow.to_down) {
-                    elements[grid_x][Number(grid_y) - 1].is_flowing = true
-                }
-            }
 
-            const right_el = old_elements[Number(grid_x) + 1]?.[grid_y]
-            if (right_el) {
-                if (right_el.outflow.to_up || right_el.outflow.to_down || right_el.outflow.to_right) {
-                    el.outflow.to_right = true
-                }
-                if (right_el.is_pressurized) {
-                    el.is_pressurized = true
-                }
-                if (old_el.is_flowing && old_el.outflow.to_right) {
-                    elements[Number(grid_x) + 1][grid_y].is_flowing = true
-                }
+function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, adj_y) {
+    const adj_el = old_elements[adj_x]?.[adj_y]
+    if (adj_el) {
+        if (!old_el.is_blocked) {
+            // Pull outflow from adjacent cell (unless it's flowing into this cell).
+            el.has_outflow[flow_direction] =
+                (adj_el.type === 'D') ||
+                (flow_direction !== 'to_up' && adj_el.has_outflow['to_down']) ||
+                (flow_direction !== 'to_down' && adj_el.has_outflow['to_up']) ||
+                (flow_direction !== 'to_right' && adj_el.has_outflow['to_left']) ||
+                (flow_direction !== 'to_left' && adj_el.has_outflow['to_right'])
+            
+            // Become pressurized if adjacent cell is pressurized.
+            if (old_el.type === 'S' || adj_el.is_pressurized) {
+                el.is_pressurized = true
             }
+            
+            //
+            const has_inflow = 
+                (flow_direction === 'to_up' && adj_el.has_outflow['to_down']) ||
+                (flow_direction === 'to_down' && adj_el.has_outflow['to_up']) ||
+                (flow_direction === 'to_right' && adj_el.has_outflow['to_left']) ||
+                (flow_direction === 'to_left' && adj_el.has_outflow['to_right'])
+            if (old_el.type === 'S' || (adj_el.is_flowing && has_inflow)) {
+                el.is_flowing = true
+            }
+        }
 
-            const left_el = old_elements[Number(grid_x) - 1]?.[grid_y]
-            if (left_el) {
-                if (left_el.outflow.to_up || left_el.outflow.to_down || left_el.outflow.to_left) {
-                    el.outflow.to_left = true
-                }
-                if (left_el.is_pressurized) {
-                    el.is_pressurized = true
-                }
-                if (old_el.is_flowing && old_el.outflow.to_left) {
-                    elements[Number(grid_x) - 1][grid_y].is_flowing = true
-                }
-            }
+        // Become blocked (or unblocked) under certain conditions.
+        if (old_el.type === 'G' && (adj_el.type === 'V' || adj_el.type === 'B') && adj_el.is_pressurized) {
+            el.is_blocked = true
+        }
+        if (old_el.type === 'J' && (adj_el.type === 'V' || adj_el.type === 'B') && adj_el.is_pressurized) {
+            el.is_blocked = false
         }
     }
 }
