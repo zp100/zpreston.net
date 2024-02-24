@@ -8,21 +8,18 @@ const camera = {
     grid_y: 8,
     zoom: 32,
 }
-const inputs = {}
+const current_inputs = {}
 
 
 
 function main() {
     // Create elements.
     const test_component = [
-        ['  ', '  ', '  ', '  ', 'L ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
-        ['S ', 'P ', 'L ', 'P ', 'P ', 'P ', 'D ', ],
-        ['  ', 'P ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', 'P ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', 'V ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'P ', 'P ', 'P ', 'P ', 'P ', '  ', '  ', ],
+        ['  ', '  ', 'P ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', 'P ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'P ', '  ', '  ', '  ', 'B1', '  ', '  ', ],
+        ['S ', 'P ', 'P ', 'P ', 'L ', 'P ', 'J ', 'P ', 'D ', ],
     ]
     component_to_elements(test_component)
 
@@ -118,8 +115,15 @@ function update() {
             calc_flow(old_elements, elements, old_el, el, 'right', Number(grid_x) + 1, grid_y)
             calc_flow(old_elements, elements, old_el, el, 'left', Number(grid_x) - 1, grid_y)
 
-            el.is_pressurized = (Object.values(el.flow).includes('o') || Object.values(el.flow).includes('b'))
-            el.is_flowing = (Object.values(el.flow).includes('o') && Object.values(el.flow).includes('i'))
+            el.is_pressurized = (
+                (el.type === 'B' && el.input in current_inputs) ||
+                Object.values(el.flow).includes('o') ||
+                Object.values(el.flow).includes('b')
+            )
+            el.is_flowing = (
+                Object.values(el.flow).includes('o') &&
+                Object.values(el.flow).includes('i')
+            )
         }
     }
 }
@@ -222,7 +226,7 @@ function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, ad
     } else if (old_el.type === 'D') {
         el.flow[flow_direction] = 'i'
     } else if (adj_el) {
-        if (!old_el.is_blocked && adj_el.type !== 'V' && adj_el.type !== 'B') {
+        if (!old_el.is_blocked && old_el.type !== 'V' && old_el.type !== 'B') {
             // Has outflow into adjacent cell if that cell has outflow (or balanced) on any other sides.
             const has_outflow = (
                 (flow_direction !== 'up' && (adj_el.flow['down'] === 'o' || adj_el.flow['down'] === 'b')) ||
@@ -243,6 +247,8 @@ function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, ad
             if (has_outflow && !has_inflow) el.flow[flow_direction] = 'o'
             if (!has_outflow && has_inflow) el.flow[flow_direction] = 'i'
             if (has_outflow && has_inflow) el.flow[flow_direction] = 'b'
+        } else {
+            el.flow[flow_direction] = 'n'
         }
 
         // Become blocked (or unblocked) under certain conditions.
@@ -297,13 +303,13 @@ addEventListener('mouseup', (ev) => {
 
 
 addEventListener('keydown', (ev) => {
-    inputs[ev.key] = true
+    current_inputs[ev.key] = true
 })
 
 
 
 addEventListener('keyup', (ev) => {
-    delete inputs[ev.key]
+    delete current_inputs[ev.key]
 })
 
 
