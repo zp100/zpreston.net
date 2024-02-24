@@ -1,4 +1,7 @@
 "use strict";
+const MIN_ZOOM = 2**-6
+const ZOOM_BG_LIMIT = 2**2
+const MAX_ZOOM = 2**10
 const elements = {}
 const camera = {
     grid_x: 8,
@@ -59,6 +62,62 @@ function component_to_elements(comp=[]) {
 
 
 function draw_rec() {
+    const canvas_el = document.querySelector('canvas.grid')
+    canvas_el.width = canvas_el.clientWidth
+    canvas_el.height = canvas_el.clientHeight
+    const ctx = canvas_el.getContext('2d')
+
+    const max_grid_x = (canvas_el.width / 2) / camera.zoom
+    const max_grid_y = (canvas_el.height / 2) / camera.zoom
+    if (camera.zoom < ZOOM_BG_LIMIT) {
+        // Fill background if zoomed out too much to load the checkered bg.
+        ctx.fillStyle = '#040404'
+        ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
+
+        // Only loop through cells with elements.
+        for (const grid_x in elements) {
+            for (const grid_y in elements[grid_x]) {
+                draw_cell(ctx, elements, grid_x, grid_y)
+            }
+        }
+    } else {
+        // Loop through all cells on-screen.
+        for (let grid_x = Math.round(camera.grid_x - max_grid_x); grid_x <= Math.round(camera.grid_x + max_grid_x); grid_x++) {
+            for (let grid_y = Math.round(camera.grid_y - max_grid_y); grid_y <= Math.round(camera.grid_y + max_grid_y); grid_y++) {
+                draw_cell(ctx, elements, grid_x, grid_y)
+            }
+        }
+    }
+
+    // Recursive call for animation.
+    requestAnimationFrame(draw_rec)
+}
+
+
+
+function update() {
+    // Make deep-copy of old elements for reference.
+    const old_elements = structuredClone(elements)
+
+    // Determine flow.
+    for (const grid_x in elements) {
+        for (const grid_y in elements[grid_x]) {
+            const old_el = old_elements[grid_x][grid_y]
+            const el = elements[grid_x][grid_y]
+            el.is_blocked = (el.type === 'J')
+            el.is_pressurized = false
+            el.is_flowing = false
+            calc_flow(old_elements, elements, old_el, el, 'to_up', grid_x, Number(grid_y) + 1)
+            calc_flow(old_elements, elements, old_el, el, 'to_down', grid_x, Number(grid_y) - 1)
+            calc_flow(old_elements, elements, old_el, el, 'to_right', Number(grid_x) + 1, grid_y)
+            calc_flow(old_elements, elements, old_el, el, 'to_left', Number(grid_x) - 1, grid_y)
+        }
+    }
+}
+
+
+
+function draw_cell(ctx, elements, grid_x, grid_y) {
     const color_map = {
         'P': {
             default: '#222',
@@ -93,87 +152,44 @@ function draw_rec() {
         },
     }
 
-    const canvas_el = document.querySelector('canvas.grid')
-    canvas_el.width = canvas_el.clientWidth
-    canvas_el.height = canvas_el.clientHeight
-    const ctx = canvas_el.getContext('2d')
-
-    // Fill background if zoomed out too much to load the checkered bg.
-    const zoom_bg_limit = 3
-    if (camera.zoom < zoom_bg_limit) {
-        ctx.fillStyle = '#040404'
-        ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
-    }
-
-    const max_grid_x = (canvas_el.width / 2) / camera.zoom
-    const max_grid_y = (canvas_el.height / 2) / camera.zoom
-    for (let grid_x = Math.round(camera.grid_x - max_grid_x); grid_x <= Math.round(camera.grid_x + max_grid_x); grid_x++) {
-        for (let grid_y = Math.round(camera.grid_y - max_grid_y); grid_y <= Math.round(camera.grid_y + max_grid_y); grid_y++) {
-            const draw_x = (canvas_el.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
-            const draw_y = (canvas_el.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
-            const el = elements[grid_x]?.[grid_y]
-            if (el) {
-                // Element.
-                if (el.is_flowing && 'flowing' in color_map[el.type]) {
-                    ctx.fillStyle = color_map[el.type]['flowing']
-                } else if (el.is_pressurized && 'pressurized' in color_map[el.type]) {
-                    ctx.fillStyle = color_map[el.type]['pressurized']
-                } else if (el.is_blocked && 'blocked' in color_map[el.type]) {
-                    ctx.fillStyle = color_map[el.type]['blocked']
-                } else {
-                    ctx.fillStyle = color_map[el.type]['default']
-                }
-                ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
-
-                // // DEBUG
-                // ctx.fillStyle = '#000'
-                // ctx.fillRect(draw_x, draw_y, 9, 9)
-                // ctx.fillStyle = '#fff'
-                // if (el.has_outflow.to_up) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-                // if (el.has_outflow.to_down) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-                // if (el.has_outflow.to_right) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-                // if (el.has_outflow.to_left) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
-
-            } else if (grid_x === 0 || grid_y === 0) {
-                // Axis lines.
-                if ((grid_x + grid_y) % 2 === 0) {
-                    ctx.fillStyle = '#081008'
-                    ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
-                } else {
-                    ctx.fillStyle = '#101810'
-                    ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
-                }
-            } else if (camera.zoom >= zoom_bg_limit && (grid_x + grid_y) % 2 !== 0) {
-                // Checkered grid background.
-                ctx.fillStyle = '#080808'
-                ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
-            }
+    const draw_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
+    const draw_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
+    const el = elements[grid_x]?.[grid_y]
+    if (el) {
+        // Element.
+        if (el.is_flowing && 'flowing' in color_map[el.type]) {
+            ctx.fillStyle = color_map[el.type]['flowing']
+        } else if (el.is_pressurized && 'pressurized' in color_map[el.type]) {
+            ctx.fillStyle = color_map[el.type]['pressurized']
+        } else if (el.is_blocked && 'blocked' in color_map[el.type]) {
+            ctx.fillStyle = color_map[el.type]['blocked']
+        } else {
+            ctx.fillStyle = color_map[el.type]['default']
         }
-    }
+        ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
 
-    // Recursive call for animation.
-    requestAnimationFrame(draw_rec)
-}
+        // // DEBUG: Draw outflow directions.
+        // ctx.fillStyle = '#000'
+        // ctx.fillRect(draw_x, draw_y, 9, 9)
+        // ctx.fillStyle = '#fff'
+        // if (el.has_outflow.to_up) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+        // if (el.has_outflow.to_down) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+        // if (el.has_outflow.to_right) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+        // if (el.has_outflow.to_left) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
 
-
-
-function update() {
-    // Make deep-copy of old elements for reference.
-    const old_elements = structuredClone(elements)
-
-    // Determine flow.
-    for (const grid_x in elements) {
-        for (const grid_y in elements[grid_x]) {
-            const old_el = old_elements[grid_x][grid_y]
-            const el = elements[grid_x][grid_y]
-            el.is_blocked = (el.type === 'J')
-            el.is_pressurized = false
-            el.is_flowing = false
-            calc_flow(old_elements, elements, old_el, el, 'to_up', grid_x, Number(grid_y) + 1)
-            calc_flow(old_elements, elements, old_el, el, 'to_down', grid_x, Number(grid_y) - 1)
-            calc_flow(old_elements, elements, old_el, el, 'to_right', Number(grid_x) + 1, grid_y)
-            calc_flow(old_elements, elements, old_el, el, 'to_left', Number(grid_x) - 1, grid_y)
+    } else if (grid_x === 0 || grid_y === 0) {
+        // Axis lines.
+        if ((grid_x + grid_y) % 2 === 0) {
+            ctx.fillStyle = '#081008'
+            ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+        } else {
+            ctx.fillStyle = '#101810'
+            ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
         }
+    } else if (camera.zoom >= ZOOM_BG_LIMIT && (grid_x + grid_y) % 2 !== 0) {
+        // Checkered grid background.
+        ctx.fillStyle = '#080808'
+        ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
     }
 }
 
@@ -283,8 +299,8 @@ function pan(x, y) {
 
 function zoom(z) {
     camera.zoom *= 1 + (-0.002 * z)
-    if (camera.zoom < 1) camera.zoom = 1
-    if (camera.zoom > 256) camera.zoom = 256
+    if (camera.zoom < MIN_ZOOM) camera.zoom = MIN_ZOOM
+    if (camera.zoom > MAX_ZOOM) camera.zoom = MAX_ZOOM
 }
 
 
