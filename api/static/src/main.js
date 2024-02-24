@@ -15,8 +15,23 @@ const inputs = {}
 function main() {
     // Create elements.
     const test_component = [
-        ['S ', 'P ', 'P ', 'P ', 'L ', 'P ', 'P ', 'P ', 'J ', 'P ', 'P ', 'P ', 'D ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'B1', '  ', '  ', '  ', '  ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
     ]
     component_to_elements(test_component)
 
@@ -154,6 +169,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 
     const draw_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
     const draw_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
+    const draw_size = camera.zoom
     const el = elements[grid_x]?.[grid_y]
     if (el) {
         // Element.
@@ -166,7 +182,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         } else {
             ctx.fillStyle = color_map[el.type]['default']
         }
-        ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+        ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
 
         // // DEBUG: Draw outflow directions.
         // ctx.fillStyle = '#000'
@@ -181,15 +197,15 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         // Axis lines.
         if ((grid_x + grid_y) % 2 === 0) {
             ctx.fillStyle = '#081008'
-            ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+            ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
         } else {
             ctx.fillStyle = '#101810'
-            ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+            ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
         }
     } else if (camera.zoom >= ZOOM_BG_LIMIT && (grid_x + grid_y) % 2 !== 0) {
         // Checkered grid background.
         ctx.fillStyle = '#080808'
-        ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
+        ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
     }
 }
 
