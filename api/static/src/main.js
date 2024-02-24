@@ -15,23 +15,14 @@ const inputs = {}
 function main() {
     // Create elements.
     const test_component = [
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['  ', '  ', '  ', '  ', 'L ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'P ', '  ', '  ', ],
+        ['S ', 'P ', 'L ', 'P ', 'P ', 'P ', 'D ', ],
+        ['  ', 'P ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', 'P ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', 'V ', '  ', '  ', '  ', '  ', '  ', ],
     ]
     component_to_elements(test_component)
 
@@ -60,11 +51,11 @@ function component_to_elements(comp=[]) {
                     type: el_type,
                     input: el_input,
                     is_blocked: (el_type === 'J'),
-                    has_outflow: {
-                        to_up: false,
-                        to_down: false,
-                        to_right: false,
-                        to_left: false,
+                    flow: {
+                        up: 'n',
+                        down: 'n',
+                        right: 'n',
+                        left: 'n',
                     },
                     is_pressurized: false,
                     is_flowing: false,
@@ -119,13 +110,16 @@ function update() {
         for (const grid_y in elements[grid_x]) {
             const old_el = old_elements[grid_x][grid_y]
             const el = elements[grid_x][grid_y]
+
             el.is_blocked = (el.type === 'J')
-            el.is_pressurized = false
-            el.is_flowing = false
-            calc_flow(old_elements, elements, old_el, el, 'to_up', grid_x, Number(grid_y) + 1)
-            calc_flow(old_elements, elements, old_el, el, 'to_down', grid_x, Number(grid_y) - 1)
-            calc_flow(old_elements, elements, old_el, el, 'to_right', Number(grid_x) + 1, grid_y)
-            calc_flow(old_elements, elements, old_el, el, 'to_left', Number(grid_x) - 1, grid_y)
+
+            calc_flow(old_elements, elements, old_el, el, 'up', grid_x, Number(grid_y) + 1)
+            calc_flow(old_elements, elements, old_el, el, 'down', grid_x, Number(grid_y) - 1)
+            calc_flow(old_elements, elements, old_el, el, 'right', Number(grid_x) + 1, grid_y)
+            calc_flow(old_elements, elements, old_el, el, 'left', Number(grid_x) - 1, grid_y)
+
+            el.is_pressurized = (Object.values(el.flow).includes('o') || Object.values(el.flow).includes('b'))
+            el.is_flowing = (Object.values(el.flow).includes('o') && Object.values(el.flow).includes('i'))
         }
     }
 }
@@ -185,13 +179,23 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
 
         // // DEBUG: Draw outflow directions.
-        // ctx.fillStyle = '#000'
+        // ctx.fillStyle = '#7f7f7f'
         // ctx.fillRect(draw_x, draw_y, 9, 9)
+        // ctx.fillStyle = '#000'
+        // if (el.flow.up === 'o') ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+        // if (el.flow.down === 'o') ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+        // if (el.flow.right === 'o') ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+        // if (el.flow.left === 'o') ctx.fillRect(draw_x, draw_y + 3, 3, 3)
         // ctx.fillStyle = '#fff'
-        // if (el.has_outflow.to_up) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-        // if (el.has_outflow.to_down) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-        // if (el.has_outflow.to_right) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-        // if (el.has_outflow.to_left) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
+        // if (el.flow.up === 'i') ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+        // if (el.flow.down === 'i') ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+        // if (el.flow.right === 'i') ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+        // if (el.flow.left === 'i') ctx.fillRect(draw_x, draw_y + 3, 3, 3)
+        // ctx.fillStyle = '#4040ff'
+        // if (el.flow.up === 'b') ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+        // if (el.flow.down === 'b') ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+        // if (el.flow.right === 'b') ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+        // if (el.flow.left === 'b') ctx.fillRect(draw_x, draw_y + 3, 3, 3)
 
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
@@ -213,34 +217,32 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 
 function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, adj_y) {
     const adj_el = old_elements[adj_x]?.[adj_y]
-    if (adj_el) {
-        if (!old_el.is_blocked) {
-            // Pull outflow from adjacent cell (unless it's a valve or button, or is flowing into this cell).
-            el.has_outflow[flow_direction] = (
-                adj_el.type !== 'V' && adj_el.type !== 'B' && (
-                    (adj_el.type === 'D') ||
-                    (flow_direction !== 'to_up' && adj_el.has_outflow['to_down']) ||
-                    (flow_direction !== 'to_down' && adj_el.has_outflow['to_up']) ||
-                    (flow_direction !== 'to_right' && adj_el.has_outflow['to_left']) ||
-                    (flow_direction !== 'to_left' && adj_el.has_outflow['to_right'])
-                )
+    if (old_el.type === 'S') {
+        el.flow[flow_direction] = 'o'
+    } else if (old_el.type === 'D') {
+        el.flow[flow_direction] = 'i'
+    } else if (adj_el) {
+        if (!old_el.is_blocked && adj_el.type !== 'V' && adj_el.type !== 'B') {
+            // Has outflow into adjacent cell if that cell has outflow (or balanced) on any other sides.
+            const has_outflow = (
+                (flow_direction !== 'up' && (adj_el.flow['down'] === 'o' || adj_el.flow['down'] === 'b')) ||
+                (flow_direction !== 'down' && (adj_el.flow['up'] === 'o' || adj_el.flow['up'] === 'b')) ||
+                (flow_direction !== 'right' && (adj_el.flow['left'] === 'o' || adj_el.flow['left'] === 'b')) ||
+                (flow_direction !== 'left' && (adj_el.flow['right'] === 'o' || adj_el.flow['right'] === 'b'))
             )
 
-            // Become pressurized if adjacent cell is pressurized.
-            if (old_el.type === 'S' || adj_el.is_pressurized || old_el.input in inputs) {
-                el.is_pressurized = true
-            }
-
-            // Become flowing if a cell that flows into this one is flowing.
+            // Has inflow from adjacent cell if that cell has inflow (or balanced) on any other sides.
             const has_inflow = (
-                (flow_direction === 'to_up' && adj_el.has_outflow['to_down']) ||
-                (flow_direction === 'to_down' && adj_el.has_outflow['to_up']) ||
-                (flow_direction === 'to_right' && adj_el.has_outflow['to_left']) ||
-                (flow_direction === 'to_left' && adj_el.has_outflow['to_right'])
+                (flow_direction !== 'up' && (adj_el.flow['down'] === 'i' || adj_el.flow['down'] === 'b')) ||
+                (flow_direction !== 'down' && (adj_el.flow['up'] === 'i' || adj_el.flow['up'] === 'b')) ||
+                (flow_direction !== 'right' && (adj_el.flow['left'] === 'i' || adj_el.flow['left'] === 'b')) ||
+                (flow_direction !== 'left' && (adj_el.flow['right'] === 'i' || adj_el.flow['right'] === 'b'))
             )
-            if (old_el.type === 'S' || (adj_el.is_flowing && has_inflow)) {
-                el.is_flowing = true
-            }
+
+            if (!has_outflow && !has_inflow) el.flow[flow_direction] = 'n'
+            if (has_outflow && !has_inflow) el.flow[flow_direction] = 'o'
+            if (!has_outflow && has_inflow) el.flow[flow_direction] = 'i'
+            if (has_outflow && has_inflow) el.flow[flow_direction] = 'b'
         }
 
         // Become blocked (or unblocked) under certain conditions.
