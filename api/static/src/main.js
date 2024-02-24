@@ -1,5 +1,4 @@
 "use strict";
-const P_FIDELITY = 65536
 const elements = {}
 const camera = {
     grid_x: 8,
@@ -13,20 +12,20 @@ function main() {
     // Create elements.
     const test_component = [
         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ],
-        [' ', 'S', 'P', 'P', 'P', 'P', 'P', 'P', ' ', ],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', 'P', ' ', ],
-        [' ', 'D', ' ', 'P', 'P', 'P', 'P', 'P', ' ', ],
-        [' ', 'P', ' ', 'P', ' ', ' ', ' ', ' ', ' ', ],
-        [' ', 'P', ' ', 'P', 'P', 'P', 'P', 'P', ' ', ],
-        [' ', 'P', ' ', ' ', ' ', ' ', ' ', 'P', ' ', ],
-        [' ', 'P', 'P', 'P', 'P', 'P', 'P', 'P', ' ', ],
+        [' ', 'S', 'P', 'L', 'P', 'P', 'L', 'P', ' ', ],
+        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
+        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
+        [' ', ' ', ' ', ' ', 'L', ' ', ' ', ' ', ' ', ],
+        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
+        [' ', ' ', ' ', ' ', 'P', ' ', ' ', ' ', ' ', ],
+        [' ', 'L', 'P', 'P', 'P', 'P', 'P', 'D', ' ', ],
         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ],
     ]
     component_to_elements(test_component)
 
     // Draw loop and update loop.
     requestAnimationFrame(draw_rec)
-    const loop_handler = setInterval(update, 20)
+    const loop_handler = setInterval(update, 10)
 }
 
 
@@ -40,21 +39,20 @@ function component_to_elements(comp=[]) {
                 const grid_x = col
                 const grid_y = comp.length - 1 - row
 
-                // Set pressure.
-                let base_pressure = 0
-                if (el_type == 'S') {
-                    base_pressure = P_FIDELITY
-                } else if (el_type == 'D') {
-                    base_pressure = -P_FIDELITY
-                }
-
                 // Add to elements, keyed using its coordinates.
                 if (!(grid_x in elements)) {
                     elements[grid_x] = {}
                 }
                 elements[grid_x][grid_y] = {
                     type: el_type,
-                    pressure: base_pressure,
+                    outflow: {
+                        to_up: (el_type === 'D'),
+                        to_down: (el_type === 'D'),
+                        to_right: (el_type === 'D'),
+                        to_left: (el_type === 'D'),
+                    },
+                    is_pressurized: (el_type === 'S'),
+                    is_flowing: (el_type === 'S'),
                 }
             }
         }
@@ -65,12 +63,14 @@ function component_to_elements(comp=[]) {
 
 function draw_rec() {
     const color_map = {
-        'S': '#0cc',
+        'S': '#99f',
         'D': '#003',
-        'P': '#669',
-        'G': '#0f0',
-        'V': '#c0c',
-        'C': '#f00',
+        'P': '#333',
+        'P_pressurized': '#666',
+        'P_flowing': '#669',
+        'L': '#330',
+        'L_flowing': '#ff0',
+        // other elements
     }
 
     const canvas_el = document.querySelector('canvas.grid')
@@ -94,23 +94,15 @@ function draw_rec() {
             const el = elements[grid_x]?.[grid_y]
             if (el) {
                 // Element.
-                if (el.type === 'P') {
-                    // For pipes, scale brightness and blue-ness with pressure.
-                    const p_scaled = (el.pressure / P_FIDELITY + 1) / 2
-                    const rg = Math.ceil(p_scaled * 102 + 51)
-                    const blue = Math.ceil(p_scaled * 204 + 51)
-                    ctx.fillStyle = `rgb(${rg}, ${rg}, ${blue})`
-                } else {
-                    ctx.fillStyle = color_map[el.type]
+                ctx.fillStyle = color_map[el.type]
+                if (el.type === 'P' && el.is_flowing) {
+                    ctx.fillStyle = color_map.P_flowing
+                } else if (el.type === 'P' && el.is_pressurized) {
+                    ctx.fillStyle = color_map.P_pressurized
+                } else if (el.type === 'L' && el.is_flowing) {
+                    ctx.fillStyle = color_map.L_flowing
                 }
                 ctx.fillRect(draw_x, draw_y, camera.zoom, camera.zoom)
-
-                // Text test.
-                ctx.font = `${camera.zoom / 4}px Arial`
-                ctx.fillStyle = '#fff'
-                ctx.textAlign = 'center'
-                ctx.textBaseline = 'middle'
-                ctx.fillText(el.pressure, draw_x + 0.5 * camera.zoom, draw_y + 0.5 * camera.zoom)
             } else if (grid_x === 0 || grid_y === 0) {
                 // Axis lines.
                 if ((grid_x + grid_y) % 2 === 0) {
@@ -135,65 +127,65 @@ function draw_rec() {
 
 
 function update() {
-    // Deep-copy elements to new mapping.
-    const new_elements = structuredClone(elements)
+    // Make deep-copy of old elements for reference.
+    const old_elements = structuredClone(elements)
 
-    // Average out the pressure for each element.
-    const flow_speed = 0.5 // higher than 0.5 causes "waves" where the pressure oscillates before settling
+    // Determine flow.
     for (const grid_x in elements) {
         for (const grid_y in elements[grid_x]) {
+            const old_el = old_elements[grid_x][grid_y]
             const el = elements[grid_x][grid_y]
-            let total_pressure = 0
-            let adj_count = 0
 
-            const up_el = elements[grid_x][Number(grid_y) + 1]
+            const up_el = old_elements[grid_x]?.[Number(grid_y) + 1]
             if (up_el) {
-                total_pressure += up_el.pressure
-                adj_count++
+                if (up_el.outflow.to_up || up_el.outflow.to_right || up_el.outflow.to_left) {
+                    el.outflow.to_up = true
+                }
+                if (up_el.is_pressurized) {
+                    el.is_pressurized = true
+                }
+                if (old_el.is_flowing && old_el.outflow.to_up) {
+                    elements[grid_x][Number(grid_y) + 1].is_flowing = true
+                }
             }
 
-            const down_el = elements[grid_x][Number(grid_y) - 1]
+            const down_el = old_elements[grid_x]?.[Number(grid_y) - 1]
             if (down_el) {
-                total_pressure += down_el.pressure
-                adj_count++
+                if (down_el.outflow.to_down || down_el.outflow.to_right || down_el.outflow.to_left) {
+                    el.outflow.to_down = true
+                }
+                if (down_el.is_pressurized) {
+                    el.is_pressurized = true
+                }
+                if (old_el.is_flowing && old_el.outflow.to_down) {
+                    elements[grid_x][Number(grid_y) - 1].is_flowing = true
+                }
             }
 
-            const right_el = elements[Number(grid_x) + 1]?.[grid_y]
+            const right_el = old_elements[Number(grid_x) + 1]?.[grid_y]
             if (right_el) {
-                total_pressure += right_el.pressure
-                adj_count++
+                if (right_el.outflow.to_up || right_el.outflow.to_down || right_el.outflow.to_right) {
+                    el.outflow.to_right = true
+                }
+                if (right_el.is_pressurized) {
+                    el.is_pressurized = true
+                }
+                if (old_el.is_flowing && old_el.outflow.to_right) {
+                    elements[Number(grid_x) + 1][grid_y].is_flowing = true
+                }
             }
 
-            const left_el = elements[Number(grid_x) - 1]?.[grid_y]
+            const left_el = old_elements[Number(grid_x) - 1]?.[grid_y]
             if (left_el) {
-                total_pressure += left_el.pressure
-                adj_count++
-            }
-
-            if (adj_count !== 0) {
-                const avg_pressure = total_pressure / adj_count
-                new_elements[grid_x][grid_y].pressure += true_round((avg_pressure - el.pressure) * flow_speed)
-                if (up_el) {
-                    new_elements[grid_x][Number(grid_y) + 1].pressure += true_round((avg_pressure - up_el.pressure) * flow_speed)
+                if (left_el.outflow.to_up || left_el.outflow.to_down || left_el.outflow.to_left) {
+                    el.outflow.to_left = true
                 }
-                if (down_el) {
-                    new_elements[grid_x][Number(grid_y) - 1].pressure += true_round((avg_pressure - down_el.pressure) * flow_speed)
+                if (left_el.is_pressurized) {
+                    el.is_pressurized = true
                 }
-                if (right_el) {
-                    new_elements[Number(grid_x) + 1][grid_y].pressure += true_round((avg_pressure - right_el.pressure) * flow_speed)
+                if (old_el.is_flowing && old_el.outflow.to_left) {
+                    elements[Number(grid_x) - 1][grid_y].is_flowing = true
                 }
-                if (left_el) {
-                    new_elements[Number(grid_x) - 1][grid_y].pressure += true_round((avg_pressure - left_el.pressure) * flow_speed)
-                }
-            }
-        }
-    }
-
-    // Deep-copy new elements to old mapping.
-    for (const grid_x in elements) {
-        for (const grid_y in elements[grid_x]) {
-            if (elements[grid_x][grid_y].type !== 'S' && elements[grid_x][grid_y].type !== 'D') {
-                elements[grid_x][grid_y] = new_elements[grid_x][grid_y]
             }
         }
     }
