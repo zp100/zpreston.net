@@ -52,10 +52,10 @@ function component_to_elements(comp=[]) {
                     input: el_input,
                     is_blocked: (el_type === 'J'),
                     flow: {
-                        up: 'n',
-                        down: 'n',
-                        right: 'n',
-                        left: 'n',
+                        up: 0,
+                        down: 0,
+                        right: 0,
+                        left: 0,
                     },
                     is_pressurized: false,
                     is_flowing: false,
@@ -120,12 +120,11 @@ function update() {
 
             el.is_pressurized = (
                 (el.type === 'B' && el.input in current_inputs) ||
-                Object.values(el.flow).includes('o') ||
-                Object.values(el.flow).includes('b')
+                Object.values(el.flow).includes(-1)
             )
             el.is_flowing = (
-                Object.values(el.flow).includes('o') &&
-                Object.values(el.flow).includes('i')
+                Object.values(el.flow).includes(-1) &&
+                Object.values(el.flow).includes(1)
             )
         }
     }
@@ -138,7 +137,6 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         'P': {
             default: '#222',
             pressurized: '#223',
-            flowing: '#224',
         },
         'S': {
             default: '#446',
@@ -199,20 +197,15 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         // ctx.fillStyle = '#7f7f7f'
         // ctx.fillRect(draw_x, draw_y, 9, 9)
         // ctx.fillStyle = '#000'
-        // if (el.flow.up === 'o') ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-        // if (el.flow.down === 'o') ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-        // if (el.flow.right === 'o') ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-        // if (el.flow.left === 'o') ctx.fillRect(draw_x, draw_y + 3, 3, 3)
+        // if (el.flow.up === -1) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+        // if (el.flow.down === -1) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+        // if (el.flow.right === -1) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+        // if (el.flow.left === -1) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
         // ctx.fillStyle = '#fff'
-        // if (el.flow.up === 'i') ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-        // if (el.flow.down === 'i') ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-        // if (el.flow.right === 'i') ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-        // if (el.flow.left === 'i') ctx.fillRect(draw_x, draw_y + 3, 3, 3)
-        // ctx.fillStyle = '#4040ff'
-        // if (el.flow.up === 'b') ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-        // if (el.flow.down === 'b') ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-        // if (el.flow.right === 'b') ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-        // if (el.flow.left === 'b') ctx.fillRect(draw_x, draw_y + 3, 3, 3)
+        // if (el.flow.up === 1) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
+        // if (el.flow.down === 1) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
+        // if (el.flow.right === 1) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
+        // if (el.flow.left === 1) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
 
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
@@ -235,33 +228,32 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, adj_y) {
     const adj_el = old_elements[adj_x]?.[adj_y]
     if (old_el.type === 'S') {
-        el.flow[flow_direction] = 'o'
+        el.flow[flow_direction] = -1
     } else if (old_el.type === 'D') {
-        el.flow[flow_direction] = 'i'
+        el.flow[flow_direction] = 1
     } else if (adj_el) {
         if (!old_el.is_blocked && old_el.type !== 'V' && old_el.type !== 'B') {
             // Has outflow into adjacent cell if that cell has outflow (or balanced) on any other sides.
             const has_outflow = (
-                (flow_direction !== 'up' && (adj_el.flow['down'] === 'o' || adj_el.flow['down'] === 'b')) ||
-                (flow_direction !== 'down' && (adj_el.flow['up'] === 'o' || adj_el.flow['up'] === 'b')) ||
-                (flow_direction !== 'right' && (adj_el.flow['left'] === 'o' || adj_el.flow['left'] === 'b')) ||
-                (flow_direction !== 'left' && (adj_el.flow['right'] === 'o' || adj_el.flow['right'] === 'b'))
+                (flow_direction !== 'up' && adj_el.flow['down'] === -1) ||
+                (flow_direction !== 'down' && adj_el.flow['up'] === -1) ||
+                (flow_direction !== 'right' && adj_el.flow['left'] === -1) ||
+                (flow_direction !== 'left' && adj_el.flow['right'] === -1)
             )
 
             // Has inflow from adjacent cell if that cell has inflow (or balanced) on any other sides.
             const has_inflow = (
-                (flow_direction !== 'up' && (adj_el.flow['down'] === 'i' || adj_el.flow['down'] === 'b')) ||
-                (flow_direction !== 'down' && (adj_el.flow['up'] === 'i' || adj_el.flow['up'] === 'b')) ||
-                (flow_direction !== 'right' && (adj_el.flow['left'] === 'i' || adj_el.flow['left'] === 'b')) ||
-                (flow_direction !== 'left' && (adj_el.flow['right'] === 'i' || adj_el.flow['right'] === 'b'))
+                (flow_direction !== 'up' && adj_el.flow['down'] === 1) ||
+                (flow_direction !== 'down' && adj_el.flow['up'] === 1) ||
+                (flow_direction !== 'right' && adj_el.flow['left'] === 1) ||
+                (flow_direction !== 'left' && adj_el.flow['right'] === 1)
             )
 
-            if (!has_outflow && !has_inflow) el.flow[flow_direction] = 'n'
-            if (has_outflow && !has_inflow) el.flow[flow_direction] = 'o'
-            if (!has_outflow && has_inflow) el.flow[flow_direction] = 'i'
-            if (has_outflow && has_inflow) el.flow[flow_direction] = 'b'
+            if (!has_outflow && !has_inflow) el.flow[flow_direction] = 0
+            if (has_outflow && !has_inflow) el.flow[flow_direction] = -1
+            if (!has_outflow && has_inflow) el.flow[flow_direction] = 1
         } else {
-            el.flow[flow_direction] = 'n'
+            el.flow[flow_direction] = 0
         }
 
         // Become blocked (or unblocked) under certain conditions.
