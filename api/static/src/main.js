@@ -15,11 +15,9 @@ const inputs = {}
 function main() {
     // Create elements.
     const test_component = [
-        ['  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'P ', 'P ', 'L ', 'P ', 'P ', 'B1', 'P ', 'P ', 'P ', '  ', '  ', ],
+        ['S ', 'P ', 'P ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'P ', 'P ', 'D ', ],
+        ['  ', '  ', 'P ', 'P ', 'L ', 'P ', 'P ', 'B2', 'P ', 'P ', 'P ', '  ', '  ', ],
     ]
     component_to_elements(test_component)
 
@@ -123,7 +121,7 @@ function update() {
             const old_el = old_elements[grid_x][grid_y]
             const new_el = elements[grid_x][grid_y]
 
-            new_el.is_blocked = (el_type === 'V' || el_type === 'B')
+            new_el.is_blocked = (old_el.type === 'V' || old_el.type === 'B')
 
             calc_flow(old_elements, old_el, new_el, 'up', grid_x, Number(grid_y) + 1)
             calc_flow(old_elements, old_el, new_el, 'down', grid_x, Number(grid_y) - 1)
@@ -215,7 +213,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillStyle = (el.is_pressurized ? '#fff' : '#000')
-            ctx.fillText(el.input, center_x, center_y)
+            ctx.fillText(el.value, center_x, center_y)
         }
 
         // // DEBUG: Draw outflow directions.
@@ -269,9 +267,9 @@ function calc_flow(old_elements, old_el, new_el, flow_direction, adj_x, adj_y) {
                 (flow_direction !== 'left' && adj_el.flow['right'] === 1)
             )
 
-            if (!has_outflow && !has_inflow) el.flow[flow_direction] = 0
-            if (has_outflow && !has_inflow) el.flow[flow_direction] = -1
-            if (!has_outflow && has_inflow) el.flow[flow_direction] = 1
+            if (!has_outflow && !has_inflow) new_el.flow[flow_direction] = 0
+            if (has_outflow && !has_inflow) new_el.flow[flow_direction] = -1
+            if (!has_outflow && has_inflow) new_el.flow[flow_direction] = 1
         } else {
             new_el.flow[flow_direction] = 0
         }
