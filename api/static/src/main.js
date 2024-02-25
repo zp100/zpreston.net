@@ -8,21 +8,18 @@ const camera = {
     grid_y: 8,
     zoom: 32,
 }
-const current_inputs = {}
+const inputs = {}
 
 
 
 function main() {
     // Create elements.
     const test_component = [
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
-        ['P ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
-        ['P ', '  ', '  ', '  ', 'L ', '  ', '  ', 'L ', ],
-        ['S ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
-        ['D ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
-        ['P ', '  ', '  ', 'B1', 'J ', '  ', 'B2', 'J ', ],
-        ['P ', '  ', '  ', '  ', 'P ', '  ', '  ', 'P ', ],
-        ['P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', 'P ', ],
+        ['  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', ],
     ]
     component_to_elements(test_component)
 
@@ -37,7 +34,7 @@ function component_to_elements(comp=[]) {
     for (const row in comp) {
         for (const col in comp[row]) {
             const el_type = comp[row][col][0]
-            const el_input = comp[row][col][1]
+            const el_value = comp[row][col][1]
             if (el_type !== ' ') {
                 // Rename variables for readability.
                 const grid_x = col
@@ -49,15 +46,14 @@ function component_to_elements(comp=[]) {
                 }
                 elements[grid_x][grid_y] = {
                     type: el_type,
-                    input: el_input,
-                    is_blocked: (el_type === 'J'),
+                    value: el_value,
                     flow: {
                         up: 0,
                         down: 0,
                         right: 0,
                         left: 0,
                     },
-                    is_pressurized: false,
+                    is_blocked: (el_type === 'V' || el_type === 'B'),
                     is_flowing: false,
                 }
             }
@@ -75,21 +71,37 @@ function draw_rec() {
 
     const max_grid_x = (canvas_el.width / 2) / camera.zoom
     const max_grid_y = (canvas_el.height / 2) / camera.zoom
+    const min_x = Math.round(camera.grid_x - max_grid_x)
+    const max_x = Math.round(camera.grid_x + max_grid_x)
+    const min_y = Math.round(camera.grid_y - max_grid_y)
+    const max_y = Math.round(camera.grid_y + max_grid_y)
     if (camera.zoom < ZOOM_BG_LIMIT) {
         // Fill background if zoomed out too much to load the checkered bg.
         ctx.fillStyle = '#040404'
         ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
 
-        // Only loop through cells with elements.
+        // Loop through cells with elements.
         for (const grid_x in elements) {
-            for (const grid_y in elements[grid_x]) {
-                draw_cell(ctx, elements, grid_x, grid_y)
+            if (grid_x >= min_x && grid_x <= max_x) {
+                for (const grid_y in elements[grid_x]) {
+                    if (grid_y >= min_y && grid_y <= max_y) {
+                        draw_cell(ctx, elements, grid_x, grid_y)
+                    }
+                }
             }
+        }
+
+        // Draw center lines.
+        for (let grid_x = min_x; grid_x <= max_x; grid_x++) {
+            draw_cell(ctx, elements, grid_x, 0)
+        }
+        for (let grid_y = min_y; grid_y <= max_y; grid_y++) {
+            draw_cell(ctx, elements, 0, grid_y)
         }
     } else {
         // Loop through all cells on-screen.
-        for (let grid_x = Math.round(camera.grid_x - max_grid_x); grid_x <= Math.round(camera.grid_x + max_grid_x); grid_x++) {
-            for (let grid_y = Math.round(camera.grid_y - max_grid_y); grid_y <= Math.round(camera.grid_y + max_grid_y); grid_y++) {
+        for (let grid_x = min_x; grid_x <= max_x; grid_x++) {
+            for (let grid_y = min_y; grid_y <= max_y; grid_y++) {
                 draw_cell(ctx, elements, grid_x, grid_y)
             }
         }
@@ -109,22 +121,18 @@ function update() {
     for (const grid_x in elements) {
         for (const grid_y in elements[grid_x]) {
             const old_el = old_elements[grid_x][grid_y]
-            const el = elements[grid_x][grid_y]
+            const new_el = elements[grid_x][grid_y]
 
-            el.is_blocked = (el.type === 'J')
+            new_el.is_blocked = (el_type === 'V' || el_type === 'B')
 
-            calc_flow(old_elements, elements, old_el, el, 'up', grid_x, Number(grid_y) + 1)
-            calc_flow(old_elements, elements, old_el, el, 'down', grid_x, Number(grid_y) - 1)
-            calc_flow(old_elements, elements, old_el, el, 'right', Number(grid_x) + 1, grid_y)
-            calc_flow(old_elements, elements, old_el, el, 'left', Number(grid_x) - 1, grid_y)
+            calc_flow(old_elements, old_el, new_el, 'up', grid_x, Number(grid_y) + 1)
+            calc_flow(old_elements, old_el, new_el, 'down', grid_x, Number(grid_y) - 1)
+            calc_flow(old_elements, old_el, new_el, 'right', Number(grid_x) + 1, grid_y)
+            calc_flow(old_elements, old_el, new_el, 'left', Number(grid_x) - 1, grid_y)
 
-            el.is_pressurized = (
-                (el.type === 'B' && el.input in current_inputs) ||
-                Object.values(el.flow).includes(-1)
-            )
-            el.is_flowing = (
-                Object.values(el.flow).includes(-1) &&
-                Object.values(el.flow).includes(1)
+            new_el.is_flowing = (
+                Object.values(new_el.flow).includes(-1) &&
+                Object.values(new_el.flow).includes(1)
             )
         }
     }
@@ -134,33 +142,40 @@ function update() {
 
 function draw_cell(ctx, elements, grid_x, grid_y) {
     const color_map = {
-        'P': {
+        'P': { // pipe: gray
             default: '#222',
-            pressurized: '#223',
+            flowing: '#334',
         },
-        'S': {
+        'C': { // cross: gray
+            default: '#222',
+            flowing: '#334',
+        },
+        'S': { // source: light-blue
             default: '#446',
         },
-        'D': {
+        'D': { // drain: black
             default: '#002',
         },
-        'J': {
-            default: '#242',
+        'A': { // activator: magenta
+            default: '#424',
+            flowing: '#646',
+        },
+        'V': { // valve: green
             blocked: '#020',
+            default: '#242',
+            flowing: '#464',
         },
-        'G': {
-            default: '#422',
+        'G': { // gate: red
             blocked: '#200',
+            default: '#422',
+            flowing: '#644',
         },
-        'V': {
-            default: '#202',
-            pressurized: '#424',
+        'B': { // button: cyan
+            blocked: '#022',
+            default: '#244',
+            flowing: '#466',
         },
-        'B': {
-            default: '#022',
-            pressurized: '#244',
-        },
-        'L': {
+        'L': { // light: yellow
             default: '#220',
             flowing: '#ff0',
         },
@@ -184,6 +199,16 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.fillStyle = color_map[el.type]['default']
         }
         ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
+
+        if (el.type === 'C') {
+            ctx.strokeStyle = '#111'
+            ctx.beginPath()
+            ctx.moveTo(draw_x, draw_y)
+            ctx.lineTo(draw_x + draw_size, draw_y + draw_size)
+            ctx.moveTo(draw_x + draw_size, draw_y)
+            ctx.lineTo(draw_x, draw_y + draw_size)
+            ctx.stroke()
+        }
 
         if (el.type === 'B') {
             ctx.font = `${camera.zoom / 2}px Arial`
@@ -209,13 +234,8 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
-        if ((grid_x + grid_y) % 2 === 0) {
-            ctx.fillStyle = '#081008'
-            ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
-        } else {
-            ctx.fillStyle = '#101810'
-            ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
-        }
+        ctx.fillStyle = ((grid_x + grid_y) % 2 !== 0 ? '#101810' : '#081008')
+        ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
     } else if (camera.zoom >= ZOOM_BG_LIMIT && (grid_x + grid_y) % 2 !== 0) {
         // Checkered grid background.
         ctx.fillStyle = '#080808'
@@ -225,14 +245,14 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 
 
 
-function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, adj_y) {
+function calc_flow(old_elements, old_el, new_el, flow_direction, adj_x, adj_y) {
     const adj_el = old_elements[adj_x]?.[adj_y]
     if (old_el.type === 'S') {
-        el.flow[flow_direction] = -1
+        new_el.flow[flow_direction] = -1
     } else if (old_el.type === 'D') {
-        el.flow[flow_direction] = 1
+        new_el.flow[flow_direction] = 1
     } else if (adj_el) {
-        if (!old_el.is_blocked && old_el.type !== 'V' && old_el.type !== 'B') {
+        if (!old_el.is_blocked) {
             // Has outflow into adjacent cell if that cell has outflow (or balanced) on any other sides.
             const has_outflow = (
                 (flow_direction !== 'up' && adj_el.flow['down'] === -1) ||
@@ -253,15 +273,16 @@ function calc_flow(old_elements, elements, old_el, el, flow_direction, adj_x, ad
             if (has_outflow && !has_inflow) el.flow[flow_direction] = -1
             if (!has_outflow && has_inflow) el.flow[flow_direction] = 1
         } else {
-            el.flow[flow_direction] = 0
+            new_el.flow[flow_direction] = 0
         }
 
-        // Become blocked (or unblocked) under certain conditions.
-        if (old_el.type === 'G' && (adj_el.type === 'V' || adj_el.type === 'B') && adj_el.is_pressurized) {
-            el.is_blocked = true
-        }
-        if (old_el.type === 'J' && (adj_el.type === 'V' || adj_el.type === 'B') && adj_el.is_pressurized) {
-            el.is_blocked = false
+        // Become unblocked (or blocked) under certain conditions.
+        if (old_el.type === 'V' && adj_el.type === 'A' && adj_el.is_flowing) {
+            new_el.is_blocked = false
+        } else if (old_el.type === 'G' && adj_el.type === 'A' && adj_el.is_flowing) {
+            new_el.is_blocked = true
+        } else if (old_el.type === 'B' && old_el.value in inputs) {
+            new_el.is_blocked = false
         }
     }
 }
@@ -308,13 +329,13 @@ addEventListener('mouseup', (ev) => {
 
 
 addEventListener('keydown', (ev) => {
-    current_inputs[ev.key] = true
+    inputs[ev.key] = true
 })
 
 
 
 addEventListener('keyup', (ev) => {
-    delete current_inputs[ev.key]
+    delete inputs[ev.key]
 })
 
 
