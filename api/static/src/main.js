@@ -15,9 +15,22 @@ const inputs = {}
 function main() {
     // Create elements.
     const test_component = [
-        ['  ', '  ', 'P ', 'P ', 'L ', 'P ', 'P ', 'B1', 'P ', 'P ', 'P ', '  ', '  ', ],
-        ['S ', 'P ', 'P ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'P ', 'P ', 'D ', ],
-        ['  ', '  ', 'P ', 'P ', 'L ', 'P ', 'P ', 'B2', 'P ', 'P ', 'P ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'S ', 'W ', 'W ', 'L ', 'W ', 'W ', 'D ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
     ]
     component_to_elements(test_component)
 
@@ -45,14 +58,20 @@ function component_to_elements(comp=[]) {
                 elements[grid_x][grid_y] = {
                     type: el_type,
                     value: el_value,
-                    flow: {
-                        up: 0,
-                        down: 0,
-                        right: 0,
-                        left: 0,
+                    is_blocked: (el_type === 'N' || el_type === 'B'),
+                    high_pull: {
+                        up: false,
+                        down: false,
+                        right: false,
+                        left: false,
                     },
-                    is_blocked: (el_type === 'V' || el_type === 'B'),
-                    is_flowing: false,
+                    low_pull: {
+                        up: false,
+                        down: false,
+                        right: false,
+                        left: false,
+                    },
+                    state: 'n',
                 }
             }
         }
@@ -121,17 +140,28 @@ function update() {
             const old_el = old_elements[grid_x][grid_y]
             const new_el = elements[grid_x][grid_y]
 
-            new_el.is_blocked = (old_el.type === 'V' || old_el.type === 'B')
-
             calc_flow(old_elements, old_el, new_el, 'up', grid_x, Number(grid_y) + 1)
             calc_flow(old_elements, old_el, new_el, 'down', grid_x, Number(grid_y) - 1)
             calc_flow(old_elements, old_el, new_el, 'right', Number(grid_x) + 1, grid_y)
             calc_flow(old_elements, old_el, new_el, 'left', Number(grid_x) - 1, grid_y)
 
-            new_el.is_flowing = (
-                Object.values(new_el.flow).includes(-1) &&
-                Object.values(new_el.flow).includes(1)
-            )
+            const low = Object.values(new_el.low_pull).includes(true)
+            const high = Object.values(new_el.high_pull).includes(true)
+            if (low && !high) {
+                new_el.state = 'l'
+            } else if (!low && high) {
+                new_el.state = 'h'
+            } else if (low && high) {
+                // Check that the low and high pulls are from different directions.
+                if (
+                    new_el.low_pull['up'] !== new_el.high_pull['up'] ||
+                    new_el.low_pull['down'] !== new_el.high_pull['down'] ||
+                    new_el.low_pull['right'] !== new_el.high_pull['right'] ||
+                    new_el.low_pull['left'] !== new_el.high_pull['left']
+                ) {
+                    new_el.state = 'f'
+                }
+            }
         }
     }
 }
@@ -140,13 +170,13 @@ function update() {
 
 function draw_cell(ctx, elements, grid_x, grid_y) {
     const color_map = {
-        'P': { // pipe: gray
+        'W': { // wire: gray
             default: '#222',
-            flowing: '#334',
+            flowing: '#223',
         },
         'C': { // cross: gray
             default: '#222',
-            flowing: '#334',
+            flowing: '#223',
         },
         'S': { // source: light-blue
             default: '#446',
@@ -154,28 +184,27 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         'D': { // drain: black
             default: '#002',
         },
-        'A': { // activator: magenta
-            default: '#424',
-            flowing: '#646',
-        },
-        'V': { // valve: green
+        'N': { // n-type FET: green
             blocked: '#020',
             default: '#242',
             flowing: '#464',
         },
-        'G': { // gate: red
+        'P': { // p-type FET: red
             blocked: '#200',
             default: '#422',
             flowing: '#644',
         },
+        'G': { // gate: magenta
+            blocked: '#202',
+            default: '#424',
+        },
         'B': { // button: cyan
             blocked: '#022',
             default: '#244',
-            flowing: '#466',
         },
         'L': { // light: yellow
             default: '#220',
-            flowing: '#ff0',
+            flowing: '#ff6',
         },
     }
 
@@ -187,12 +216,10 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
     const el = elements[grid_x]?.[grid_y]
     if (el) {
         // Element.
-        if (el.is_flowing && 'flowing' in color_map[el.type]) {
-            ctx.fillStyle = color_map[el.type]['flowing']
-        } else if (el.is_pressurized && 'pressurized' in color_map[el.type]) {
-            ctx.fillStyle = color_map[el.type]['pressurized']
-        } else if (el.is_blocked && 'blocked' in color_map[el.type]) {
+        if (el.is_blocked && 'blocked' in color_map[el.type]) {
             ctx.fillStyle = color_map[el.type]['blocked']
+        } else if (el.state === 'f' && 'flowing' in color_map[el.type]) {
+            ctx.fillStyle = color_map[el.type]['flowing']
         } else {
             ctx.fillStyle = color_map[el.type]['default']
         }
@@ -212,24 +239,9 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.font = `${camera.zoom / 2}px Arial`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillStyle = (el.is_pressurized ? '#fff' : '#000')
+            ctx.fillStyle = (el.is_flowing ? '#fff' : '#666')
             ctx.fillText(el.value, center_x, center_y)
         }
-
-        // // DEBUG: Draw outflow directions.
-        // ctx.fillStyle = '#7f7f7f'
-        // ctx.fillRect(draw_x, draw_y, 9, 9)
-        // ctx.fillStyle = '#000'
-        // if (el.flow.up === -1) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-        // if (el.flow.down === -1) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-        // if (el.flow.right === -1) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-        // if (el.flow.left === -1) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
-        // ctx.fillStyle = '#fff'
-        // if (el.flow.up === 1) ctx.fillRect(draw_x + 3, draw_y, 3, 3)
-        // if (el.flow.down === 1) ctx.fillRect(draw_x + 3, draw_y + 6, 3, 3)
-        // if (el.flow.right === 1) ctx.fillRect(draw_x + 6, draw_y + 3, 3, 3)
-        // if (el.flow.left === 1) ctx.fillRect(draw_x, draw_y + 3, 3, 3)
-
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
         ctx.fillStyle = ((grid_x + grid_y) % 2 !== 0 ? '#101810' : '#081008')
@@ -246,39 +258,40 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 function calc_flow(old_elements, old_el, new_el, flow_direction, adj_x, adj_y) {
     const adj_el = old_elements[adj_x]?.[adj_y]
     if (old_el.type === 'S') {
-        new_el.flow[flow_direction] = -1
+        new_el.low_pull[flow_direction] = false
+        new_el.high_pull[flow_direction] = true
     } else if (old_el.type === 'D') {
-        new_el.flow[flow_direction] = 1
+        new_el.low_pull[flow_direction] = true
+        new_el.high_pull[flow_direction] = false
     } else if (adj_el) {
         if (!old_el.is_blocked) {
-            // Has outflow into adjacent cell if that cell has outflow (or balanced) on any other sides.
-            const has_outflow = (
-                (flow_direction !== 'up' && adj_el.flow['down'] === -1) ||
-                (flow_direction !== 'down' && adj_el.flow['up'] === -1) ||
-                (flow_direction !== 'right' && adj_el.flow['left'] === -1) ||
-                (flow_direction !== 'left' && adj_el.flow['right'] === -1)
+            // Pulled low if adjacent cell is pulled low on any other sides.
+            new_el.low_pull[flow_direction] = (
+                (flow_direction !== 'up' && adj_el.low_pull['down']) ||
+                (flow_direction !== 'down' && adj_el.low_pull['up']) ||
+                (flow_direction !== 'right' && adj_el.low_pull['left']) ||
+                (flow_direction !== 'left' && adj_el.low_pull['right'])
             )
 
-            // Has inflow from adjacent cell if that cell has inflow (or balanced) on any other sides.
-            const has_inflow = (
-                (flow_direction !== 'up' && adj_el.flow['down'] === 1) ||
-                (flow_direction !== 'down' && adj_el.flow['up'] === 1) ||
-                (flow_direction !== 'right' && adj_el.flow['left'] === 1) ||
-                (flow_direction !== 'left' && adj_el.flow['right'] === 1)
+            // Pulled high if adjacent cell is pulled high on any other sides.
+            new_el.high_pull[flow_direction] = (
+                (flow_direction !== 'up' && adj_el.high_pull['down']) ||
+                (flow_direction !== 'down' && adj_el.high_pull['up']) ||
+                (flow_direction !== 'right' && adj_el.high_pull['left']) ||
+                (flow_direction !== 'left' && adj_el.high_pull['right'])
             )
-
-            if (!has_outflow && !has_inflow) new_el.flow[flow_direction] = 0
-            if (has_outflow && !has_inflow) new_el.flow[flow_direction] = -1
-            if (!has_outflow && has_inflow) new_el.flow[flow_direction] = 1
         } else {
-            new_el.flow[flow_direction] = 0
+            new_el.low_pull[flow_direction] = false
+            new_el.high_pull[flow_direction] = false
         }
 
         // Become unblocked (or blocked) under certain conditions.
-        if (old_el.type === 'V' && adj_el.type === 'A' && adj_el.is_flowing) {
+        if (old_el.type === 'N' && adj_el.type === 'G' && adj_el.state === 'h') {
             new_el.is_blocked = false
-        } else if (old_el.type === 'G' && adj_el.type === 'A' && adj_el.is_flowing) {
+        } else if (old_el.type === 'P' && adj_el.type === 'G' && adj_el.state === 'h') {
             new_el.is_blocked = true
+        } else if (old_el.type === 'G' && adj_el.state === 'h') {
+            new_el.is_blocked = false
         } else if (old_el.type === 'B' && old_el.value in inputs) {
             new_el.is_blocked = false
         }
