@@ -27,18 +27,18 @@ function main() {
     const test_component = [
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'S ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'L ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'S ', 'W ', 'W ', 'B1', 'W ', 'C ', 'W ', 'L ', 'W ', 'W ', 'D ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'B2', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'D ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'S ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', 'S ', 'W ', 'W ', 'B1', 'W ', 'W ', 'W ', 'G ', 'P ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', 'W ', 'W ', 'W ', 'G ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', 'D ', 'W ', 'W ', 'B2', 'W ', 'W ', 'W ', 'G ', 'N ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'D ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
     ]
@@ -61,21 +61,42 @@ function component_to_elements(comp=[]) {
                 const grid_x = col
                 const grid_y = comp.length - 1 - row
 
-                let base_state = S.BLOCKED
-                if (el_type === 'D')            base_state = S.LOW
-                if (el_type === 'S')            base_state = S.HIGH
+                // Set the starting state and edge pulls based on the element type.
+                let start_state = S.BLOCKED
+                let start_pull = S.BLOCKED
+                switch (el_type) {
+                    // Cross.
+                    case 'C': {
+                        start_state = {
+                            vert: S.BLOCKED,
+                            hori: S.BLOCKED,
+                        }
+                    } break
+
+                    // Drain.
+                    case 'D': {
+                        start_pull = S.LOW
+                        start_state = S.LOW
+                    } break
+
+                    // Source.
+                    case 'S': {
+                        start_pull = S.HIGH
+                        start_state = S.HIGH
+                    } break
+                }
 
                 // Add it to elements, keyed using its coordinates.
-                if (!(grid_x in elements))      elements[grid_x] = {}
+                if (!(grid_x in elements)) elements[grid_x] = {}
                 elements[grid_x][grid_y] = {
                     type: el_type,
                     value: el_value,
-                    state: base_state,
+                    state: start_state,
                     pull: [
-                        base_state, // up
-                        base_state, // right
-                        base_state, // down
-                        base_state, // left
+                        start_pull, // up
+                        start_pull, // right
+                        start_pull, // down
+                        start_pull, // left
                     ],
                 }
             }
@@ -151,7 +172,25 @@ function update() {
                 el.pull[3] = calc_pull(el, old_elements[Number(grid_x) - 1]?.[grid_y], 3) // left
 
                 // Determine the state from the edges.
-                if (
+                if (el.type === 'C') {
+                    const vert_pull = [el.pull[0], el.pull[2]]
+                    if (vert_pull.includes(S.LOW) && !vert_pull.includes(S.HIGH)) {
+                        el.state.vert = S.LOW
+                    } else if (!vert_pull.includes(S.LOW) && vert_pull.includes(S.HIGH)) {
+                        el.state.vert = S.HIGH
+                    } else if (vert_pull.includes(S.LOW) && vert_pull.includes(S.HIGH)) {
+                        el.state.vert = S.ACTIVE
+                    }
+
+                    const hori_pull = [el.pull[1], el.pull[3]]
+                    if (hori_pull.includes(S.LOW) && !hori_pull.includes(S.HIGH)) {
+                        el.state.hori = S.LOW
+                    } else if (!hori_pull.includes(S.LOW) && hori_pull.includes(S.HIGH)) {
+                        el.state.hori = S.HIGH
+                    } else if (hori_pull.includes(S.LOW) && hori_pull.includes(S.HIGH)) {
+                        el.state.hori = S.ACTIVE
+                    }
+                } else if (
                     (el.type === 'N' && !el.pull.includes(S.ACTIVE)) ||
                     (el.type === 'P' && el.pull.includes(S.ACTIVE)) ||
                     (el.type === 'B' && !(el.value in inputs))
@@ -229,35 +268,46 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         },
     }
 
-    const center_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x) * camera.zoom
-    const center_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y) * camera.zoom
     const draw_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
     const draw_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
-    const draw_size = camera.zoom
+    const du = camera.zoom / 6
     const el = elements[grid_x]?.[grid_y]
     if (el) {
-        // Element color.
-        ctx.fillStyle = color_map[el.type][el.state]
-        ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
-
-        // Dividers for cross.
         if (el.type === 'C') {
-            ctx.strokeStyle = '#111'
+            ctx.strokeStyle = '#181818'
+            ctx.lineWidth = 1
+            
+            ctx.fillStyle = color_map[el.type][el.state.vert]
             ctx.beginPath()
             ctx.moveTo(draw_x, draw_y)
-            ctx.lineTo(draw_x + draw_size, draw_y + draw_size)
-            ctx.moveTo(draw_x + draw_size, draw_y)
-            ctx.lineTo(draw_x, draw_y + draw_size)
+            ctx.quadraticCurveTo(draw_x + 5*du, draw_y + 3*du, draw_x, draw_y + 6*du)
+            ctx.lineTo(draw_x + 6*du, draw_y + 6*du)
+            ctx.quadraticCurveTo(draw_x + 1*du, draw_y + 3*du, draw_x + 6*du, draw_y)
+            ctx.lineTo(draw_x, draw_y)
             ctx.stroke()
-        }
+            ctx.fill()
 
-        // Input for button.
-        if (el.type === 'B') {
-            ctx.font = `${camera.zoom / 2}px Arial`
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.fillStyle = (el.state === S.BLOCKED ? '#666' : '#fff')
-            ctx.fillText(el.value, center_x, center_y)
+            ctx.fillStyle = color_map[el.type][el.state.hori]
+            ctx.beginPath()
+            ctx.moveTo(draw_x, draw_y)
+            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 5*du, draw_x + 6*du, draw_y)
+            ctx.lineTo(draw_x + 6*du, draw_y + 6*du)
+            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 1*du, draw_x, draw_y + 6*du)
+            ctx.lineTo(draw_x, draw_y)
+            ctx.stroke()
+            ctx.fill()
+        } else {
+            ctx.fillStyle = color_map[el.type][el.state]
+            ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
+        
+            // Input for button.
+            if (el.type === 'B') {
+                ctx.font = `${camera.zoom / 2}px Arial`
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.fillStyle = (el.state === S.BLOCKED ? '#666' : '#fff')
+                ctx.fillText(el.value, draw_x + 3*du, draw_y + 3*du)
+            }
         }
 
         // // DEBUG
@@ -283,11 +333,11 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
         ctx.fillStyle = ((grid_x + grid_y) % 2 !== 0 ? '#101810' : '#081008')
-        ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
+        ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
     } else if (camera.zoom >= ZOOM_BG_LIMIT && (grid_x + grid_y) % 2 !== 0) {
         // Checkered grid background.
         ctx.fillStyle = '#080808'
-        ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
+        ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
     }
 }
 
@@ -309,16 +359,19 @@ function calc_pull(el, adj_el, direction) {
     
     for (let i = 0; i < 4; i++) {
         // Skip if it's the edge connecting to the current element.
-        if (i === (direction + 2) % 4)      continue
-        
-        if (adj_el.pull[i] === S.LOW)       is_low = true
-        else if (adj_el.pull[i] === S.HIGH) is_high = true
+        if (i === (direction + 2) % 4)              continue
+
+        // Skip if it's an edge that this part of the cross doesn't go to.
+        if (adj_el.type === 'C' && i !== direction) continue
+
+        if (adj_el.pull[i] === S.LOW)               is_low = true
+        else if (adj_el.pull[i] === S.HIGH)         is_high = true
     }
     
-    if (is_low && !is_high)                 return S.LOW
-    else if (!is_low && !is_high)           return S.BLOCKED
-    else if (!is_low && is_high)            return S.HIGH
-    else                                    return el.state
+    if (is_low && !is_high)                         return S.LOW
+    else if (!is_low && !is_high)                   return S.BLOCKED
+    else if (!is_low && is_high)                    return S.HIGH
+    else                                            return el.state
 }
 
 
