@@ -24,20 +24,25 @@ const camera = {
 
 function main() {
     // Create elements.
+    // NAND gate:
     const test_component = [
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'S ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'L ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', 'S ', 'W ', 'W ', 'B1', 'W ', 'C ', 'W ', 'L ', 'W ', 'W ', 'D ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'B2', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'D ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'S ', 'B1', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', 'S ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'D ', 'B2', 'W ', '  ', '  ', '  ', '  ', 'W ', 'W ', 'W ', 'W ', 'W ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'W ', 'W ', 'W ', 'W ', 'G ', 'P ', '  ', '  ', '  ', 'W ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', 'W ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'W ', '  ', 'W ', 'W ', 'W ', 'C ', 'W ', 'W ', 'G ', 'P ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'W ', '  ', 'W ', '  ', '  ', 'W ', '  ', '  ', '  ', 'W ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'W ', '  ', 'W ', '  ', '  ', 'W ', 'W ', 'W ', 'W ', 'W ', 'W ', 'G ', ],
+        ['  ', '  ', '  ', '  ', 'W ', '  ', 'W ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', 'W ', 'W ', 'C ', 'W ', 'W ', 'W ', 'G ', 'N ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', 'W ', 'W ', 'W ', 'W ', 'G ', 'N ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'S ', 'B3', 'W ', 'W ', 'W ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'D ', 'B4', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', 'D ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
@@ -276,7 +281,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         if (el.type === 'C') {
             ctx.strokeStyle = '#181818'
             ctx.lineWidth = 1
-            
+
             ctx.fillStyle = color_map[el.type][el.state.vert]
             ctx.beginPath()
             ctx.moveTo(draw_x, draw_y)
@@ -299,37 +304,16 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         } else {
             ctx.fillStyle = color_map[el.type][el.state]
             ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
-        
+
             // Input for button.
             if (el.type === 'B') {
                 ctx.font = `${camera.zoom / 2}px Arial`
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
-                ctx.fillStyle = (el.state === S.BLOCKED ? '#666' : '#fff')
+                ctx.fillStyle = (el.state === S.BLOCKED ? '#444' : '#fff')
                 ctx.fillText(el.value, draw_x + 3*du, draw_y + 3*du)
             }
         }
-
-        // // DEBUG
-        // const colors = {
-        //     [S.LOW]: '#000',
-        //     [S.BLOCKED]: '#808080',
-        //     [S.HIGH]: '#fff',
-        //     [S.ACTIVE]: '#00f',
-        // }
-        // ctx.fillStyle = colors[S.BLOCKED]
-        // ctx.fillRect(draw_x, draw_y, 12, 12)
-        // ctx.fillStyle = colors[el.state]
-        // ctx.fillRect(draw_x + 4, draw_y + 4, 4, 4)
-        // ctx.fillStyle = colors[el.pull[0]]
-        // ctx.fillRect(draw_x + 4, draw_y, 4, 4)
-        // ctx.fillStyle = colors[el.pull[1]]
-        // ctx.fillRect(draw_x + 8, draw_y + 4, 4, 4)
-        // ctx.fillStyle = colors[el.pull[2]]
-        // ctx.fillRect(draw_x + 4, draw_y + 8, 4, 4)
-        // ctx.fillStyle = colors[el.pull[3]]
-        // ctx.fillRect(draw_x, draw_y + 4, 4, 4)
-
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
         ctx.fillStyle = ((grid_x + grid_y) % 2 !== 0 ? '#101810' : '#081008')
@@ -356,7 +340,7 @@ function calc_pull(el, adj_el, direction) {
 
     let is_low = false
     let is_high = false
-    
+
     for (let i = 0; i < 4; i++) {
         // Skip if it's the edge connecting to the current element.
         if (i === (direction + 2) % 4)              continue
@@ -367,7 +351,7 @@ function calc_pull(el, adj_el, direction) {
         if (adj_el.pull[i] === S.LOW)               is_low = true
         else if (adj_el.pull[i] === S.HIGH)         is_high = true
     }
-    
+
     if (is_low && !is_high)                         return S.LOW
     else if (!is_low && !is_high)                   return S.BLOCKED
     else if (!is_low && is_high)                    return S.HIGH
