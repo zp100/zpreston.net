@@ -2,8 +2,8 @@
 
 // Elements.
 const S = Object.freeze({
-    NEUTRAL: 0,
-    LOW: 1,
+    LOW: 0,
+    BLOCKED: 1,
     HIGH: 2,
     ACTIVE: 3,
 })
@@ -28,17 +28,17 @@ function main() {
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'S ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'L ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', 'S ', 'W ', 'W ', 'B1', 'W ', 'W ', 'G ', 'N ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', '  ', ],
-        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'D ', '  ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'S ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'S ', 'W ', 'W ', 'B1', 'W ', 'W ', 'W ', 'G ', 'P ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', 'W ', 'W ', 'W ', 'G ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', 'D ', 'W ', 'W ', 'B2', 'W ', 'W ', 'W ', 'G ', 'N ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'W ', '  ', '  ', '  ', '  ', '  ', ],
+        ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', 'D ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
         ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ', ],
     ]
@@ -61,7 +61,7 @@ function component_to_elements(comp=[]) {
                 const grid_x = col
                 const grid_y = comp.length - 1 - row
 
-                let base_state = S.NEUTRAL
+                let base_state = S.BLOCKED
                 if (el_type === 'D')            base_state = S.LOW
                 if (el_type === 'S')            base_state = S.HIGH
 
@@ -77,7 +77,6 @@ function component_to_elements(comp=[]) {
                         base_state, // down
                         base_state, // left
                     ],
-                    is_blocked: (el_type === 'N' || el_type === 'B'),
                 }
             }
         }
@@ -146,25 +145,25 @@ function update() {
             const el = elements[grid_x][grid_y]
             if (el.type !== 'S' && el.type !== 'D') {
                 // Get the pull for each edge.
-                calc_pull(el, old_elements[grid_x]?.[Number(grid_y) + 1], 0) // up
-                calc_pull(el, old_elements[Number(grid_x) + 1]?.[grid_y], 1) // right
-                calc_pull(el, old_elements[grid_x]?.[Number(grid_y) - 1], 2) // down
-                calc_pull(el, old_elements[Number(grid_x) - 1]?.[grid_y], 3) // left
+                el.pull[0] = calc_pull(el, old_elements[grid_x]?.[Number(grid_y) + 1], 0) // up
+                el.pull[1] = calc_pull(el, old_elements[Number(grid_x) + 1]?.[grid_y], 1) // right
+                el.pull[2] = calc_pull(el, old_elements[grid_x]?.[Number(grid_y) - 1], 2) // down
+                el.pull[3] = calc_pull(el, old_elements[Number(grid_x) - 1]?.[grid_y], 3) // left
 
-                // Determine if the element is blocked.
-                el.is_blocked = (
+                // Determine the state from the edges.
+                if (
                     (el.type === 'N' && !el.pull.includes(S.ACTIVE)) ||
                     (el.type === 'P' && el.pull.includes(S.ACTIVE)) ||
                     (el.type === 'B' && !(el.value in inputs))
-                )
-
-                // Determine the state from the edges.
-                el.state = (
-                    el.pull.includes(S.LOW) && !el.pull.includes(S.HIGH) ? S.LOW :
-                    !el.pull.includes(S.LOW) && el.pull.includes(S.HIGH) ? S.HIGH :
-                    el.pull.includes(S.LOW) && el.pull.includes(S.HIGH) ? S.ACTIVE :
-                    S.NEUTRAL
-                )
+                ) {
+                    el.state = S.BLOCKED
+                } else if (el.pull.includes(S.LOW) && !el.pull.includes(S.HIGH)) {
+                    el.state = S.LOW
+                } else if (!el.pull.includes(S.LOW) && el.pull.includes(S.HIGH)) {
+                    el.state = S.HIGH
+                } else if (el.pull.includes(S.LOW) && el.pull.includes(S.HIGH)) {
+                    el.state = S.ACTIVE
+                }
             }
         }
     }
@@ -175,56 +174,56 @@ function update() {
 function draw_cell(ctx, elements, grid_x, grid_y) {
     const color_map = {
         'W': { // wire: gray
-            [S.NEUTRAL]: '#222',
             [S.LOW]: '#222',
+            [S.BLOCKED]: '#222',
             [S.HIGH]: '#222',
             [S.ACTIVE]: '#223',
         },
         'C': { // cross: gray
-            [S.NEUTRAL]: '#222',
             [S.LOW]: '#222',
+            [S.BLOCKED]: '#222',
             [S.HIGH]: '#222',
             [S.ACTIVE]: '#223',
         },
         'D': { // drain: black
-            [S.NEUTRAL]: '#002',
             [S.LOW]: '#002',
+            [S.BLOCKED]: '#002',
             [S.HIGH]: '#002',
             [S.ACTIVE]: '#002',
         },
         'S': { // source: light-blue
-            [S.NEUTRAL]: '#446',
             [S.LOW]: '#446',
+            [S.BLOCKED]: '#446',
             [S.HIGH]: '#446',
             [S.ACTIVE]: '#446',
         },
         'G': { // gate: magenta
-            [S.NEUTRAL]: '#202',
             [S.LOW]: '#202',
+            [S.BLOCKED]: '#202',
             [S.HIGH]: '#424',
-            [S.ACTIVE]: '#202',
+            [S.ACTIVE]: '#424',
         },
         'N': { // n-type FET: green
-            [S.NEUTRAL]: '#020',
-            [S.LOW]: '#020',
-            [S.HIGH]: '#020',
+            [S.LOW]: '#242',
+            [S.BLOCKED]: '#020',
+            [S.HIGH]: '#242',
             [S.ACTIVE]: '#242',
         },
         'P': { // p-type FET: red
-            [S.NEUTRAL]: '#200',
-            [S.LOW]: '#200',
-            [S.HIGH]: '#200',
+            [S.LOW]: '#422',
+            [S.BLOCKED]: '#200',
+            [S.HIGH]: '#422',
             [S.ACTIVE]: '#422',
         },
         'B': { // button: cyan
-            [S.NEUTRAL]: '#022',
             [S.LOW]: '#022',
+            [S.BLOCKED]: '#022',
             [S.HIGH]: '#022',
             [S.ACTIVE]: '#244',
         },
         'L': { // light: yellow
-            [S.NEUTRAL]: '#220',
             [S.LOW]: '#220',
+            [S.BLOCKED]: '#220',
             [S.HIGH]: '#220',
             [S.ACTIVE]: '#ff6',
         },
@@ -238,10 +237,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
     const el = elements[grid_x]?.[grid_y]
     if (el) {
         // Element color.
-        ctx.fillStyle = (
-            el.is_blocked ? color_map[el.type][S.NEUTRAL] :
-            color_map[el.type][el.state]
-        )
+        ctx.fillStyle = color_map[el.type][el.state]
         ctx.fillRect(draw_x, draw_y, draw_size, draw_size)
 
         // Dividers for cross.
@@ -260,18 +256,18 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.font = `${camera.zoom / 2}px Arial`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillStyle = (el.state === S.ACTIVE ? '#fff' : '#666')
+            ctx.fillStyle = (el.state === S.BLOCKED ? '#666' : '#fff')
             ctx.fillText(el.value, center_x, center_y)
         }
 
         // // DEBUG
         // const colors = {
-        //     [S.NEUTRAL]: '#808080',
         //     [S.LOW]: '#000',
+        //     [S.BLOCKED]: '#808080',
         //     [S.HIGH]: '#fff',
         //     [S.ACTIVE]: '#00f',
         // }
-        // ctx.fillStyle = colors[S.NEUTRAL]
+        // ctx.fillStyle = colors[S.BLOCKED]
         // ctx.fillRect(draw_x, draw_y, 12, 12)
         // ctx.fillStyle = colors[el.state]
         // ctx.fillRect(draw_x + 4, draw_y + 4, 4, 4)
@@ -298,30 +294,31 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 
 
 function calc_pull(el, adj_el, direction) {
-    if (adj_el && !adj_el.is_blocked) {
-        let is_low = false
-        let is_high = false
-
-        for (let i = 0; i < 4; i++) {
-            // Skip if it's the edge connecting to the current element.
-            if (i === (direction + 2) % 4)      continue
-
-            if (adj_el.pull[i] === S.LOW)       is_low = true
-            else if (adj_el.pull[i] === S.HIGH) is_high = true
-        }
-
-        if (adj_el.type === 'G') {
-            if (!is_low && is_high)             el.pull[direction] = S.ACTIVE
-            else                                el.pull[direction] = S.NEUTRAL
-        } else {
-            if (!is_low && !is_high)            el.pull[direction] = S.NEUTRAL
-            else if (is_low && !is_high)        el.pull[direction] = S.LOW
-            else if (!is_low && is_high)        el.pull[direction] = S.HIGH
-            // if adj is both low and high, don't change state
-        }
-    } else {
-        el.pull[direction] = S.NEUTRAL
+    if (
+        !adj_el ||
+        adj_el.state === S.BLOCKED ||
+        (el.type === 'G' && (adj_el.type === 'N' || adj_el.type === 'P'))
+    ) {
+        return S.BLOCKED
+    } else if ((el.type === 'N' || el.type === 'P') && adj_el.type === 'G') {
+        return (adj_el.state === S.HIGH ? S.ACTIVE : S.BLOCKEDs)
     }
+
+    let is_low = false
+    let is_high = false
+    
+    for (let i = 0; i < 4; i++) {
+        // Skip if it's the edge connecting to the current element.
+        if (i === (direction + 2) % 4)      continue
+        
+        if (adj_el.pull[i] === S.LOW)       is_low = true
+        else if (adj_el.pull[i] === S.HIGH) is_high = true
+    }
+    
+    if (is_low && !is_high)                 return S.LOW
+    else if (!is_low && !is_high)           return S.BLOCKED
+    else if (!is_low && is_high)            return S.HIGH
+    else                                    return el.state
 }
 
 
