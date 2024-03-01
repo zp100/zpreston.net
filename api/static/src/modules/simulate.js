@@ -1,9 +1,11 @@
 import * as Controls from './controls.js'
 
-const LOW = 0
-const BLOCKED = 1
-const HIGH = 2
-const ACTIVE = 3
+const BLOCKED = 0
+const LOW = 1
+const LOW_SET = 2
+const HIGH = 3
+const HIGH_SET = 4
+const FLOWING = 5
 
 
 
@@ -25,34 +27,29 @@ function update(elements) {
                 // Determine the state from the edges.
                 if (el.type === 'C') {
                     const vert_pull = [el.pull[0], el.pull[2]]
-                    if (vert_pull.includes(LOW) && !vert_pull.includes(HIGH)) {
-                        el.state.vert = LOW
-                    } else if (!vert_pull.includes(LOW) && vert_pull.includes(HIGH)) {
-                        el.state.vert = HIGH
-                    } else if (vert_pull.includes(LOW) && vert_pull.includes(HIGH)) {
-                        el.state.vert = ACTIVE
-                    }
+                    el.state.vert = (
+                        vert_pull.includes(LOW) && vert_pull.includes(HIGH) ? FLOWING :
+                        vert_pull.includes(LOW) ? LOW :
+                        vert_pull.includes(HIGH) ? HIGH :
+                        el.state.vert // no change
+                    )
 
                     const hori_pull = [el.pull[1], el.pull[3]]
-                    if (hori_pull.includes(LOW) && !hori_pull.includes(HIGH)) {
-                        el.state.hori = LOW
-                    } else if (!hori_pull.includes(LOW) && hori_pull.includes(HIGH)) {
-                        el.state.hori = HIGH
-                    } else if (hori_pull.includes(LOW) && hori_pull.includes(HIGH)) {
-                        el.state.hori = ACTIVE
-                    }
-                } else if (
-                    (el.type === 'N' && !el.pull.includes(ACTIVE)) ||
-                    (el.type === 'P' && el.pull.includes(ACTIVE)) ||
-                    (el.type === 'B' && !(el.value in Controls.inputs))
-                ) {
-                    el.state = BLOCKED
-                } else if (el.pull.includes(LOW) && !el.pull.includes(HIGH)) {
-                    el.state = LOW
-                } else if (!el.pull.includes(LOW) && el.pull.includes(HIGH)) {
-                    el.state = HIGH
-                } else if (el.pull.includes(LOW) && el.pull.includes(HIGH)) {
-                    el.state = ACTIVE
+                    el.state.hori = (
+                        hori_pull.includes(LOW) && hori_pull.includes(HIGH) ? FLOWING :
+                        hori_pull.includes(LOW) ? LOW :
+                        hori_pull.includes(HIGH) ? HIGH :
+                        el.state.hori // no change
+                    )
+                } else {
+                    el.state = (
+                        el.type === 'N' && el.pull.includes(LOW_SET) && !el.pull.includes(HIGH_SET) ? BLOCKED :
+                        el.type === 'P' && !el.pull.includes(LOW_SET) && el.pull.includes(HIGH_SET) ? BLOCKED :
+                        el.pull.includes(LOW) && el.pull.includes(HIGH) ? FLOWING :
+                        el.pull.includes(LOW) ? LOW :
+                        el.pull.includes(HIGH) ? HIGH :
+                        el.state // no change
+                    )
                 }
             }
         }
@@ -65,11 +62,11 @@ function calc_pull(el, adj_el, direction) {
     if (
         !adj_el ||
         adj_el.state === BLOCKED ||
-        (el.type === 'G' && (adj_el.type === 'N' || adj_el.type === 'P'))
+        ((el.type === 'G' || el.type === 'B') && (adj_el.type === 'N' || adj_el.type === 'P'))
     ) {
         return BLOCKED
-    } else if ((el.type === 'N' || el.type === 'P') && adj_el.type === 'G') {
-        return (adj_el.state === HIGH ? ACTIVE : BLOCKED)
+    } else if (el.type === 'B') {
+        return (el.value in Controls.inputs ? HIGH : LOW)
     }
 
     let is_low = false
@@ -86,12 +83,23 @@ function calc_pull(el, adj_el, direction) {
         else if (adj_el.pull[i] === HIGH)           is_high = true
     }
 
-    if (is_low && !is_high)                         return LOW
-    else if (!is_low && !is_high)                   return BLOCKED
-    else if (!is_low && is_high)                    return HIGH
-    else                                            return el.state
+    if ((el.type === 'N' || el.type === 'P') && (adj_el.type === 'G' || adj_el.type === 'B')) {
+        return (
+            !is_low && !is_high ? BLOCKED :
+            is_low && !is_high ? LOW_SET :
+            !is_low && is_high ? HIGH_SET :
+            el.state // no change
+        )
+    } else {
+        return (
+            !is_low && !is_high ? BLOCKED :
+            is_low && !is_high ? LOW :
+            !is_low && is_high ? HIGH :
+            el.state // no change
+        )
+    }
 }
 
 
 
-export { LOW, BLOCKED, HIGH, ACTIVE, update }
+export { BLOCKED, LOW, HIGH, FLOWING, update }

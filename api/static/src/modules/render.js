@@ -70,58 +70,58 @@ function draw_rec(elements) {
 function draw_cell(ctx, elements, grid_x, grid_y) {
     const color_map = {
         'W': { // wire: gray
-            [Simulate.LOW]: '#222',
             [Simulate.BLOCKED]: '#222',
-            [Simulate.HIGH]: '#222',
-            [Simulate.ACTIVE]: '#223',
+            [Simulate.LOW]: '#112',
+            [Simulate.HIGH]: '#223',
+            [Simulate.FLOWING]: '#113',
         },
         'C': { // cross: gray
-            [Simulate.LOW]: '#222',
             [Simulate.BLOCKED]: '#222',
-            [Simulate.HIGH]: '#222',
-            [Simulate.ACTIVE]: '#223',
+            [Simulate.LOW]: '#112',
+            [Simulate.HIGH]: '#223',
+            [Simulate.FLOWING]: '#113',
         },
         'D': { // drain: black
-            [Simulate.LOW]: '#002',
             [Simulate.BLOCKED]: '#002',
+            [Simulate.LOW]: '#002',
             [Simulate.HIGH]: '#002',
-            [Simulate.ACTIVE]: '#002',
+            [Simulate.FLOWING]: '#002',
         },
         'S': { // source: light-blue
-            [Simulate.LOW]: '#446',
             [Simulate.BLOCKED]: '#446',
+            [Simulate.LOW]: '#446',
             [Simulate.HIGH]: '#446',
-            [Simulate.ACTIVE]: '#446',
-        },
-        'G': { // gate: magenta
-            [Simulate.LOW]: '#202',
-            [Simulate.BLOCKED]: '#202',
-            [Simulate.HIGH]: '#424',
-            [Simulate.ACTIVE]: '#424',
+            [Simulate.FLOWING]: '#446',
         },
         'N': { // n-type FET: green
-            [Simulate.LOW]: '#242',
             [Simulate.BLOCKED]: '#020',
+            [Simulate.LOW]: '#242',
             [Simulate.HIGH]: '#242',
-            [Simulate.ACTIVE]: '#242',
+            [Simulate.FLOWING]: '#242',
         },
         'P': { // p-type FET: red
-            [Simulate.LOW]: '#422',
             [Simulate.BLOCKED]: '#200',
+            [Simulate.LOW]: '#422',
             [Simulate.HIGH]: '#422',
-            [Simulate.ACTIVE]: '#422',
+            [Simulate.FLOWING]: '#422',
+        },
+        'G': { // gate: magenta
+            [Simulate.BLOCKED]: '#313',
+            [Simulate.LOW]: '#202',
+            [Simulate.HIGH]: '#424',
+            [Simulate.FLOWING]: '#313',
         },
         'B': { // button: cyan
+            [Simulate.BLOCKED]: '#133',
             [Simulate.LOW]: '#022',
-            [Simulate.BLOCKED]: '#022',
-            [Simulate.HIGH]: '#022',
-            [Simulate.ACTIVE]: '#244',
+            [Simulate.HIGH]: '#244',
+            [Simulate.FLOWING]: '#133',
         },
         'L': { // light: yellow
-            [Simulate.LOW]: '#220',
             [Simulate.BLOCKED]: '#220',
+            [Simulate.LOW]: '#220',
             [Simulate.HIGH]: '#220',
-            [Simulate.ACTIVE]: '#ff6',
+            [Simulate.FLOWING]: '#ff6',
         },
     }
 
@@ -162,7 +162,11 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
                 ctx.font = `${camera.zoom / 2}px Arial`
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
-                ctx.fillStyle = (el.state === Simulate.BLOCKED ? '#444' : '#fff')
+                ctx.fillStyle = (
+                    el.state === Simulate.LOW ? '#444' :
+                    el.state === Simulate.HIGH ? '#fff' :
+                    '#0000'
+                )
                 ctx.fillText(el.value, draw_x + 3*du, draw_y + 3*du)
             }
         }
