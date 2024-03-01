@@ -17,7 +17,7 @@ function update(elements) {
     for (const grid_x in elements) {
         for (const grid_y in elements[grid_x]) {
             const el = elements[grid_x][grid_y]
-            if (el.type !== 'S' && el.type !== 'D') {
+            if (el.type !== 'D' && el.type !== 'S') {
                 // Get the pull for each edge.
                 el.pull[0] = calc_pull(el, old_elements[grid_x]?.[Number(grid_y) + 1], 0) // up
                 el.pull[1] = calc_pull(el, old_elements[Number(grid_x) + 1]?.[grid_y], 1) // right

@@ -81,13 +81,13 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             [Simulate.HIGH]: '#223',
             [Simulate.FLOWING]: '#113',
         },
-        'D': { // drain: black
+        'S': { // source: black
             [Simulate.BLOCKED]: '#002',
             [Simulate.LOW]: '#002',
             [Simulate.HIGH]: '#002',
             [Simulate.FLOWING]: '#002',
         },
-        'S': { // source: light-blue
+        'D': { // drain: light-blue
             [Simulate.BLOCKED]: '#446',
             [Simulate.LOW]: '#446',
             [Simulate.HIGH]: '#446',
