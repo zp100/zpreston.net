@@ -70,55 +70,55 @@ function draw_rec(elements) {
 function draw_cell(ctx, elements, grid_x, grid_y) {
     const color_map = {
         'W': { // wire: gray
-            [Simulate.BLOCKED]: '#222',
+            [Simulate.NEUTRAL]: '#222',
             [Simulate.LOW]: '#112',
             [Simulate.HIGH]: '#223',
             [Simulate.FLOWING]: '#113',
         },
         'C': { // cross: gray
-            [Simulate.BLOCKED]: '#222',
+            [Simulate.NEUTRAL]: '#222',
             [Simulate.LOW]: '#112',
             [Simulate.HIGH]: '#223',
             [Simulate.FLOWING]: '#113',
         },
         'S': { // source: black
-            [Simulate.BLOCKED]: '#002',
+            [Simulate.NEUTRAL]: '#002',
             [Simulate.LOW]: '#002',
             [Simulate.HIGH]: '#002',
             [Simulate.FLOWING]: '#002',
         },
         'D': { // drain: light-blue
-            [Simulate.BLOCKED]: '#446',
+            [Simulate.NEUTRAL]: '#446',
             [Simulate.LOW]: '#446',
             [Simulate.HIGH]: '#446',
             [Simulate.FLOWING]: '#446',
         },
         'N': { // n-type FET: green
-            [Simulate.BLOCKED]: '#020',
+            [Simulate.NEUTRAL]: '#020',
             [Simulate.LOW]: '#242',
             [Simulate.HIGH]: '#242',
             [Simulate.FLOWING]: '#242',
         },
         'P': { // p-type FET: red
-            [Simulate.BLOCKED]: '#200',
+            [Simulate.NEUTRAL]: '#200',
             [Simulate.LOW]: '#422',
             [Simulate.HIGH]: '#422',
             [Simulate.FLOWING]: '#422',
         },
         'G': { // gate: magenta
-            [Simulate.BLOCKED]: '#313',
+            [Simulate.NEUTRAL]: '#313',
             [Simulate.LOW]: '#202',
             [Simulate.HIGH]: '#424',
             [Simulate.FLOWING]: '#313',
         },
         'B': { // button: cyan
-            [Simulate.BLOCKED]: '#133',
+            [Simulate.NEUTRAL]: '#133',
             [Simulate.LOW]: '#022',
             [Simulate.HIGH]: '#244',
             [Simulate.FLOWING]: '#133',
         },
         'L': { // light: yellow
-            [Simulate.BLOCKED]: '#220',
+            [Simulate.NEUTRAL]: '#220',
             [Simulate.LOW]: '#220',
             [Simulate.HIGH]: '#220',
             [Simulate.FLOWING]: '#ff6',
@@ -154,7 +154,10 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.stroke()
             ctx.fill()
         } else {
-            ctx.fillStyle = color_map[el.type][el.state]
+            ctx.fillStyle = (
+                el.is_blocked ? color_map[el.type][Simulate.NEUTRAL] :
+                color_map[el.type][el.state]
+            )
             ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
 
             // Input for button.
@@ -170,6 +173,25 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
                 ctx.fillText(el.value, draw_x + 3*du, draw_y + 3*du)
             }
         }
+
+        // // DEBUG
+        // ctx.fillStyle = '#808080'
+        // ctx.fillRect(draw_x, draw_y, 15, 15)
+        // ctx.fillStyle = '#000'
+        // if (el.state === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+        // if (el.pull[0] === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y, 5, 5)
+        // if (el.pull[1] === Simulate.LOW) ctx.fillRect(draw_x + 10, draw_y + 5, 5, 5)
+        // if (el.pull[2] === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y + 10, 5, 5)
+        // if (el.pull[3] === Simulate.LOW) ctx.fillRect(draw_x, draw_y + 5, 5, 5)
+        // ctx.fillStyle = '#fff'
+        // if (el.state === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+        // if (el.pull[0] === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y, 5, 5)
+        // if (el.pull[1] === Simulate.HIGH) ctx.fillRect(draw_x + 10, draw_y + 5, 5, 5)
+        // if (el.pull[2] === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y + 10, 5, 5)
+        // if (el.pull[3] === Simulate.HIGH) ctx.fillRect(draw_x, draw_y + 5, 5, 5)
+        // ctx.fillStyle = '#00f'
+        // if (el.state === Simulate.FLOWING) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
         ctx.fillStyle = ((grid_x + grid_y) % 2 !== 0 ? '#101810' : '#081008')

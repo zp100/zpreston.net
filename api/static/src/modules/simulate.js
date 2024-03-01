@@ -1,6 +1,6 @@
 import * as Controls from './controls.js'
 
-const BLOCKED = 0
+const NEUTRAL = 0
 const LOW = 1
 const LOW_SET = 2
 const HIGH = 3
@@ -42,14 +42,22 @@ function update(elements) {
                         el.state.hori // no change
                     )
                 } else {
-                    el.state = (
-                        el.type === 'N' && el.pull.includes(LOW_SET) && !el.pull.includes(HIGH_SET) ? BLOCKED :
-                        el.type === 'P' && !el.pull.includes(LOW_SET) && el.pull.includes(HIGH_SET) ? BLOCKED :
-                        el.pull.includes(LOW) && el.pull.includes(HIGH) ? FLOWING :
-                        el.pull.includes(LOW) ? LOW :
-                        el.pull.includes(HIGH) ? HIGH :
-                        el.state // no change
+                    el.is_blocked = (
+                        (el.type === 'N' && el.pull.includes(LOW_SET) && !el.pull.includes(HIGH_SET)) ? true :
+                        (el.type === 'N' && !el.pull.includes(LOW_SET) && el.pull.includes(HIGH_SET)) ? false :
+                        (el.type === 'P' && el.pull.includes(LOW_SET) && !el.pull.includes(HIGH_SET)) ? false :
+                        (el.type === 'P' && !el.pull.includes(LOW_SET) && el.pull.includes(HIGH_SET)) ? true :
+                        el.is_blocked // no change
                     )
+
+                    if (!el.is_blocked) {
+                        el.state = (
+                            el.pull.includes(LOW) && el.pull.includes(HIGH) ? FLOWING :
+                            el.pull.includes(LOW) ? LOW :
+                            el.pull.includes(HIGH) ? HIGH :
+                            el.state // no change
+                        )
+                    }
                 }
             }
         }
@@ -59,8 +67,8 @@ function update(elements) {
 
 
 function calc_pull(el, adj_el, direction) {
-    if (!adj_el || adj_el.state === BLOCKED || (el.is_controller && adj_el.is_mutable)) {
-        return BLOCKED
+    if (!adj_el || adj_el.is_blocked || (el.is_controller && adj_el.is_mutable)) {
+        return NEUTRAL
     } else if (el.type === 'B') {
         return (el.value in Controls.inputs ? HIGH : LOW)
     }
@@ -81,14 +89,14 @@ function calc_pull(el, adj_el, direction) {
 
     if (el.is_mutable && adj_el.is_controller) {
         return (
-            !is_low && !is_high ? BLOCKED :
+            !is_low && !is_high ? NEUTRAL :
             is_low && !is_high ? LOW_SET :
             !is_low && is_high ? HIGH_SET :
             el.state // no change
         )
     } else {
         return (
-            !is_low && !is_high ? BLOCKED :
+            !is_low && !is_high ? NEUTRAL :
             is_low && !is_high ? LOW :
             !is_low && is_high ? HIGH :
             el.state // no change
@@ -98,4 +106,4 @@ function calc_pull(el, adj_el, direction) {
 
 
 
-export { BLOCKED, LOW, HIGH, FLOWING, update }
+export { NEUTRAL, LOW, HIGH, FLOWING, update }

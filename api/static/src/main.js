@@ -46,16 +46,17 @@ function component_to_elements(comp=[]) {
                 const grid_y = comp.length - 1 - row
 
                 // Set the starting values based on the element type.
-                let start_state = Simulate.BLOCKED
-                let start_pull = Simulate.BLOCKED
+                let start_state = Simulate.NEUTRAL
+                let start_pull = Simulate.NEUTRAL
+                let blocked = false
                 let mutable = false
                 let controller = false
                 switch (el_type) {
                     // Cross.
                     case 'C': {
                         start_state = {
-                            vert: Simulate.BLOCKED,
-                            hori: Simulate.BLOCKED,
+                            vert: Simulate.NEUTRAL,
+                            hori: Simulate.NEUTRAL,
                         }
                     } break
 
@@ -74,6 +75,7 @@ function component_to_elements(comp=[]) {
                     // Switch.
                     case 'N':
                     case 'P': {
+                        blocked = true
                         mutable = true
                     } break
 
@@ -96,6 +98,7 @@ function component_to_elements(comp=[]) {
                         start_pull, // down
                         start_pull, // left
                     ],
+                    is_blocked: blocked,
                     is_mutable: mutable,
                     is_controller: controller,
                 }
