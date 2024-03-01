@@ -131,25 +131,17 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
     const el = elements[grid_x]?.[grid_y]
     if (el) {
         if (el.type === 'C') {
-            ctx.strokeStyle = '#181818'
-            ctx.lineWidth = 1
-
             ctx.fillStyle = color_map[el.type][el.state.vert]
-            ctx.beginPath()
-            ctx.moveTo(draw_x, draw_y)
-            ctx.quadraticCurveTo(draw_x + 5*du, draw_y + 3*du, draw_x, draw_y + 6*du)
-            ctx.lineTo(draw_x + 6*du, draw_y + 6*du)
-            ctx.quadraticCurveTo(draw_x + 1*du, draw_y + 3*du, draw_x + 6*du, draw_y)
-            ctx.lineTo(draw_x, draw_y)
-            ctx.stroke()
-            ctx.fill()
+            ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
 
+            ctx.strokeStyle = '#181818'
+            ctx.lineWidth = 2
             ctx.fillStyle = color_map[el.type][el.state.hori]
             ctx.beginPath()
             ctx.moveTo(draw_x, draw_y)
-            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 5*du, draw_x + 6*du, draw_y)
+            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 3*du, draw_x + 6*du, draw_y)
             ctx.lineTo(draw_x + 6*du, draw_y + 6*du)
-            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 1*du, draw_x, draw_y + 6*du)
+            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 3*du, draw_x, draw_y + 6*du)
             ctx.lineTo(draw_x, draw_y)
             ctx.stroke()
             ctx.fill()
