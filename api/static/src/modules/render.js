@@ -175,22 +175,24 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
         }
 
         // // DEBUG
-        // ctx.fillStyle = '#808080'
-        // ctx.fillRect(draw_x, draw_y, 15, 15)
-        // ctx.fillStyle = '#000'
-        // if (el.state === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
-        // if (el.pull[0] === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y, 5, 5)
-        // if (el.pull[1] === Simulate.LOW) ctx.fillRect(draw_x + 10, draw_y + 5, 5, 5)
-        // if (el.pull[2] === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y + 10, 5, 5)
-        // if (el.pull[3] === Simulate.LOW) ctx.fillRect(draw_x, draw_y + 5, 5, 5)
-        // ctx.fillStyle = '#fff'
-        // if (el.state === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
-        // if (el.pull[0] === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y, 5, 5)
-        // if (el.pull[1] === Simulate.HIGH) ctx.fillRect(draw_x + 10, draw_y + 5, 5, 5)
-        // if (el.pull[2] === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y + 10, 5, 5)
-        // if (el.pull[3] === Simulate.HIGH) ctx.fillRect(draw_x, draw_y + 5, 5, 5)
-        // ctx.fillStyle = '#00f'
-        // if (el.state === Simulate.FLOWING) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+        // if (!el.is_blocked) {
+        //     ctx.fillStyle = '#808080'
+        //     ctx.fillRect(draw_x, draw_y, 15, 15)
+        //     ctx.fillStyle = '#000'
+        //     if (el.state === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+        //     if (el.pull[0] === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y, 5, 5)
+        //     if (el.pull[1] === Simulate.LOW) ctx.fillRect(draw_x + 10, draw_y + 5, 5, 5)
+        //     if (el.pull[2] === Simulate.LOW) ctx.fillRect(draw_x + 5, draw_y + 10, 5, 5)
+        //     if (el.pull[3] === Simulate.LOW) ctx.fillRect(draw_x, draw_y + 5, 5, 5)
+        //     ctx.fillStyle = '#fff'
+        //     if (el.state === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+        //     if (el.pull[0] === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y, 5, 5)
+        //     if (el.pull[1] === Simulate.HIGH) ctx.fillRect(draw_x + 10, draw_y + 5, 5, 5)
+        //     if (el.pull[2] === Simulate.HIGH) ctx.fillRect(draw_x + 5, draw_y + 10, 5, 5)
+        //     if (el.pull[3] === Simulate.HIGH) ctx.fillRect(draw_x, draw_y + 5, 5, 5)
+        //     ctx.fillStyle = '#00f'
+        //     if (el.state === Simulate.FLOWING) ctx.fillRect(draw_x + 5, draw_y + 5, 5, 5)
+        // }
 
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.

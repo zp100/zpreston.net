@@ -97,8 +97,8 @@ function calc_pull(el, adj_el, direction) {
     } else {
         return (
             !is_low && !is_high ? NEUTRAL :
-            is_low && !is_high ? LOW :
-            !is_low && is_high ? HIGH :
+            el.type !== 'P' && is_low && !is_high ? LOW :
+            el.type !== 'N' && !is_low && is_high ? HIGH :
             el.state // no change
         )
     }
