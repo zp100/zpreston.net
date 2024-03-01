@@ -59,11 +59,7 @@ function update(elements) {
 
 
 function calc_pull(el, adj_el, direction) {
-    if (
-        !adj_el ||
-        adj_el.state === BLOCKED ||
-        ((el.type === 'G' || el.type === 'B') && (adj_el.type === 'N' || adj_el.type === 'P'))
-    ) {
+    if (!adj_el || adj_el.state === BLOCKED || (el.is_controller && adj_el.is_mutable)) {
         return BLOCKED
     } else if (el.type === 'B') {
         return (el.value in Controls.inputs ? HIGH : LOW)
@@ -83,7 +79,7 @@ function calc_pull(el, adj_el, direction) {
         else if (adj_el.pull[i] === HIGH)           is_high = true
     }
 
-    if ((el.type === 'N' || el.type === 'P') && (adj_el.type === 'G' || adj_el.type === 'B')) {
+    if (el.is_mutable && adj_el.is_controller) {
         return (
             !is_low && !is_high ? BLOCKED :
             is_low && !is_high ? LOW_SET :

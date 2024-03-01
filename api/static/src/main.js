@@ -45,9 +45,11 @@ function component_to_elements(comp=[]) {
                 const grid_x = col
                 const grid_y = comp.length - 1 - row
 
-                // Set the starting state and edge pulls based on the element type.
+                // Set the starting values based on the element type.
                 let start_state = Simulate.BLOCKED
                 let start_pull = Simulate.BLOCKED
+                let mutable = false
+                let controller = false
                 switch (el_type) {
                     // Cross.
                     case 'C': {
@@ -68,6 +70,18 @@ function component_to_elements(comp=[]) {
                         start_pull = Simulate.HIGH
                         start_state = Simulate.HIGH
                     } break
+
+                    // Switch.
+                    case 'N':
+                    case 'P': {
+                        mutable = true
+                    } break
+
+                    // Detector.
+                    case 'G':
+                    case 'B': {
+                        controller = true
+                    } break
                 }
 
                 // Add it to elements, keyed using its coordinates.
@@ -82,6 +96,8 @@ function component_to_elements(comp=[]) {
                         start_pull, // down
                         start_pull, // left
                     ],
+                    is_mutable: mutable,
+                    is_controller: controller,
                 }
             }
         }
