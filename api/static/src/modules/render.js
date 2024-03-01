@@ -1,8 +1,8 @@
 import * as Simulate from './simulate.js'
 
-const MIN_ZOOM = 2**-6
-const ZOOM_BG_LIMIT = 2**2
-const MAX_ZOOM = 2**10
+const MIN_ZOOM = 2**-4
+const ZOOM_BG_LIMIT = 2**4
+const MAX_ZOOM = 2**12
 const camera = {
     grid_x: 8,
     grid_y: 8,

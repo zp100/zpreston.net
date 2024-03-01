@@ -1,11 +1,22 @@
 import * as Controls from './controls.js'
 
+const SIM_SPEED = 2
 const NEUTRAL = 0
 const LOW = 1
 const LOW_SET = 2
 const HIGH = 3
 const HIGH_SET = 4
 const FLOWING = 5
+
+
+
+function update_loop(elements) {
+    setInterval(() => {
+        for (let i = 0; i < SIM_SPEED; i++) {
+            update(elements)
+        }
+    }, Math.floor(1 / SIM_SPEED))
+}
 
 
 
@@ -106,4 +117,4 @@ function calc_pull(el, adj_el, direction) {
 
 
 
-export { NEUTRAL, LOW, HIGH, FLOWING, update }
+export { NEUTRAL, LOW, HIGH, FLOWING, update_loop }
