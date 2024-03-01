@@ -22,16 +22,16 @@ function draw_rec(elements) {
     canvas_el.width = canvas_el.clientWidth
     canvas_el.height = canvas_el.clientHeight
     const ctx = canvas_el.getContext('2d')
+    ctx.fillStyle = '#040404'
+    ctx.strokeStyle = '#040404'
+    ctx.lineWidth = 2
 
-    const max_grid_x = (canvas_el.width / 2) / camera.zoom
-    const max_grid_y = (canvas_el.height / 2) / camera.zoom
-    const min_x = Math.round(camera.grid_x - max_grid_x)
-    const max_x = Math.round(camera.grid_x + max_grid_x)
-    const min_y = Math.round(camera.grid_y - max_grid_y)
-    const max_y = Math.round(camera.grid_y + max_grid_y)
+    const min_x = Math.round(camera.grid_x - (canvas_el.width / 2) / camera.zoom)
+    const max_x = Math.round(camera.grid_x + (canvas_el.width / 2) / camera.zoom)
+    const min_y = Math.round(camera.grid_y - (canvas_el.height / 2) / camera.zoom)
+    const max_y = Math.round(camera.grid_y + (canvas_el.height / 2) / camera.zoom)
     if (camera.zoom < ZOOM_BG_LIMIT) {
         // Fill background if zoomed out too much to load the checkered bg.
-        ctx.fillStyle = '#040404'
         ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
 
         // Loop through cells with elements.
@@ -127,30 +127,30 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
 
     const draw_x = (ctx.canvas.width / 2) + (grid_x - camera.grid_x - 0.5) * camera.zoom
     const draw_y = (ctx.canvas.height / 2) - (grid_y - camera.grid_y + 0.5) * camera.zoom
-    const du = camera.zoom / 6
+    const du = camera.zoom / 12
     const el = elements[grid_x]?.[grid_y]
     if (el) {
         if (el.type === 'C') {
             ctx.fillStyle = color_map[el.type][el.state.vert]
-            ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
+            ctx.fillRect(draw_x, draw_y, 12*du, 12*du)
+            ctx.strokeRect(draw_x, draw_y, 12*du, 12*du)
 
-            ctx.strokeStyle = '#181818'
-            ctx.lineWidth = 2
             ctx.fillStyle = color_map[el.type][el.state.hori]
             ctx.beginPath()
             ctx.moveTo(draw_x, draw_y)
-            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 3*du, draw_x + 6*du, draw_y)
-            ctx.lineTo(draw_x + 6*du, draw_y + 6*du)
-            ctx.quadraticCurveTo(draw_x + 3*du, draw_y + 3*du, draw_x, draw_y + 6*du)
+            ctx.quadraticCurveTo(draw_x + 6*du, draw_y + 6*du, draw_x + 12*du, draw_y)
+            ctx.lineTo(draw_x + 12*du, draw_y + 12*du)
+            ctx.quadraticCurveTo(draw_x + 6*du, draw_y + 6*du, draw_x, draw_y + 12*du)
             ctx.lineTo(draw_x, draw_y)
-            ctx.stroke()
             ctx.fill()
+            ctx.stroke()
         } else {
             ctx.fillStyle = (
                 el.is_blocked ? color_map[el.type][Simulate.NEUTRAL] :
                 color_map[el.type][el.state]
             )
-            ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
+            ctx.fillRect(draw_x, draw_y, 12*du, 12*du)
+            ctx.strokeRect(draw_x, draw_y, 12*du, 12*du)
 
             // Input for button.
             if (el.type === 'B') {
@@ -162,7 +162,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
                     el.state === Simulate.HIGH ? '#fff' :
                     '#0000'
                 )
-                ctx.fillText(el.value, draw_x + 3*du, draw_y + 3*du)
+                ctx.fillText(el.value, draw_x + 6*du, draw_y + 6*du)
             }
         }
 
@@ -189,11 +189,11 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
     } else if (grid_x === 0 || grid_y === 0) {
         // Axis lines.
         ctx.fillStyle = ((grid_x + grid_y) % 2 !== 0 ? '#101810' : '#081008')
-        ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
+        ctx.fillRect(draw_x, draw_y, 12*du, 12*du)
     } else if (camera.zoom >= ZOOM_BG_LIMIT && (grid_x + grid_y) % 2 !== 0) {
         // Checkered grid background.
         ctx.fillStyle = '#080808'
-        ctx.fillRect(draw_x, draw_y, 6*du, 6*du)
+        ctx.fillRect(draw_x, draw_y, 12*du, 12*du)
     }
 }
 
