@@ -1,6 +1,5 @@
 import * as Controls from './controls.js'
 
-const SIM_SPEED = 2
 const NEUTRAL = 0
 const LOW = 1
 const LOW_SET = 2
@@ -11,11 +10,7 @@ const FLOWING = 5
 
 
 function update_loop(elements) {
-    setInterval(() => {
-        for (let i = 0; i < SIM_SPEED; i++) {
-            update(elements)
-        }
-    }, Math.floor(1 / SIM_SPEED))
+    setInterval(() => update(elements), 0)
 }
 
 
