@@ -1,7 +1,8 @@
 import * as Simulate from './simulate.js'
 
-const MIN_ZOOM = 2**-2
-const ZOOM_BG_LIMIT = 2**4
+const MAX_FPS = 100
+const MIN_ZOOM = 2**-3
+const ZOOM_BG_LIMIT = 2**3
 const MAX_ZOOM = 2**9
 const camera = {
     grid_x: 8,
@@ -12,7 +13,7 @@ const camera = {
 
 
 function draw_loop(elements) {
-    requestAnimationFrame(() => draw_rec(elements))
+    setTimeout(() => requestAnimationFrame(() => draw_rec(elements)), 1 / MAX_FPS)
 }
 
 
@@ -30,7 +31,15 @@ function draw_rec(elements) {
     const max_x = Math.round(camera.grid_x + (canvas_el.width / 2) / camera.zoom)
     const min_y = Math.round(camera.grid_y - (canvas_el.height / 2) / camera.zoom)
     const max_y = Math.round(camera.grid_y + (canvas_el.height / 2) / camera.zoom)
-    if (camera.zoom < ZOOM_BG_LIMIT) {
+    if (camera.zoom >= ZOOM_BG_LIMIT) {
+        // Loop through all cells on-screen.
+        for (let grid_x = min_x; grid_x <= max_x; grid_x++) {
+            // Render rows top-to-bottom for 3D effects.
+            for (let grid_y = max_y; grid_y >= min_y; grid_y--) {
+                draw_cell(ctx, elements, grid_x, grid_y)
+            }
+        }
+    } else {
         // Fill background if zoomed out too much to load the checkered bg.
         ctx.fillRect(0, 0, canvas_el.width, canvas_el.height)
 
@@ -52,17 +61,10 @@ function draw_rec(elements) {
         for (let grid_y = min_y; grid_y <= max_y; grid_y++) {
             draw_cell(ctx, elements, 0, grid_y)
         }
-    } else {
-        // Loop through all cells on-screen.
-        for (let grid_x = min_x; grid_x <= max_x; grid_x++) {
-            for (let grid_y = min_y; grid_y <= max_y; grid_y++) {
-                draw_cell(ctx, elements, grid_x, grid_y)
-            }
-        }
     }
 
     // Recursive call for animation.
-    requestAnimationFrame(() => draw_rec(elements))
+    setTimeout(() => requestAnimationFrame(() => draw_rec(elements)), 1 / MAX_FPS)
 }
 
 
@@ -130,7 +132,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
     const du = camera.zoom / 12
     const el = elements[grid_x]?.[grid_y]
     if (el) {
-        if (el.type === 'C') {
+        if (el.type === 'C' && camera.zoom >= ZOOM_BG_LIMIT) {
             ctx.fillStyle = color_map[el.type][el.state.vert]
             ctx.fillRect(draw_x, draw_y, 12*du, 12*du)
             ctx.strokeRect(draw_x, draw_y, 12*du, 12*du)
@@ -138,7 +140,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.fillStyle = color_map[el.type][el.state.hori]
             ctx.beginPath()
             ctx.moveTo(draw_x, draw_y)
-            ctx.quadraticCurveTo(draw_x + 6*du, draw_y + 6*du, draw_x + 12*du, draw_y)
+            ctx.quadraticCurveTo(draw_x + 6*du, draw_y - 5*du, draw_x + 12*du, draw_y)
             ctx.lineTo(draw_x + 12*du, draw_y + 12*du)
             ctx.quadraticCurveTo(draw_x + 6*du, draw_y + 6*du, draw_x, draw_y + 12*du)
             ctx.lineTo(draw_x, draw_y)
@@ -153,7 +155,7 @@ function draw_cell(ctx, elements, grid_x, grid_y) {
             ctx.strokeRect(draw_x, draw_y, 12*du, 12*du)
 
             // Input for button.
-            if (el.type === 'B') {
+            if (el.type === 'B' && camera.zoom >= ZOOM_BG_LIMIT) {
                 ctx.font = `${camera.zoom / 2}px Arial`
                 ctx.textAlign = 'center'
                 ctx.textBaseline = 'middle'
