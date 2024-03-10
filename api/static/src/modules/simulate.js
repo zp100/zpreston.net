@@ -1,6 +1,6 @@
 import * as Controls from './controls.js'
 
-const SIM_SPEED = 2**4
+const SIM_SPEED = 2**3
 const NEUTRAL = 0
 const LOW = 1
 const LOW_SET = 2

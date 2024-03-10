@@ -1,3 +1,7 @@
+:root {
+    --toolbar-width: 10rem;
+}
+
 /* Make the body element fill the screen. */
 body {
     height: 100vh;
@@ -6,9 +10,31 @@ body {
     overflow: hidden;
 }
 
-/* Make the canvas fill the body. */
 canvas.grid {
+    position: absolute;
+    z-index: -1;
     width: 100%;
     height: 100%;
     background-color: #000;
+}
+
+/* Have toolbar slide onscreen when its area is hovered over. */
+div.toolbar-box {
+    position: fixed;
+    width: var(--toolbar-width);
+    height: 100%;
+
+    div.toolbar {
+        position: absolute;
+        left: calc(0rem - var(--toolbar-width));
+        width: 100%;
+        height: 100%;
+        background-color: #333;
+        transition: left 0.1s;
+    }
+}
+div.toolbar-box:hover {
+    div.toolbar {
+        left: 0;
+    }
 }
