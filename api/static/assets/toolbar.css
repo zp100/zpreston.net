@@ -1,0 +1,43 @@
+:root {
+    --toolbar-width: 10rem;
+    --toolbar-tag-size: 1.5rem;
+}
+
+/* Have toolbar slide onscreen when its area is hovered over. */
+div.toolbar-box {
+    position: fixed;
+    width: var(--toolbar-width);
+    height: 100%;
+
+    div.toolbar {
+        position: absolute;
+        left: calc(0rem - var(--toolbar-width));
+        width: 100%;
+        height: 100%;
+        background-color: #222;
+        color: var(--text-color);
+        font-family: Arial, Helvetica, sans-serif;
+        transition: left 0.1s;
+        display: flex;
+    }
+}
+div.toolbar-box:hover {
+    div.toolbar {
+        left: 0;
+    }
+}
+
+/* Add pull-tag decoration. */
+div.toolbar-tag {
+    position: absolute;
+    align-self: center;
+    left: var(--toolbar-width);
+    width: var(--toolbar-tag-size);
+    height: calc(2 * var(--toolbar-tag-size));
+    border-radius: 0 var(--toolbar-tag-size) var(--toolbar-tag-size) 0;
+    background-color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: large;
+}
