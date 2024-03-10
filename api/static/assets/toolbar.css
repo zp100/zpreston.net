@@ -1,5 +1,5 @@
 :root {
-    --toolbar-width: 10rem;
+    --toolbar-width: 16rem;
     --toolbar-tag-size: 1.5rem;
 }
 
@@ -18,7 +18,10 @@ div.toolbar-box {
         color: var(--text-color);
         font-family: Arial, Helvetica, sans-serif;
         transition: left 0.1s;
-        display: flex;
+
+        div.toolbar-block {
+            margin: 1rem;
+        }
     }
 }
 div.toolbar-box:hover {
